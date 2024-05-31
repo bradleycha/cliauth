@@ -1,0 +1,8 @@
+CliAuth is a program for managing accounts which use 2-factor authentication
+through TOPT.  It is designed to be minimal and portable while still providing
+enough functionality to be a primary authenticator used for real accounts.
+
+WARNING: Account database files must be backed up manually.  If an account
+database file is corrupted or the password is lost, all attached accounts will
+be unaccessible without further recovery efforts.
+
