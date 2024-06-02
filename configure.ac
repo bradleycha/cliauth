@@ -16,5 +16,16 @@ AC_CONFIG_FILES([Makefile])
 
 AC_PROG_CC
 
+AC_ARG_ENABLE([log-ansi],
+   [AS_HELP_STRING([Use ANSI escape sequences to color log messages])],
+   [AC_DEFINE([CLIAUTH_CONFIG_LOG_ANSI], [1], [Use ANSI escape sequences to color log messages])],
+   [AC_DEFINE([CLIAUTH_CONFIG_LOG_ANSI], [0], [Use ANSI escape sequences to color log messages])]
+)
+AC_ARG_ENABLE([log-origin],
+   [AS_HELP_STRING(Include the location in source code every log message originates from)],
+   [AC_DEFINE([CLIAUTH_CONFIG_LOG_ORIGIN], [1], [Include the location in source code every log message originates from])],
+   [AC_DEFINE([CLIAUTH_CONFIG_LOG_ORIGIN], [0], [Include the location in source code every log message originates from])]
+)
+
 AC_OUTPUT
 

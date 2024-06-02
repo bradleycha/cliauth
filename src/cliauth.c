@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <limits.h>
 
-#define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION "\n"
+#define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION
 
 /* Return status enum for cliauth_main(). */
 enum CliAuthExitStatus {
@@ -17,7 +17,7 @@ enum CliAuthExitStatus {
    CLIAUTH_EXIT_STATUS_SUCCESS = 0,
 
    /* More arguments were passed than can be handled. */
-   CLIAUTH_EXIT_STATUS_MAXIMUM_ARGUMENTS_EXCEEDED = 1,
+   CLIAUTH_EXIT_STATUS_MAXIMUM_ARGUMENTS_EXCEEDED = 1
 };
 
 static enum CliAuthExitStatus
@@ -25,16 +25,18 @@ cliauth_main(unsigned short argc, const char * const argv [], const char * const
    (void)argc;
    (void)argv;
    (void)envp;
-   fputs(CLIAUTH_ABOUT, stdout);
+   cliauth_log(CLIAUTH_LOG_INFO(CLIAUTH_ABOUT));
    return CLIAUTH_EXIT_STATUS_SUCCESS;
 }
 
 int main(int argc, char * argv [], char * envp []) {
+   enum CliAuthExitStatus exit_status;
+
    if (argc > USHRT_MAX) {
       return (int)CLIAUTH_EXIT_STATUS_MAXIMUM_ARGUMENTS_EXCEEDED;
    }
 
-   enum CliAuthExitStatus exit_status = cliauth_main(
+   exit_status = cliauth_main(
       (unsigned short)argc,
       (const char * const *)argv,
       (const char * const *)envp
