@@ -6,8 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include <stdio.h>
-#include <limits.h>
 
 #define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION
 
@@ -21,25 +19,23 @@ enum CliAuthExitStatus {
 };
 
 static enum CliAuthExitStatus
-cliauth_main(unsigned short argc, const char * const argv [], const char * const envp []) {
+cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
    (void)argc;
    (void)argv;
-   (void)envp;
    cliauth_log(CLIAUTH_LOG_INFO(CLIAUTH_ABOUT));
    return CLIAUTH_EXIT_STATUS_SUCCESS;
 }
 
-int main(int argc, char * argv [], char * envp []) {
+int main(int argc, char * argv []) {
    enum CliAuthExitStatus exit_status;
 
-   if (argc > USHRT_MAX) {
+   if (argc > CLIAUTH_UINT16_MAX) {
       return (int)CLIAUTH_EXIT_STATUS_MAXIMUM_ARGUMENTS_EXCEEDED;
    }
 
    exit_status = cliauth_main(
-      (unsigned short)argc,
-      (const char * const *)argv,
-      (const char * const *)envp
+      (CliAuthUInt16)argc,
+      (const char * const *)argv
    );
 
    return (int)exit_status;
