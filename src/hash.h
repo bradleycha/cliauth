@@ -88,6 +88,12 @@ struct CliAuthHashContextSha232 {
    /* the current state of the hash digest */
    CliAuthUInt32 digest [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
 
+   /* used internally by the block digest function */
+   CliAuthUInt32 work [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
+
+   /* used internally by the block digest function */
+   CliAuthUInt32 schedule [_CLIAUTH_HASH_SHA2_32_MESSAGE_SCHEDULE_LENGTH];
+
    /* a circular buffer storing the current undigested block.  this is */
    /* flushed either when it's full or when the hash gets finalized. and */
    /* the message gets padded. */
@@ -144,6 +150,8 @@ cliauth_hash_sha256;
 /*----------------------------------------------------------------------------*/
 struct CliAuthHashContextSha264 {
    CliAuthUInt64 digest [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
+   CliAuthUInt64 work [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
+   CliAuthUInt64 schedule [_CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH];
    CliAuthUInt8 block_buffer [_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH];
    CliAuthUInt64 message_bytes;
    CliAuthUInt8 block_bytes_free;

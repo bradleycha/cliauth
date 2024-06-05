@@ -18,11 +18,36 @@ enum CliAuthExitStatus {
    CLIAUTH_EXIT_STATUS_MAXIMUM_ARGUMENTS_EXCEEDED = 1
 };
 
+#if 1
+/*----------------------------------------------------------------------------*/
+
+#include "hash.h"
+
+#define TEST_DATA "Hi, mom!"
+
+void
+test_hash(void) {
+   struct CliAuthHashContextSha264 context;
+   CliAuthUInt8 digest [CLIAUTH_HASH_SHA512_DIGEST_LENGTH];
+
+   cliauth_hash_sha512.initialize(&context);
+   cliauth_hash_sha512.digest(&context, TEST_DATA, sizeof(TEST_DATA) - 1);
+   cliauth_hash_sha512.finalize(&context, digest);
+
+   return;
+}
+
+/*----------------------------------------------------------------------------*/
+#endif
+
 static enum CliAuthExitStatus
 cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
    (void)argc;
    (void)argv;
    cliauth_log(CLIAUTH_LOG_INFO(CLIAUTH_ABOUT));
+
+   test_hash();
+
    return CLIAUTH_EXIT_STATUS_SUCCESS;
 }
 
