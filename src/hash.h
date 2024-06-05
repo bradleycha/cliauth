@@ -114,15 +114,15 @@ struct CliAuthHashContextSha232 {
 /* The length of 'digest' is CLIAUTH_HASH_SHA224_DIGEST_LENGTH or             */
 /* CLIAUTH_HASH_SHA256_DIGEST_LENGTH, depending on the specific algorithm.    */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_HASH_SHA224_DIGEST_LENGTH 28
-#define CLIAUTH_HASH_SHA256_DIGEST_LENGTH 32
 
 #if CLIAUTH_CONFIG_HASH_SHA224
+#define CLIAUTH_HASH_SHA224_DIGEST_LENGTH 28
 extern const struct CliAuthHashFunction
 cliauth_hash_sha224;
 #endif /* CLIAUTH_CONFIG_HASH_SHA224 */
 
 #if CLIAUTH_CONFIG_HASH_SHA256
+#define CLIAUTH_HASH_SHA256_DIGEST_LENGTH 32
 extern const struct CliAuthHashFunction
 cliauth_hash_sha256;
 #endif /* CLIAUTH_CONFIG_HASH_SHA256 */
@@ -167,27 +167,27 @@ struct CliAuthHashContextSha264 {
 /* or CLIAUTH_HASH_SHA512_256_DIGEST_LENGTH, depending on the specific        */
 /* algorithm.                                                                 */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_HASH_SHA384_DIGEST_LENGTH 48
-#define CLIAUTH_HASH_SHA512_DIGEST_LENGTH 64
-#define CLIAUTH_HASH_SHA512_224_DIGEST_LENGTH 28
-#define CLIAUTH_HASH_SHA512_256_DIGEST_LENGTH 32
 
 #if CLIAUTH_CONFIG_HASH_SHA384
+#define CLIAUTH_HASH_SHA384_DIGEST_LENGTH 48
 extern const struct CliAuthHashFunction
 cliauth_hash_sha384;
 #endif /* CLIAUTH_CONFIG_HASH_SHA384 */
 
 #if CLIAUTH_CONFIG_HASH_SHA512
+#define CLIAUTH_HASH_SHA512_DIGEST_LENGTH 64
 extern const struct CliAuthHashFunction
 cliauth_hash_sha512;
 #endif /* CLIAUTH_CONFIG_HASH_SHA512 */
 
 #if CLIAUTH_CONFIG_HASH_SHA512_224
+#define CLIAUTH_HASH_SHA512_224_DIGEST_LENGTH 28
 extern const struct CliAuthHashFunction
 cliauth_hash_sha512_224;
 #endif /* CLIAUTH_CONFIG_HASH_SHA512_224 */
 
 #if CLIAUTH_CONFIG_HASH_SHA512_256
+#define CLIAUTH_HASH_SHA512_256_DIGEST_LENGTH 32
 extern const struct CliAuthHashFunction
 cliauth_hash_sha512_256;
 #endif /* CLIAUTH_CONFIG_HASH_SHA512_256 */
