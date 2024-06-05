@@ -14,5 +14,6 @@ cliauth_SOURCES = \
 	src/log.c \
 	src/endian.c \
 	src/bitwise.c \
-	src/hash.c
+	src/hash.c \
+	src/mac.c
 
