@@ -36,8 +36,9 @@
 /* key_bytes - The number of bytes to read from 'key'.                        */
 /*                                                                            */
 /* block_bytes - The byte length of the hash input blocks.  This is used      */
-/*                internally by the HMAC algorithm and does not affect the    */
-/*                expected length of the input block size.                    */
+/*               internally by the HMAC algorithm and does not affect the     */
+/*               expected length of the input block size.  The block length   */
+/*               must be greater than or equal to the digest length.          */
 /*                                                                            */
 /* digest_bytes - The byte length of the hash digest.  This is used           */
 /*                internally by the HMAC algorithm and does not affect the    */
