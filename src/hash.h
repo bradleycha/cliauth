@@ -11,6 +11,49 @@
 
 #include "cliauth.h"
 
+/* check to make sure all algorithms aren't disabled */
+#define _CLIAUTH_HASH_ALGORITHMS_ENABLED (\
+      CLIAUTH_CONFIG_HASH_SHA224 ||\
+      CLIAUTH_CONFIG_HASH_SHA256 ||\
+      CLIAUTH_CONFIG_HASH_SHA384 ||\
+      CLIAUTH_CONFIG_HASH_SHA512 ||\
+      CLIAUTH_CONFIG_HASH_SHA512_224 ||\
+      CLIAUTH_CONFIG_HASH_SHA512_256\
+   )
+
+#if _CLIAUTH_HASH_ALGORITHMS_ENABLED == 0
+#error all hash algorithms are disabled.  please verify the build was configured correctly.
+#endif
+
+/* enable shared constants and functions for 32-bit SHA-2 hash functions */
+#define _CLIAUTH_HASH_SHA2_32\
+   (\
+      CLIAUTH_CONFIG_HASH_SHA224 ||\
+      CLIAUTH_CONFIG_HASH_SHA256\
+   )
+
+/* enable shared constants and functions for 64-bit SHA-2 hash functions */
+#define _CLIAUTH_HASH_SHA2_64\
+   (\
+      CLIAUTH_HASH_CONFIG_SHA384 ||\
+      CLIAUTH_CONFIG_HASH_SHA512 ||\
+      CLIAUTH_CONFIG_HASH_SHA512_224 ||\
+      CLIAUTH_CONFIG_HASH_SHA512_256\
+   )
+
+/*----------------------------------------------------------------------------*/
+/* Stores the number of enabled hash algorithms, useful for storing buffer    */
+/* lengths.                                                                   */
+/*----------------------------------------------------------------------------*/
+#define CLIAUTH_HASH_ENABLED_COUNT (\
+      CLIAUTH_CONFIG_HASH_SHA224 +\
+      CLIAUTH_CONFIG_HASH_SHA256 +\
+      CLIAUTH_CONFIG_HASH_SHA384 +\
+      CLIAUTH_CONFIG_HASH_SHA512 +\
+      CLIAUTH_CONFIG_HASH_SHA512_224 +\
+      CLIAUTH_CONFIG_HASH_SHA512_256\
+   )
+
 /*----------------------------------------------------------------------------*/
 /* Generic hash function pointers.                                            */
 /*----------------------------------------------------------------------------*/
@@ -49,22 +92,6 @@ struct CliAuthHashFunction {
    CliAuthHashFunctionDigest     digest;
    CliAuthHashFunctionFinalize   finalize;
 };
-
-/* enable shared constants and functions for 32-bit SHA-2 hash functions */
-#define _CLIAUTH_HASH_SHA2_32\
-   (\
-      CLIAUTH_CONFIG_HASH_SHA224 ||\
-      CLIAUTH_CONFIG_HASH_SHA256\
-   )
-
-/* enable shared constants and functions for 64-bit SHA-2 hash functions */
-#define _CLIAUTH_HASH_SHA2_64\
-   (\
-      CLIAUTH_HASH_CONFIG_SHA384 ||\
-      CLIAUTH_CONFIG_HASH_SHA512 ||\
-      CLIAUTH_CONFIG_HASH_SHA512_224 ||\
-      CLIAUTH_CONFIG_HASH_SHA512_256\
-   )
 
 #if _CLIAUTH_HASH_SHA2_32
 /*----------------------------------------------------------------------------*/

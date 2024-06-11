@@ -16,5 +16,7 @@ cliauth_SOURCES = \
 	src/bitwise.c \
 	src/hash.c \
 	src/mac.c \
-	src/otp.c
+	src/otp.c \
+	src/parse.c \
+	src/args.c
 
