@@ -36,7 +36,7 @@
    #define _CLIAUTH_LOG_ORIGIN_LINE
 #endif /* CLIAUTH_CONFIG_LOG_ORIGIN */
 
-#if CLIAUTH_CONFIG_LOG_ANSI
+#if CLIAUTH_CONFIG_ANSI
    #define _CLIAUTH_LOG_FORMAT(prefix, color, format)\
       _CLIAUTH_LOG_COLOR_SEPERATOR "["\
       color prefix\
@@ -45,7 +45,7 @@
       _CLIAUTH_LOG_COLOR_SEPERATOR _CLIAUTH_LOG_FORMAT_ORIGIN_SEPERATOR\
       _CLIAUTH_LOG_COLOR_FORMAT format\
       _CLIAUTH_LOG_COLOR_RESET "\n"
-#else /* CLIAUTH_CONFIG_LOG_ANSI */
+#else /* CLIAUTH_CONFIG_ANSI */
    #define _CLIAUTH_LOG_FORMAT(prefix, color, format)\
       "["\
       prefix\
@@ -54,7 +54,7 @@
       _CLIAUTH_LOG_FORMAT_ORIGIN_SEPERATOR\
       format\
       "\n"
-#endif /* CLIAUTH_CONFIG_LOG_ANSI */
+#endif /* CLIAUTH_CONFIG_ANSI */
 
 #define _CLIAUTH_LOG_INVOKE(prefix, color, format)\
    _CLIAUTH_LOG_FORMAT(prefix, color, format) _CLIAUTH_LOG_ORIGIN_LINE
