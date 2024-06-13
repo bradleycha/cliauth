@@ -11,17 +11,21 @@
 
 #include "cliauth.h"
 
-/* check to make sure all algorithms aren't disabled */
-#define _CLIAUTH_HASH_ALGORITHMS_ENABLED (\
-      CLIAUTH_CONFIG_HASH_SHA224 ||\
-      CLIAUTH_CONFIG_HASH_SHA256 ||\
-      CLIAUTH_CONFIG_HASH_SHA384 ||\
-      CLIAUTH_CONFIG_HASH_SHA512 ||\
-      CLIAUTH_CONFIG_HASH_SHA512_224 ||\
+/*----------------------------------------------------------------------------*/
+/* Stores the number of enabled hash algorithms, useful for storing buffer    */
+/* lengths.                                                                   */
+/*----------------------------------------------------------------------------*/
+#define CLIAUTH_HASH_ENABLED_COUNT (\
+      CLIAUTH_CONFIG_HASH_SHA1 +\
+      CLIAUTH_CONFIG_HASH_SHA224 +\
+      CLIAUTH_CONFIG_HASH_SHA256 +\
+      CLIAUTH_CONFIG_HASH_SHA384 +\
+      CLIAUTH_CONFIG_HASH_SHA512 +\
+      CLIAUTH_CONFIG_HASH_SHA512_224 +\
       CLIAUTH_CONFIG_HASH_SHA512_256\
    )
 
-#if _CLIAUTH_HASH_ALGORITHMS_ENABLED == 0
+#if CLIAUTH_HASH_ENABLED_COUNT == 0
 #error all hash algorithms are disabled.  please verify the build was configured correctly.
 #endif
 
@@ -41,17 +45,18 @@
       CLIAUTH_CONFIG_HASH_SHA512_256\
    )
 
-/*----------------------------------------------------------------------------*/
-/* Stores the number of enabled hash algorithms, useful for storing buffer    */
-/* lengths.                                                                   */
-/*----------------------------------------------------------------------------*/
-#define CLIAUTH_HASH_ENABLED_COUNT (\
-      CLIAUTH_CONFIG_HASH_SHA224 +\
-      CLIAUTH_CONFIG_HASH_SHA256 +\
-      CLIAUTH_CONFIG_HASH_SHA384 +\
-      CLIAUTH_CONFIG_HASH_SHA512 +\
-      CLIAUTH_CONFIG_HASH_SHA512_224 +\
-      CLIAUTH_CONFIG_HASH_SHA512_256\
+/* enable shared constants and functions for all SHA-2 hash functions */
+#define _CLIAUTH_HASH_SHA2\
+   (\
+      _CLIAUTH_HASH_SHA2_32 ||\
+      _CLIAUTH_HASH_SHA2_64\
+   )
+
+/* enable shared constants and functions for all SHA function */
+#define _CLIAUTH_HASH_SHA\
+   (\
+      _CLIAUTH_HASH_SHA1 ||\
+      _CLIAUTH_HASH_SHA2\
    )
 
 /*----------------------------------------------------------------------------*/
@@ -93,14 +98,54 @@ struct CliAuthHashFunction {
    CliAuthHashFunctionFinalize   finalize;
 };
 
+#if CLIAUTH_CONFIG_HASH_SHA1
+/*----------------------------------------------------------------------------*/
+
+/* constants for SHA1 */
+#define _CLIAUTH_HASH_SHA1_BLOCK_LENGTH\
+   64
+#define _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT\
+   5
+#define _CLIAUTH_HASH_SHA1_ROUNDS_COUNT\
+   80
+#define _CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH\
+   _CLIAUTH_HASH_SHA1_ROUNDS_COUNT
+#define _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH\
+   4
+
+/*----------------------------------------------------------------------------*/
+/* Context struct to be used with the SHA1 function.                          */
+/*----------------------------------------------------------------------------*/
+struct CliAuthHashContextSha1 {
+   CliAuthUInt32 digest [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT];
+   CliAuthUInt32 work [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT];
+   CliAuthUInt32 schedule [_CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH];
+   CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA1_BLOCK_LENGTH];
+   CliAuthUInt64 ring_buffer_total;
+   CliAuthUInt8 ring_buffer_capacity;
+};
+
+/*----------------------------------------------------------------------------*/
+/* SHA1 function.                                                             */
+/*----------------------------------------------------------------------------*/
+/* The type of 'context' should be CliAuthHashContextSha1.                    */
+/*                                                                            */
+/* The length of 'digest' is CLIAUTH_HASH_SHA1_DIGEST_LENGTH.                 */
+/*----------------------------------------------------------------------------*/
+#define CLIAUTH_HASH_SHA1_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA1_BLOCK_LENGTH
+#define CLIAUTH_HASH_SHA1_DIGEST_LENGTH 20
+extern const struct CliAuthHashFunction
+cliauth_hash_sha1;
+
+/*----------------------------------------------------------------------------*/
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
+   
 #if _CLIAUTH_HASH_SHA2_32
 /*----------------------------------------------------------------------------*/
 
 /* constants for 32-bit SHA2 */
 #define _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH\
    64
-#define _CLIAUTH_HASH_SHA2_32_BLOCK_RESIDUAL_LENGTH\
-   (_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH * 2)
 #define _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT\
    8
 #define _CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT\
@@ -121,16 +166,14 @@ struct CliAuthHashContextSha232 {
    /* used internally by the block digest function */
    CliAuthUInt32 schedule [_CLIAUTH_HASH_SHA2_32_MESSAGE_SCHEDULE_LENGTH];
 
-   /* a circular buffer storing the current undigested block.  this is */
-   /* flushed either when it's full or when the hash gets finalized. and */
-   /* the message gets padded. */
-   CliAuthUInt8 block_buffer [_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH];
+   /* the ring buffer bytes */
+   CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH];
 
-   /* the total number of bytes digested */
-   CliAuthUInt64 message_bytes;
+   /* the ring buffer total bytes */
+   CliAuthUInt64 ring_buffer_total;
 
-   /* the number of bytes currently free in 'block_buffer'. */
-   CliAuthUInt8 block_bytes_free;
+   /* the ring buffer capacity */
+   CliAuthUInt8 ring_buffer_capacity;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -165,8 +208,6 @@ cliauth_hash_sha256;
 /* constants for 64-bit SHA2 */
 #define _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH\
    128
-#define _CLIAUTH_HASH_SHA2_64_BLOCK_RESIDUAL_LENGTH\
-   (_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH * 2)
 #define _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT\
    8
 #define _CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT\
@@ -181,9 +222,9 @@ struct CliAuthHashContextSha264 {
    CliAuthUInt64 digest [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
    CliAuthUInt64 work [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
    CliAuthUInt64 schedule [_CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH];
-   CliAuthUInt8 block_buffer [_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH];
-   CliAuthUInt64 message_bytes;
-   CliAuthUInt8 block_bytes_free;
+   CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH];
+   CliAuthUInt64 ring_buffer_total;
+   CliAuthUInt8 ring_buffer_capacity;
 };
 
 /*----------------------------------------------------------------------------*/

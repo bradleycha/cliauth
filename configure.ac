@@ -30,6 +30,11 @@ AC_ARG_ENABLE([log-origin],
    [AC_DEFINE([CLIAUTH_CONFIG_LOG_ORIGIN], [1], [Include the location in source code every log message originates from])],
    [AC_DEFINE([CLIAUTH_CONFIG_LOG_ORIGIN], [0], [Include the location in source code every log message originates from])]
 )
+AC_ARG_ENABLE([hash-sha1],
+   [AS_HELP_STRING([Enable support for the SHA-1 hash algorithm])],
+   [AC_DEFINE([CLIAUTH_CONFIG_HASH_SHA1], [1], [Enable support for the SHA-1 hash algorithm])],
+   [AC_DEFINE([CLIAUTH_CONFIG_HASH_SHA1], [0], [Enable support for the SHA-1 hash algorithm])]
+)
 AC_ARG_ENABLE([hash-sha224],
    [AS_HELP_STRING([Enable support for the SHA-224 hash algorithm])],
    [AC_DEFINE([CLIAUTH_CONFIG_HASH_SHA224], [1], [Enable support for the SHA-224 hash algorithm])],

@@ -77,6 +77,9 @@ cliauth_parse_integer_uint64(
 }
 
 /* identifiers stored with #define to allow use of sizeof() */
+#if CLIAUTH_CONFIG_HASH_SHA1
+#define CLIAUTH_PARSE_HASH_IDENTIFIER_SHA1 "sha1"
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
 #if CLIAUTH_CONFIG_HASH_SHA224
 #define CLIAUTH_PARSE_HASH_IDENTIFIER_SHA224 "sha224"
 #endif /* CLIAUTH_CONFIG_HASH_SHA224 */
@@ -103,6 +106,12 @@ struct CliAuthParseHashIdentifier {
 
 static const struct CliAuthParseHashIdentifier
 cliauth_parse_hash_identifier_list [CLIAUTH_HASH_ENABLED_COUNT] = {
+#if CLIAUTH_CONFIG_HASH_SHA1
+   {
+      CLIAUTH_PARSE_HASH_IDENTIFIER_SHA1,
+      (sizeof(CLIAUTH_PARSE_HASH_IDENTIFIER_SHA1) / sizeof(char)) - 1
+   },
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
 #if CLIAUTH_CONFIG_HASH_SHA224
    {
       CLIAUTH_PARSE_HASH_IDENTIFIER_SHA224,
@@ -143,6 +152,13 @@ cliauth_parse_hash_identifier_list [CLIAUTH_HASH_ENABLED_COUNT] = {
 
 static const struct CliAuthParseHashPayload
 cliauth_parse_hash_payload_list [CLIAUTH_HASH_ENABLED_COUNT] = {
+#if CLIAUTH_CONFIG_HASH_SHA1
+   {
+      &cliauth_hash_sha1,
+      CLIAUTH_HASH_SHA1_INPUT_BLOCK_LENGTH,
+      CLIAUTH_HASH_SHA1_DIGEST_LENGTH
+   },
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
 #if CLIAUTH_CONFIG_HASH_SHA224
    {
       &cliauth_hash_sha224,
@@ -368,10 +384,20 @@ cliauth_parse_key_uri_state_initialize(
    state->uri_iter = uri;
    state->uri_iter_characters = uri_characters;
    state->required_present_secrets = CLIAUTH_BOOLEAN_FALSE;
-   state->required_present_hash = CLIAUTH_BOOLEAN_FALSE;
    state->required_present_hotp_counter = CLIAUTH_BOOLEAN_FALSE;
 
-   /* TODO: Enable SHA1 hash algorithm by default when it's enabled */
+   /* if SHA1 hash is enabled, set it by default, otherwise the algorithm */
+   /* will be a required parameter */
+#if CLIAUTH_CONFIG_HASH_SHA1
+   (void)cliauth_parse_hash_identifier(
+      &payload->hash,
+      CLIAUTH_PARSE_HASH_IDENTIFIER_SHA1,
+      (sizeof(CLIAUTH_PARSE_HASH_IDENTIFIER_SHA1) / sizeof(char)) - 1
+   );
+   state->required_present_hash = CLIAUTH_BOOLEAN_TRUE;
+#else /* CLIAUTH_CONFIG_HASH_SHA1 */
+   state->required_present_hash = CLIAUTH_BOOLEAN_FALSE;
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
 
    return;
 }

@@ -13,6 +13,9 @@
 #define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION
 
 union CliAuthOtpBuffersGenericHashContext {
+#if CLIAUTH_CONFIG_HASH_SHA1
+   struct CliAuthHashContextSha1 sha1;
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
 #if CLIAUTH_CONFIG_HASH_SHA224
    struct CliAuthHashContextSha232 sha224;
 #endif /* CLIAUTH_CONFIG_HASH_SHA224 */
@@ -34,6 +37,9 @@ union CliAuthOtpBuffersGenericHashContext {
 };
 
 union CliAuthOtpBuffersGenericDigest {
+#if CLIAUTH_CONFIG_HASH_SHA1
+   CliAuthUInt8 sha1 [CLIAUTH_HASH_SHA1_DIGEST_LENGTH];
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
 #if CLIAUTH_CONFIG_HASH_SHA224
    CliAuthUInt8 sha224 [CLIAUTH_HASH_SHA224_DIGEST_LENGTH];
 #endif /* CLIAUTH_CONFIG_HASH_SHA224 */
@@ -55,6 +61,9 @@ union CliAuthOtpBuffersGenericDigest {
 };
 
 union CliAuthOtpBuffersGenericKey {
+#if CLIAUTH_CONFIG_HASH_SHA1
+   CliAuthUInt8 sha1 [CLIAUTH_HASH_SHA1_INPUT_BLOCK_LENGTH];
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
 #if CLIAUTH_CONFIG_HASH_SHA224
    CliAuthUInt8 sha224 [CLIAUTH_HASH_SHA224_INPUT_BLOCK_LENGTH];
 #endif /* CLIAUTH_CONFIG_HASH_SHA224 */
