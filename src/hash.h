@@ -52,8 +52,15 @@
       _CLIAUTH_HASH_SHA2_64\
    )
 
-/* enable shared constants and functions for all SHA function */
-#define _CLIAUTH_HASH_SHA\
+/* enable shared constants and functions for SHA1 and SHA2-32 functions */
+#define _CLIAUTH_HASH_SHA1_2_32\
+   (\
+      _CLIAUTH_HASH_SHA1 ||\
+      _CLIAUTH_HASH_SHA2_32\
+   )
+
+/* enable shared constants and functions for all SHA1 and SHA2 function */
+#define _CLIAUTH_HASH_SHA1_2\
    (\
       _CLIAUTH_HASH_SHA1 ||\
       _CLIAUTH_HASH_SHA2\
@@ -98,6 +105,21 @@ struct CliAuthHashFunction {
    CliAuthHashFunctionFinalize   finalize;
 };
 
+#if _CLIAUTH_HASH_SHA1_2
+/*----------------------------------------------------------------------------*/
+
+/* internal struct for storing the ring buffer context */
+struct _CliAuthHashSha12RingBufferContext {
+   /* stores the total number of bytes that have been digested */
+   CliAuthUInt64 total;
+
+   /* stores the current capacity of the ring buffer */
+   CliAuthUInt8 capacity;
+};
+
+/*----------------------------------------------------------------------------*/
+#endif /* _CLIAUTH_HASH_SHA1_2 */
+
 #if CLIAUTH_CONFIG_HASH_SHA1
 /*----------------------------------------------------------------------------*/
 
@@ -121,8 +143,7 @@ struct CliAuthHashContextSha1 {
    CliAuthUInt32 work [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT];
    CliAuthUInt32 schedule [_CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH];
    CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA1_BLOCK_LENGTH];
-   CliAuthUInt64 ring_buffer_total;
-   CliAuthUInt8 ring_buffer_capacity;
+   struct _CliAuthHashSha12RingBufferContext ring_context;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -169,11 +190,9 @@ struct CliAuthHashContextSha232 {
    /* the ring buffer bytes */
    CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH];
 
-   /* the ring buffer total bytes */
-   CliAuthUInt64 ring_buffer_total;
+   /* the ring buffer context */
+   struct _CliAuthHashSha12RingBufferContext ring_context;
 
-   /* the ring buffer capacity */
-   CliAuthUInt8 ring_buffer_capacity;
 };
 
 /*----------------------------------------------------------------------------*/
@@ -223,8 +242,7 @@ struct CliAuthHashContextSha264 {
    CliAuthUInt64 work [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
    CliAuthUInt64 schedule [_CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH];
    CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH];
-   CliAuthUInt64 ring_buffer_total;
-   CliAuthUInt8 ring_buffer_capacity;
+   struct _CliAuthHashSha12RingBufferContext ring_context;
 };
 
 /*----------------------------------------------------------------------------*/
