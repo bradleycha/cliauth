@@ -12,18 +12,11 @@
 #include "cliauth.h"
 #include "parse.h"
 
-#define CLIAUTH_ARGS_KEY_MAX_LENGTH 128
-
 /*----------------------------------------------------------------------------*/
 /* Return status enum for cliauth_args_parse().                               */
 /*----------------------------------------------------------------------------*/
 /* CLIAUTH_ARGS_PARSE_RESULT_SUCCESS - The arguments were parsed              */
 /*                                     successfully.                          */
-/*                                                                            */
-/* CLIAUTH_ARGS_PARSE_RESULT_DEFERRED - Argument parsing was successful,      */
-/*                                      however normal control flow was       */
-/*                                      diverted and the resulting arguments  */
-/*                                      are likely in an incomplete state.    */
 /*                                                                            */
 /* CLIAUTH_ARGS_PARSE_RESULT_MISSING - One or more required arguments were    */
 /*                                     missing.                               */
@@ -31,10 +24,9 @@
 /* CLIAUTH_ARGS_PARSE_RESULT_INVALID - One or more arguments were given an    */
 /*                                     invalid value.                         */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_ARGS_PARSE_RESULT_FIELD_COUNT 4
+#define CLIAUTH_ARGS_PARSE_RESULT_FIELD_COUNT 3
 enum CliAuthArgsParseResult {
    CLIAUTH_ARGS_PARSE_RESULT_SUCCESS,
-   CLIAUTH_ARGS_PARSE_RESULT_DEFERRED,
    CLIAUTH_ARGS_PARSE_RESULT_MISSING,
    CLIAUTH_ARGS_PARSE_RESULT_INVALID
 };
@@ -65,9 +57,9 @@ struct CliAuthArgsPayload {
 /*          'CLIAUTH_ARGS_PARSE_RESULT_SUCCESS'.                              */
 /*                                                                            */
 /* args - An array of strings which represent the input arguments from the    */
-/*        command-line.                                                       */
+/*        command-line.  Each string in the array should be null-terminated.  */
 /*                                                                            */
-/* args_count - The number of string elements in 'args'.                      */
+/* args_count - The number of strings in 'args'.                              */
 /*----------------------------------------------------------------------------*/
 /* Return value - An enum representing the output state of the parsed         */
 /*                arguments in 'payload'.                                     */

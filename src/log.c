@@ -2,7 +2,7 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/log.c - Logging interface implementation                               */
+/* src/log.c - Logging interface implementation.                              */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"

@@ -176,9 +176,6 @@ cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
    switch (cliauth_args_parse(&args, argv, argc)) {
       case CLIAUTH_ARGS_PARSE_RESULT_SUCCESS:
          break;
-      
-      case CLIAUTH_ARGS_PARSE_RESULT_DEFERRED:
-         return CLIAUTH_EXIT_STATUS_SUCCESS;
 
       default:
          cliauth_log(CLIAUTH_LOG_ERROR("failed to parse command-line arguments, exiting"));

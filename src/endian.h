@@ -6,10 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_ENDIAN_H
+#define _CLIAUTH_ENDIAN_H
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include <string.h>
 
 /*----------------------------------------------------------------------------*/
 /* Swaps the endianess of an arbitrary amount of data in-place.               */
@@ -62,61 +62,39 @@ cliauth_endian_swap_uint64(CliAuthUInt64 value);
 /* information, see the documentation for cliauth_endian_swap() and           */
 /* cliauth_endian_swap_*int*().                                               */
 /*----------------------------------------------------------------------------*/
-#if CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE
-   #define cliauth_endian_host_to_big_inplace(data, bytes)
-   #define cliauth_endian_host_to_big_copy(dest, source, bytes)\
-      (void)memcpy(dest, source, bytes)
-   #define cliauth_endian_host_to_big_sint16(value) (value)
-   #define cliauth_endian_host_to_big_sint32(value) (value)
-   #define cliauth_endian_host_to_big_sint64(value) (value)
-   #define cliauth_endian_host_to_big_uint16(value) (value)
-   #define cliauth_endian_host_to_big_uint32(value) (value)
-   #define cliauth_endian_host_to_big_uint64(value) (value)
-   #define cliauth_endian_host_to_little_inplace(data, bytes)\
-      cliauth_endian_swap_inplace(data, bytes)
-   #define cliauth_endian_host_to_little_copy(dest, source, bytes)\
-      cliauth_endian_swap_copy(dest, source, bytes)
-   #define cliauth_endian_host_to_little_sint16(value)\
-      cliauth_endian_swap_sint16(value)
-   #define cliauth_endian_host_to_little_sint32(value)\
-      cliauth_endian_swap_sint32(value)
-   #define cliauth_endian_host_to_little_sint64(value)\
-      cliauth_endian_swap_sint64(value)
-   #define cliauth_endian_host_to_little_uint16(value)\
-      cliauth_endian_swap_uint16(value)
-   #define cliauth_endian_host_to_little_uint32(value)\
-      cliauth_endian_swap_uint32(value)
-   #define cliauth_endian_host_to_little_uint64(value)\
-      cliauth_endian_swap_uint64(value)
-#else /* CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
-   #define cliauth_endian_host_to_big_inplace(data, bytes)\
-      cliauth_endian_swap_inplace(data, bytes)
-   #define cliauth_endian_host_to_big_copy(dest, source, bytes)\
-      cliauth_endian_swap_copy(dest, source, bytes)
-   #define cliauth_endian_host_to_big_sint16(value)\
-      cliauth_endian_swap_sint16(value)
-   #define cliauth_endian_host_to_big_sint32(value)\
-      cliauth_endian_swap_sint32(value)
-   #define cliauth_endian_host_to_big_sint64(value)\
-      cliauth_endian_swap_sint64(value)
-   #define cliauth_endian_host_to_big_uint16(value)\
-      cliauth_endian_swap_uint16(value)
-   #define cliauth_endian_host_to_big_uint32(value)\
-      cliauth_endian_swap_uint32(value)
-   #define cliauth_endian_host_to_big_uint64(value)\
-      cliauth_endian_swap_uint64(value)
-   #define cliauth_endian_host_to_little_inplace(data, bytes)
-   #define cliauth_endian_host_to_little_copy(dest, source, bytes)\
-      (void)memcpy(dest, source, bytes)
-   #define cliauth_endian_host_to_little_sint16(value) (value)
-   #define cliauth_endian_host_to_little_sint32(value) (value)
-   #define cliauth_endian_host_to_little_sint64(value) (value)
-   #define cliauth_endian_host_to_little_uint16(value) (value)
-   #define cliauth_endian_host_to_little_uint32(value) (value)
-   #define cliauth_endian_host_to_little_uint64(value) (value)
-#endif /* CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
+void
+cliauth_endian_host_to_big_inplace(void * data, CliAuthUInt32 bytes);
+void
+cliauth_endian_host_to_big_copy(void * dest, const void * source, CliAuthUInt32 bytes);
+CliAuthSInt16
+cliauth_endian_host_to_big_sint16(CliAuthSInt16 value);
+CliAuthSInt32
+cliauth_endian_host_to_big_sint32(CliAuthSInt32 value);
+CliAuthSInt64
+cliauth_endian_host_to_big_sint64(CliAuthSInt64 value);
+CliAuthUInt16
+cliauth_endian_host_to_big_uint16(CliAuthUInt16 value);
+CliAuthUInt32
+cliauth_endian_host_to_big_uint32(CliAuthUInt32 value);
+CliAuthUInt64
+cliauth_endian_host_to_big_uint64(CliAuthUInt64 value);
+void
+cliauth_endian_host_to_little_inplace(void * data, CliAuthUInt32 bytes);
+void
+cliauth_endian_host_to_little_copy(void * dest, const void * source, CliAuthUInt32 bytes);
+CliAuthSInt16
+cliauth_endian_host_to_little_sint16(CliAuthSInt16 value);
+CliAuthSInt32
+cliauth_endian_host_to_little_sint32(CliAuthSInt32 value);
+CliAuthSInt64
+cliauth_endian_host_to_little_sint64(CliAuthSInt64 value);
+CliAuthUInt16
+cliauth_endian_host_to_little_uint16(CliAuthUInt16 value);
+CliAuthUInt32
+cliauth_endian_host_to_little_uint32(CliAuthUInt32 value);
+CliAuthUInt64
+cliauth_endian_host_to_little_uint64(CliAuthUInt64 value);
 
 /*----------------------------------------------------------------------------*/
-#define _CLIAUTH_ENDIAN_H
 #endif /* _CLIAUTH_ENDIAN_H */
 

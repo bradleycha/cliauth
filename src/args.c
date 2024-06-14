@@ -33,48 +33,6 @@ cliauth_args_parse_key_uri_error_name [CLIAUTH_PARSE_KEY_URI_RESULT_FIELD_COUNT]
 };
 
 enum CliAuthArgsParseResult
-cliauth_args_parse_display_otp_uri_failure(
-   enum CliAuthParseKeyUriResult result
-) {
-   enum CliAuthArgsParseResult retn;
-   const char * error_name;
-
-   error_name = cliauth_args_parse_key_uri_error_name[result - 1];
-
-   cliauth_log(CLIAUTH_LOG_ERROR("failed to parse key URI: %s"), error_name);
-
-   switch (result) {
-      case CLIAUTH_PARSE_KEY_URI_RESULT_MISSING_TYPE:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_MISSING_SECRETS:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_MISSING_HASH:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_MISSING_HOTP_COUNTER:
-         retn = CLIAUTH_ARGS_PARSE_RESULT_MISSING;
-         break;
-
-      case CLIAUTH_PARSE_KEY_URI_RESULT_MALFORMED_URI:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_INVALID_TEXT_ESCAPE:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_INVALID_TYPE:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_INVALID_SECRETS:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_INVALID_HASH:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_INVALID_DIGITS:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_INVALID_TOTP_PERIOD:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_INVALID_HOTP_COUNTER:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_TOO_LONG_LABEL:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_TOO_LONG_ISSUER:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_TOO_LONG_ACCOUNT_NAME:
-      case CLIAUTH_PARSE_KEY_URI_RESULT_TOO_LONG_SECRETS:
-         retn = CLIAUTH_ARGS_PARSE_RESULT_INVALID;
-         break;
-
-      case CLIAUTH_PARSE_KEY_URI_RESULT_SUCCESS:
-         retn = CLIAUTH_ARGS_PARSE_RESULT_SUCCESS;
-         break;
-   }
-
-   return retn;
-}
-
-enum CliAuthArgsParseResult
 cliauth_args_parse(
    struct CliAuthArgsPayload * payload,
    const char * const args [],
@@ -83,6 +41,7 @@ cliauth_args_parse(
    const char * key_uri;
    CliAuthUInt32 key_uri_characters;
    enum CliAuthParseKeyUriResult parse_key_uri_result;
+   const char * error_name;
 
    if (args_count < 2) {
       cliauth_log(CLIAUTH_LOG_ERROR("no key URI was given as an argument"));
@@ -102,11 +61,15 @@ cliauth_args_parse(
    );
 
    if (parse_key_uri_result != CLIAUTH_PARSE_KEY_URI_RESULT_SUCCESS) {
-      return cliauth_args_parse_display_otp_uri_failure(parse_key_uri_result);
+      error_name = cliauth_args_parse_key_uri_error_name[parse_key_uri_result - 1];
+
+      cliauth_log(CLIAUTH_LOG_ERROR("failed to parse key URI: %s"), error_name);
+
+      return CLIAUTH_ARGS_PARSE_RESULT_INVALID;
    }
 
    payload->time_initial = 0;
-   payload->time_current = time(NULL);
+   payload->time_current = time(CLIAUTH_NULLPTR);
 
    return CLIAUTH_ARGS_PARSE_RESULT_SUCCESS;
 }
