@@ -1,3 +1,24 @@
+2024-06-14	Chase Bradley	<bradleycha@proton.me>
+
+	Version 0.1.1
+
+	This version mostly focueses on cleanup and correction of mistakes caught
+	after the release of 0.1.0.
+
+	The only changes relevant to end-users is a couple of minor bugs resulting
+	from mistakes and typos in the code.  The only intended difference in
+	functionality is making argument parsing return
+	CLIAUTH_ARGS_PARSE_RESULT_INVALID if key URI parsing fails.  The old
+	behavior was to return CLIAUTH_ARGS_PARSE_RESULT_MISSING if a required part
+	of the key URI was missing.
+
+	For developers or those planning on building from source, the automake
+	script was updated to include headers as part of the source list.  In
+	0.1.0,  this was not done, which resulted in issues with running 'make
+	dist'.  This has been corrected due to the above change.
+
+	The plans for future versions remain unchanged from 0.1.0.
+
 2024-06-13	Chase Bradley	<bradleycha@proton.me>
 
 	Version 0.1.0

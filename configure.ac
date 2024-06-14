@@ -5,7 +5,7 @@
 # configure.ac - GNU Autoconf script                                           #
 #------------------------------------------------------------------------------#
 
-AC_INIT([cliauth], 0.1.0, [bradleycha@proton.me])
+AC_INIT([cliauth], 0.1.1, [bradleycha@proton.me])
 
 AC_CONFIG_SRCDIR([src/cliauth.c])
 AC_CONFIG_AUX_DIR([build])

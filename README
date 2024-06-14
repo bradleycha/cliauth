@@ -21,7 +21,7 @@ encrypted by default, requiring a password to be entered every time the program
 starts.  This allows the user to create and manage their own backups and have
 full knowledge of where and how their accounts are stored.
 
-As of version 0.1.0, there is no persistent account storage or user interface.
+As of version 0.1.1, there is no persistent account storage or user interface.
 There is only decoding of a key URI and generation of a passcode from such URI.
 Read the changelog for more information.
 
