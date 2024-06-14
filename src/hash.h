@@ -55,14 +55,14 @@
 /* enable shared constants and functions for SHA1 and SHA2-32 functions */
 #define _CLIAUTH_HASH_SHA1_2_32\
    (\
-      _CLIAUTH_HASH_SHA1 ||\
+      CLIAUTH_CONFIG_HASH_SHA1 ||\
       _CLIAUTH_HASH_SHA2_32\
    )
 
 /* enable shared constants and functions for all SHA1 and SHA2 function */
 #define _CLIAUTH_HASH_SHA1_2\
    (\
-      _CLIAUTH_HASH_SHA1 ||\
+      CLIAUTH_CONFIG_HASH_SHA1 ||\
       _CLIAUTH_HASH_SHA2\
    )
 
