@@ -96,7 +96,7 @@ installed.
    configure script.  For example, to use the above options, the command would
    look like the following:
 
-   ./configure CC="clang" CFLAGS="-march=native -O2 -flto"
+   ./configure CC="clang" CFLAGS="-march=native -O2 -flto" --enable-ansi --enable-hash-sha1
 
    If building the program multiple times, this step only needs to be run once.
    Successive builds can reuse the generated configuration from this step.
