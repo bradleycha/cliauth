@@ -36,10 +36,17 @@
       CLIAUTH_CONFIG_HASH_SHA256\
    )
 
+/* enable shared constants and functions for SHA1 and SHA2-32 functions */
+#define _CLIAUTH_HASH_SHA1_2_32\
+   (\
+      CLIAUTH_CONFIG_HASH_SHA1 ||\
+      _CLIAUTH_HASH_SHA2_32\
+   )
+
 /* enable shared constants and functions for 64-bit SHA-2 hash functions */
 #define _CLIAUTH_HASH_SHA2_64\
    (\
-      CLIAUTH_HASH_CONFIG_SHA384 ||\
+      CLIAUTH_CONFIG_HASH_SHA384 ||\
       CLIAUTH_CONFIG_HASH_SHA512 ||\
       CLIAUTH_CONFIG_HASH_SHA512_224 ||\
       CLIAUTH_CONFIG_HASH_SHA512_256\
@@ -50,13 +57,6 @@
    (\
       _CLIAUTH_HASH_SHA2_32 ||\
       _CLIAUTH_HASH_SHA2_64\
-   )
-
-/* enable shared constants and functions for SHA1 and SHA2-32 functions */
-#define _CLIAUTH_HASH_SHA1_2_32\
-   (\
-      CLIAUTH_CONFIG_HASH_SHA1 ||\
-      _CLIAUTH_HASH_SHA2_32\
    )
 
 /* enable shared constants and functions for all SHA1 and SHA2 function */

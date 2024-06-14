@@ -11,7 +11,7 @@
 
 #include "config.h"
 
-#define CLIAUTH_NULL ((void *)0)
+#define CLIAUTH_NULLPTR ((void *)0)
 
 #include "types.h"
 #include "log.h"

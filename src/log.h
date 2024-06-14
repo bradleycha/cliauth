@@ -2,7 +2,7 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/log.h - Header for logging interface                                   */
+/* src/log.h - Logging interface header.                                      */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_LOG_H
@@ -10,7 +10,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include <stdio.h>
 
 #define _CLIAUTH_LOG_ANSI_COLOR(color) "\033[" color "m"
 

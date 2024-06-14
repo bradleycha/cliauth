@@ -1148,7 +1148,7 @@ cliauth_parse_key_uri_query_match_key(
       i--;
    }
 
-   return NULL;
+   return CLIAUTH_NULLPTR;
 }
 
 #define CLIAUTH_PARSE_KEY_URI_QUERY_SENTINEL_SEPERATE '='
@@ -1189,7 +1189,7 @@ cliauth_parse_key_uri_query(
    parser = cliauth_parse_key_uri_query_match_key(key, key_characters);
 
    /* ignore queries which don't have a parser */
-   if (parser == NULL) {
+   if (parser == CLIAUTH_NULLPTR) {
       return CLIAUTH_PARSE_KEY_URI_RESULT_SUCCESS;
    }
 

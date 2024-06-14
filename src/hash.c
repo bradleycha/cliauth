@@ -181,10 +181,10 @@ cliauth_hash_sha1_2_load_message_block(
    CliAuthUInt8 block_bytes,
    CliAuthUInt8 schedule_bytes_per_word
 ) {
-#if CLAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE
+#if CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE
    (void)schedule_bytes_per_word;
    (void)memcpy(schedule, block, block_bytes);
-#else /* CLAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
+#else /* CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
    const CliAuthUInt8 * block_iter;
    CliAuthUInt8 * schedule_iter;
 
@@ -197,7 +197,7 @@ cliauth_hash_sha1_2_load_message_block(
       schedule_iter += schedule_bytes_per_word;
       block_bytes -= schedule_bytes_per_word;
    }
-#endif /* CLAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
+#endif /* CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
 
    return;
 }
@@ -500,7 +500,7 @@ cliauth_hash_sha1 = {
 };
 
 /*----------------------------------------------------------------------------*/
-#endif
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
 
 #if _CLIAUTH_HASH_SHA2_32
 /*----------------------------------------------------------------------------*/
