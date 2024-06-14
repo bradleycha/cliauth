@@ -1,8 +1,145 @@
-CliAuth is a program for managing accounts which use 2-factor authentication
-through TOPT.  It is designed to be minimal and portable while still providing
-enough functionality to be a primary authenticator used for real accounts.
+CliAuth is a minimalistic terminal authenticator app designed to be highly
+portable and customizable at a binary level, while still providing full support
+for most websites that use the HOTP and TOTP authentication algorithms and a
+comfortable user experience.
 
-WARNING: Account database files must be backed up manually.  If an account
-database file is corrupted or the password is lost, all attached accounts will
-be unaccessible without further recovery efforts.
+CliAuth is designed for those who want an authenticator app that simply does
+its job and nothing else and works on any computer with a C compiler and
+standard library.  What you see is what you get.  You aren't forced to create
+an online account linked to a phone number and agree to cloud backups of
+accounts with no other option for creating backups.  This authenticator works
+perfectly without ever connecting to the internet.  Being free software, anyone
+can view, audit, or modify the source code to make sure there's no hidden
+functionality or backdoors.  CliAuth is also designed to be highly customizable
+at a binary level due to the ability to enable or disable features at compile-time.
+This can be useful for those who only want to build and execute what they
+actually use while minimising on bloat.  This can also be useful for those who
+want to create the smallest attack surface for hackers possible.
+
+All account files are stored on disk at a user-defined location and are
+encrypted by default, requiring a password to be entered every time the program
+starts.  This allows the user to create and manage their own backups and have
+full knowledge of where and how their accounts are stored.
+
+As of version 0.1.0, there is no persistent account storage or user interface.
+There is only decoding of a key URI and generation of a passcode from such URI.
+Read the changelog for more information.
+
+------------------------------------ Usage -------------------------------------
+
+Since this is a terminal authenticator app, a terminal shell is required to run,
+such as Bash or ZSH.  Executing from a graphical environment without using a
+terminal will result in nothing happening.
+
+For example, to execute from within Bash shells where the current working
+directory contains the program, the following command would be used:
+
+./cliauth
+
+If attempting to execute fails with some version of "permission denied", the
+executable needs to be given execute permissions.  This can be done on unix-like
+operating systems with the following:
+
+chmod +x cliauth
+
+Attempting the previous command should now work.
+
+For more usage information, see the help text when running the program with no
+arguments.
+
+----------------------------------- Building -----------------------------------
+
+Building requires a unix-like system with a terminal shell, such as Bash or ZSH,
+GNU make, and a C compiler.
+
+If downloading directly from the GitHub repository, GNU autotools must also be
+installed.
+
+(optional) 0. Creating the configure script using autotools
+
+   This is only necessary if cloning directly from the GitHub repository.
+   Release tarballs will already contain the configure script.
+
+   To generate the configure script, type the following:
+
+   autoreconf -i
+
+1. Generate a Makefile using the configure script
+
+   By default, all compile-time features will be disabled.  To see which
+   features are available, enter:
+   
+   ./configure --help
+
+   Then navigate to the 'Optional Features' section.  There will be all
+   available compile-time features.
+
+   It is recommended to at least enable the SHA1 hash algorithm and ANSI
+   support.  SHA1 is the default hash algorithm used by most websites to
+   generate an authenticator code, and enabling ANSI support will allow
+   coloring of terminal output.
+
+   This can be done with the following flags when running configure:
+
+   --enable-ansi --enable-hash-sha1
+
+   It is also possible to specify a C compiler and C compiler flags as part
+   of the configure step.
+
+   For example, to use Clang targetting your native CPU architecture, O2
+   code optimizations, and link-time optimizations, use the following flags
+   when running configure:
+
+   CC="clang" CFLAGS="-march=native -O2 -flto"
+
+   To generate a Makefile which will be used to build the source code, run the
+   configure script.  For example, to use the above options, the command would
+   look like the following:
+
+   ./configure CC="clang" CFLAGS="-march=native -O2 -flto"
+
+   If building the program multiple times, this step only needs to be run once.
+   Successive builds can reuse the generated configuration from this step.
+
+2. Build the program using the generated Makefile
+
+   To build the program after generating the Makefile, simply type:
+
+   make
+
+   By default, make will only use a single CPU core.  To enable parallelization
+   through multiple CPU cores, append the following flag:
+
+   -j$(nproc)
+
+   This will specify $(nproc) jobs, where $(nproc) will evaluate to the current
+   number of available CPU cores.
+   
+   An example make command to build with all available CPU cores would look
+   like the following:
+
+   make -j$(nproc)
+
+   The resulting binary will be a single file called 'cliauth'.  This file is
+   the entire compiled program, and can be moved wherever desired.
+
+(optional) 3. Strip program symbols
+
+   By default, the compiled binary will include names for variables, types, and
+   functions.  While useful for debugging, these are almost never useful for
+   end users and end up bloating the binary size.
+
+   To strip symbols, you must either have GNU binutils installed or LLVM.
+
+   To strip symbols using GNU binutils, type the following:
+
+   strip cliauth
+
+   To strip symbols using LLVM, type the following:
+
+   llvm-strip cliauth
+
+   The stripped binary will overwrite the unstripped binary, which means if
+   the program needs to have symbols restored, the stripped binary must be
+   deleted and then re-run step 2.
 
