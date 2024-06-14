@@ -1,3 +1,25 @@
+2024-06-13	Chase Bradley	<bradleycha@proton.me>
+
+	Version 0.1.0
+
+	This version implements the HOTP and TOTP algorithms, as well as a key URI
+	parser to interact with the algorithms.
+
+	Currently there is no account storage or user interface.  This version
+	mostly serves as a frontend to the HOTP and TOTP algorithms.
+
+	Since there is no user interface, the key URI is passed to the program
+	through the first argument.  The program will log the resulting generated
+	passcode to the terminal.
+
+	The plans for future versions are as follows:
+
+		0.2.0 - Implement persistent encrypted account storage on disk
+
+		0.3.0 - Implement a basic terminal TUI which supports non-ANSI terminals
+		
+		0.4.0 - Implement an advanced terminal TUI which requires ANSI support
+
 2024-05-31	Chase Bradley	<bradleycha@proton.me>
 
 	Version 0.1.0+setup

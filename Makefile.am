@@ -7,5 +7,16 @@
 
 bin_PROGRAMS = cliauth
 
-cliauth_SOURCES = src/cliauth.c
+cliauth_CFLAGS = -Wall -Wextra -Wpedantic -Werror -std=c89
+
+cliauth_SOURCES = \
+	src/cliauth.c \
+	src/log.c \
+	src/endian.c \
+	src/bitwise.c \
+	src/hash.c \
+	src/mac.c \
+	src/otp.c \
+	src/parse.c \
+	src/args.c
 
