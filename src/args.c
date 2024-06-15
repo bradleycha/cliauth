@@ -10,27 +10,19 @@
 
 #include <string.h>
 #include <time.h>
-#include "parse.h"
+#include "account.h"
 
-const char * const
-cliauth_args_parse_key_uri_error_name [CLIAUTH_PARSE_KEY_URI_RESULT_FIELD_COUNT] = {
-   "malformed URI format",
-   "missing algorithm type",
-   "missing algorithm secrets",
-   "missing hash algorithm",
-   "missing initial counter value for HOTP algorithm",
-   "invalid text escape sequence",
-   "invalid algorithm type",
-   "improperly formatted algorithm secrets",
-   "unknown hash algorithm",
-   "invalid number of passcode digits",
-   "invalid period value for TOTP algorithm",
-   "invalid initial counter value for HOTP algorithm",
-   "the issuer and account name label string is too long",
-   "the issuer string is too long",
-   "the account name string is too long",
-   "the base-32 secrets string is too long"
-};
+#define PLACEHOLDER_ACCOUNT_SECRETS "\xde\xad\xbe\xef\xba\xad\xf0\x0d"
+#define PLACEHOLDER_ACCOUNT_SECRETS_LENGTH\
+   (sizeof(PLACEHOLDER_ACCOUNT_SECRETS) - 1)
+
+#define PLACEHOLDER_ACCOUNT_ISSUER "Authentication Authority Inc."
+#define PLACEHOLDER_ACCOUNT_ISSUER_LENGTH\
+   ((sizeof(PLACEHOLDER_ACCOUNT_ISSUER) / sizeof(char)) - 1)
+
+#define PLACEHOLDER_ACCOUNT_NAME "user@email.com"
+#define PLACEHOLDER_ACCOUNT_NAME_LENGTH\
+   ((sizeof(PLACEHOLDER_ACCOUNT_NAME) / sizeof(char)) - 1)
 
 enum CliAuthArgsParseResult
 cliauth_args_parse(
@@ -40,8 +32,6 @@ cliauth_args_parse(
 ) {
    const char * key_uri;
    CliAuthUInt32 key_uri_characters;
-   enum CliAuthParseKeyUriResult parse_key_uri_result;
-   const char * error_name;
 
    if (args_count < 2) {
       cliauth_log(CLIAUTH_LOG_ERROR("no key URI was given as an argument"));
@@ -54,23 +44,11 @@ cliauth_args_parse(
    key_uri = args[1];
    key_uri_characters = strlen(key_uri);
 
-   parse_key_uri_result = cliauth_parse_key_uri(
-      &payload->uri,
-      key_uri,
-      key_uri_characters
-   );
-
-   if (parse_key_uri_result != CLIAUTH_PARSE_KEY_URI_RESULT_SUCCESS) {
-      error_name = cliauth_args_parse_key_uri_error_name[parse_key_uri_result - 1];
-
-      cliauth_log(CLIAUTH_LOG_ERROR("failed to parse key URI: %s"), error_name);
-
-      return CLIAUTH_ARGS_PARSE_RESULT_INVALID;
-   }
-
-   payload->time_initial = 0;
-   payload->time_current = time(CLIAUTH_NULLPTR);
-
-   return CLIAUTH_ARGS_PARSE_RESULT_SUCCESS;
+   /* TODO: re-implement key URI parsing */
+   cliauth_log(CLIAUTH_LOG_WARNING("key URI parsing is temporarily regressed, arguments parsing will always fail"));
+   (void)key_uri;
+   (void)key_uri_characters;
+   (void)payload;
+   return CLIAUTH_ARGS_PARSE_RESULT_INVALID;
 }
 

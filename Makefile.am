@@ -28,5 +28,7 @@ cliauth_SOURCES = \
 	src/parse.c \
 	src/parse.h \
 	src/args.c \
-	src/args.h
+	src/args.h \
+	src/account.c \
+	src/account.h
 

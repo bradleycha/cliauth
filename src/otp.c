@@ -102,39 +102,16 @@ cliauth_otp_hotp(
    return passcode_final;
 }
 
-CliAuthUInt32
-cliauth_otp_totp(
-   const struct CliAuthHashFunction * hash_function,
-   void * hash_context,
-   const void * key,
-   void * digest_buffer,
-   void * key_buffer,
-   CliAuthUInt32 key_bytes,
-   CliAuthUInt32 block_bytes,
-   CliAuthUInt32 digest_bytes,
+CliAuthUInt64
+cliauth_otp_totp_calculate_counter(
    CliAuthUInt64 time_initial,
    CliAuthUInt64 time_current,
-   CliAuthUInt64 time_interval,
-   CliAuthUInt8 digits
+   CliAuthUInt64 time_interval
 ) {
    CliAuthUInt64 counter;
-   CliAuthUInt32 passcode;
 
    counter = (time_current - time_initial) / time_interval;
 
-   passcode = cliauth_otp_hotp(
-      hash_function,
-      hash_context,
-      key,
-      digest_buffer,
-      key_buffer,
-      key_bytes,
-      block_bytes,
-      digest_bytes,
-      counter,
-      digits
-   );
-
-   return passcode;
+   return counter;
 }
 

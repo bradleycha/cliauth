@@ -10,7 +10,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "parse.h"
+#include "account.h"
 
 /*----------------------------------------------------------------------------*/
 /* Return status enum for cliauth_args_parse().                               */
@@ -34,18 +34,20 @@ enum CliAuthArgsParseResult {
 /*----------------------------------------------------------------------------*/
 /* Output parsed arguments from cliauth_args_parse().                         */
 /*----------------------------------------------------------------------------*/
-/* uri - The parsed OTP URI data.                                             */
+/* account - The parsed authenticator account .                               */
 /*                                                                            */
-/* time_initial - The initial time value for the TOTP algorithm.  This will   */
-/*                always be less than or equal to 'time_current'.             */
+/* totp_parameters - TOTP-specific algorithm parameters.  This will only be   */
+/*                   valid when the account's authenticator algorithm type is */
+/*                   'CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP'.                   */
 /*                                                                            */
-/* time_current - The current time value for the TOTP algorithm.  This will   */
-/*                always be greater than or equal to 'time_initial'.          */
+/* index - The password index to generate, relative to the currently valid    */
+/*         password.  See the documentation for                               */
+/*         'cliauth_account_generate_password()' for more information.        */
 /*----------------------------------------------------------------------------*/
 struct CliAuthArgsPayload {
-   struct CliAuthParseKeyUriPayload uri;
-   CliAuthUInt64 time_initial;
-   CliAuthUInt64 time_current;
+   struct CliAuthAccount account;
+   struct CliAuthAccountGeneratePasscodeTotpParameters totp_parameters;
+   CliAuthSInt64 index;
 };
 
 /*----------------------------------------------------------------------------*/
