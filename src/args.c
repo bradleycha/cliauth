@@ -9,20 +9,7 @@
 #include "args.h"
 
 #include <string.h>
-#include <time.h>
 #include "account.h"
-
-#define PLACEHOLDER_ACCOUNT_SECRETS "\xde\xad\xbe\xef\xba\xad\xf0\x0d"
-#define PLACEHOLDER_ACCOUNT_SECRETS_LENGTH\
-   (sizeof(PLACEHOLDER_ACCOUNT_SECRETS) - 1)
-
-#define PLACEHOLDER_ACCOUNT_ISSUER "Authentication Authority Inc."
-#define PLACEHOLDER_ACCOUNT_ISSUER_LENGTH\
-   ((sizeof(PLACEHOLDER_ACCOUNT_ISSUER) / sizeof(char)) - 1)
-
-#define PLACEHOLDER_ACCOUNT_NAME "user@email.com"
-#define PLACEHOLDER_ACCOUNT_NAME_LENGTH\
-   ((sizeof(PLACEHOLDER_ACCOUNT_NAME) / sizeof(char)) - 1)
 
 enum CliAuthArgsParseResult
 cliauth_args_parse(
