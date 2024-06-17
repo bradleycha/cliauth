@@ -30,5 +30,7 @@ cliauth_SOURCES = \
 	src/args.c \
 	src/args.h \
 	src/account.c \
-	src/account.h
+	src/account.h \
+	src/io.c \
+	src/io.h
 
