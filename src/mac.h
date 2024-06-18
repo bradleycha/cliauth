@@ -11,6 +11,7 @@
 
 #include "cliauth.h"
 #include "hash.h"
+#include "io.h"
 
 /*----------------------------------------------------------------------------*/
 /* Runs the Keyed-Hash Message Authentication Code (HMAC) algorithm.          */
@@ -24,12 +25,12 @@
 /*                                                                            */
 /* key - Generic byte data to use as the key input.                           */
 /*                                                                            */
+/* digest - A byte array long enough to store the digest output as defined by */
+/*          the given hash function.                                          */
+/*                                                                            */
 /* key_buffer - A temporary byte buffer used internally.  Should be long      */
 /*              enough to store a single block as defined by the hash         */
 /*              algorithm.                                                    */
-/*                                                                            */
-/* digest - A byte array long enough to store the digest output as defined by */
-/*          the given hash function.                                          */
 /*                                                                            */
 /* message_bytes - The number of bytes to read from 'message'.                */
 /*                                                                            */

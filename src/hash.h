@@ -10,6 +10,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
+#include "io.h"
 
 /*----------------------------------------------------------------------------*/
 /* Stores the number of enabled hash algorithms, useful for storing buffer    */
@@ -67,25 +68,61 @@
    )
 
 /*----------------------------------------------------------------------------*/
-/* Generic hash function pointers.                                            */
+/* Hash function to initialize a generic context.                             */
 /*----------------------------------------------------------------------------*/
-/* context - Pointer to a function-specific context struct instance as        */
-/*           defined in the function's documentation.  The internal state of  */
-/*           the context should be considered private, and thus should not be */
-/*           read or modified unless the function's documentation permits it. */
-/*                                                                            */
-/* message - Pointer to arbitrary byte data of length 'bytes' to be digested  */
-/*           by the hash function.                                            */
-/*                                                                            */
-/* bytes - The number of bytes to digest from 'message'.                      */
-/*                                                                            */
-/* digest - A byte buffer to store the final hash value in.  The length of    */
-/*          the buffer should be at least the size defined in the function's  */
-/*          documentation.                                                    */
+/* context - The hash function context to initialize.                         */
 /*----------------------------------------------------------------------------*/
-typedef void (*CliAuthHashFunctionInitialize)(void * context);
-typedef void (*CliAuthHashFunctionDigest)(void * context, const void * message, CliAuthUInt32 bytes);
-typedef void (*CliAuthHashFunctionFinalize)(void * context, void * digest);
+typedef void (*CliAuthHashFunctionInitialize)(
+   void * context
+);
+
+/*----------------------------------------------------------------------------*/
+/* Digest an arbitrary amount of data.                                        */
+/*----------------------------------------------------------------------------*/
+/* context - The hash function context to digest the message into.  The       */
+/*           context must first be initialized.                               */
+/*                                                                            */
+/* remaining_bytes - A pointer to an integer which stores the remaining       */
+/*                   number of bytes to digest.  This will only be valid if   */
+/*                   the function does not return                             */
+/*                   'CLIAUTH_IO_READ_STATUS_SUCCESS'.                        */
+/*                                                                            */
+/* message_reader - The reader for the data to digest.                        */
+/*                                                                            */
+/* message_bytes - The number of bytes to read from 'message_reader'.         */
+/*----------------------------------------------------------------------------*/
+/* Return value - The result of reading the message from 'message_reader'.    */
+/*                the return value is not 'CLIAUTH_IO_READ_STATUS_SUCCESS',   */
+/*                'remaining_bytes' will contain the number of bytes which    */
+/*                were unable to be digested.  The caller can then handle the */
+/*                IO error and resume message digestion by digesting the      */
+/*                remaining message bytes.                                    */
+/*----------------------------------------------------------------------------*/
+typedef enum CliAuthIoReadStatus (*CliAuthHashFunctionDigest)(
+   void * context,
+   CliAuthUInt32 * remaining_bytes,
+   const struct CliAuthIoReader * message_reader,
+   CliAuthUInt32 message_bytes
+);
+
+/*----------------------------------------------------------------------------*/
+/* Finalizes a hash function and generates a digest value.                    */
+/*----------------------------------------------------------------------------*/
+/* context - The hash function context to finalize.  The context must first   */
+/*           be initialized and optionally contain digested byte data.        */
+/*           Calling this function requires the context to be re-initialized  */
+/*           before digesting again.                                          */
+/*----------------------------------------------------------------------------*/
+/* Return value - A pointer to the final digest value.  This value will only  */
+/*                be valid for the lifetime of the hash context and will be   */
+/*                invalidated by re-initialization.  The length of the        */
+/*                returned buffer containing the digest depends on the hash   */
+/*                algorithm.  The byte length of the output digest value can  */
+/*                be found from 'CLIAUTH_HASH_*_DIGEST_LENGTH'.               */
+/*----------------------------------------------------------------------------*/
+typedef void * (*CliAuthHashFunctionFinalize)(
+   void * context
+);
 
 /*----------------------------------------------------------------------------*/
 /* A generic hash function represented by its function pointers.              */
