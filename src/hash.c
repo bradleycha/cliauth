@@ -44,47 +44,43 @@ cliauth_hash_sha1_2_ring_buffer_initialize(
 }
 
 /* loads a message into the ring buffer, digesting if the ring buffer fills */
-static enum CliAuthIoReadStatus
+static struct CliAuthIoReadResult
 cliauth_hash_sha1_2_ring_buffer_digest(
    const struct CliAuthHashSha12RingBufferImplementation * implementation,
    struct _CliAuthHashSha12RingBufferContext * context,
    void * state,
    CliAuthUInt8 * buffer,
-   CliAuthUInt32 * remaining_bytes,
    const struct CliAuthIoReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
-   enum CliAuthIoReadStatus read_status;
+   struct CliAuthIoReadResult read_result;
    CliAuthUInt8 * ring_buffer_free;
    CliAuthUInt32 digest_blocks;
+   CliAuthUInt32 digest_bytes;
    CliAuthUInt32 remainder_bytes;
 
    /* calculate a pointer to the start of free space in the ring buffer */
    ring_buffer_free = buffer + (implementation->bytes - context->capacity);
 
-   /* initialize the remaining bytes, where we will store our progress in the */
-   /* case of an IO error */
-   *remaining_bytes = message_bytes;
-
-   /* increment the total number of digested bytes */
-   context->total += message_bytes;
-
    /* if the number of bytes to insert is less than the remaining capacity, */
    /* simply copy them in and return */
    if (message_bytes < context->capacity) {
-      read_status = cliauth_io_reader_read_all(
+      read_result = cliauth_io_reader_read_all(
          message_reader,
          ring_buffer_free,
          message_bytes
       );
-      if (read_status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-         return read_status;
-      }
-      
-      context->capacity -= message_bytes;
 
-      return CLIAUTH_IO_READ_STATUS_SUCCESS;
+      context->capacity -= read_result.bytes;
+      context->total += read_result.bytes;
+
+      /* read_result will be set to the final output since we only do a */
+      /* single read operation in this case */
+      return read_result;
    }
+   
+   /* initialize the number of digested bytes */
+   digest_bytes = 0;
 
    /* calculate the number of full blocks and residual bytes after filling */
    /* the ring buffer */
@@ -92,31 +88,37 @@ cliauth_hash_sha1_2_ring_buffer_digest(
    remainder_bytes = (message_bytes - context->capacity) % implementation->bytes;
 
    /* populate and digest the ring buffer */
-   read_status = cliauth_io_reader_read_all(
+   read_result = cliauth_io_reader_read_all(
       message_reader,
       ring_buffer_free,
       context->capacity
    );
-   if (read_status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-      return read_status;
+   digest_bytes += read_result.bytes;
+   context->total += read_result.bytes;
+
+   if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+      context->capacity = implementation->bytes - read_result.bytes;
+      read_result.bytes = digest_bytes;
+      return read_result;
    }
-   *remaining_bytes -= context->capacity;
 
    implementation->digest(state, buffer);
 
-   /* digest the full blocks */
+   /* digest the full blocks, using the ring buffer as a read buffer */
    while (digest_blocks != 0) {
-      read_status = cliauth_io_reader_read_all(
+      read_result = cliauth_io_reader_read_all(
          message_reader,
          buffer,
          implementation->bytes
       );
-      if (read_status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-         return read_status;
-      }
-      *remaining_bytes -= implementation->bytes;
+      digest_bytes += read_result.bytes;
+      context->total += read_result.bytes;
 
-      implementation->digest(state, buffer);
+      if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+         context->capacity = implementation->bytes - read_result.bytes;
+         read_result.bytes = digest_bytes;
+         return read_result;
+      }
 
       digest_blocks--;
    }
@@ -124,18 +126,19 @@ cliauth_hash_sha1_2_ring_buffer_digest(
    /* copy the remainder bytes into the ring buffer, note that we don't */
    /* update remaining_bytes because the function will never fail after this */
    /* final read. */
-   read_status = cliauth_io_reader_read_all(
+   read_result = cliauth_io_reader_read_all(
       message_reader,
       buffer,
       remainder_bytes
    );
-   if (read_status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-      return read_status;
-   }
+   digest_bytes += read_result.bytes;
+   context->total += read_result.bytes;
 
-   context->capacity = (implementation->bytes - remainder_bytes);
-
-   return CLIAUTH_IO_READ_STATUS_SUCCESS;
+   /* since there's no additional work, we set these values no matter the */
+   /* read status */
+   context->capacity = implementation->bytes - read_result.bytes;
+   read_result.bytes = digest_bytes;
+   return read_result;
 }
 
 /* performs the SHA message padding step on remaining data and digests the */
@@ -472,10 +475,9 @@ cliauth_hash_sha1_initialize(void * context) {
    return;
 }
 
-static enum CliAuthIoReadStatus
+static struct CliAuthIoReadResult
 cliauth_hash_sha1_digest(
    void * context,
-   CliAuthUInt32 * remaining_bytes,
    const struct CliAuthIoReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
@@ -488,7 +490,6 @@ cliauth_hash_sha1_digest(
       &context_sha->ring_context,
       context,
       context_sha->ring_buffer,
-      remaining_bytes,
       message_reader,
       message_bytes
    );
@@ -747,10 +748,9 @@ cliauth_hash_sha2_32_initialize(
    return;
 }
 
-static enum CliAuthIoReadStatus
+static struct CliAuthIoReadResult
 cliauth_hash_sha2_32_digest(
    void * context,
-   CliAuthUInt32 * remaining_bytes,
    const struct CliAuthIoReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
@@ -763,7 +763,6 @@ cliauth_hash_sha2_32_digest(
       &context_sha->ring_context,
       context,
       context_sha->ring_buffer,
-      remaining_bytes,
       message_reader,
       message_bytes
    );
@@ -1055,10 +1054,9 @@ cliauth_hash_sha2_64_initialize(
    return;
 }
 
-static enum CliAuthIoReadStatus
+static struct CliAuthIoReadResult
 cliauth_hash_sha2_64_digest(
    void * context,
-   CliAuthUInt32 * remaining_bytes,
    const struct CliAuthIoReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
@@ -1071,7 +1069,6 @@ cliauth_hash_sha2_64_digest(
       &context_sha->ring_context,
       context,
       context_sha->ring_buffer,
-      remaining_bytes,
       message_reader,
       message_bytes
    );

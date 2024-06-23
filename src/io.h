@@ -30,6 +30,18 @@ enum CliAuthIoReadStatus {
 };
 
 /*----------------------------------------------------------------------------*/
+/* The result of a generic I/O read operation.                                */
+/*----------------------------------------------------------------------------*/
+/* status - The status of the read operation.                                 */
+/*                                                                            */
+/* bytes - The number of bytes which were successfully read.                  */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoReadResult {
+   enum CliAuthIoReadStatus status;
+   CliAuthUInt32 bytes;
+};
+
+/*----------------------------------------------------------------------------*/
 /* A generic I/O write result status.                                         */
 /*----------------------------------------------------------------------------*/
 /* CLIAUTH_IO_WRITE_STATUS_SUCCESS - The writer function executed             */
@@ -48,12 +60,23 @@ enum CliAuthIoWriteStatus {
 };
 
 /*----------------------------------------------------------------------------*/
+/* The result of a generic I/O write operation.                               */
+/*----------------------------------------------------------------------------*/
+/* status - The status of the write operation.                                */
+/*                                                                            */
+/* bytes - The number of bytes which were successfully written.               */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoWriteResult {
+   enum CliAuthIoWriteStatus status;
+   CliAuthUInt32 bytes;
+};
+
+/*----------------------------------------------------------------------------*/
 /* A function which implements the reader interface.  For more information,   */
 /* see the documentation for cliauth_io_reader_read().                        */
 /*----------------------------------------------------------------------------*/
-typedef enum CliAuthIoReadStatus (*CliAuthIoReaderFunction)(
+typedef struct CliAuthIoReadResult (*CliAuthIoReaderFunction)(
    void * context,
-   CliAuthUInt32 * output_read_bytes,
    void * buffer,
    CliAuthUInt32 bytes
 );
@@ -62,9 +85,8 @@ typedef enum CliAuthIoReadStatus (*CliAuthIoReaderFunction)(
 /* A function which implements the writer interface.  For more information,   */
 /* see the documentation for cliauth_io_writer_write().                        */
 /*----------------------------------------------------------------------------*/
-typedef enum CliAuthIoWriteStatus (*CliAuthIoWriterFunction)(
+typedef struct CliAuthIoWriteResult (*CliAuthIoWriterFunction)(
    void * context,
-   CliAuthUInt32 * output_write_bytes,
    const void * data,
    CliAuthUInt32 bytes
 );
@@ -86,24 +108,18 @@ struct CliAuthIoReader {
 /*----------------------------------------------------------------------------*/
 /* reader - The reader interface to read from.                                */
 /*                                                                            */
-/* output_read_bytes - A pointer to an integer which stores the number of     */
-/*                     bytes which were read into the buffer.  The data will  */
-/*                     only be valid if the function returns                  */
-/*                     'CLIAUTH_IO_READ_ERROR_SUCCESS'.                       */
-/*                                                                            */
-/* buffer - A byte buffer to store the read contents to.  The contents of     */
-/*          this buffer will only be valid for 'output_read_bytes' bytes if   */
-/*          if the function returns 'CLIAUTH_IO_READ_ERROR_SUCCESS'.          */
+/* buffer - A byte buffer to store the read contents to.  The buffer will     */
+/*          only be valid up to the number of bytes successfully read in the  */
+/*          returned read result.                                             */
 /*                                                                            */
 /* bytes - The number of bytes to attempt to read.  The actual number of      */
-/*         bytes read is output in 'output_read_bytes'.                       */
+/*         bytes read is output in the 'bytes' result field.                  */
 /*----------------------------------------------------------------------------*/
-/* Return value - An enum representing the result of reading.                 */
+/* Return value - A struct representing the result of reading.                */
 /*----------------------------------------------------------------------------*/
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read(
    const struct CliAuthIoReader * reader,
-   CliAuthUInt32 * output_read_bytes,
    void * buffer,
    CliAuthUInt32 bytes
 );
@@ -113,14 +129,15 @@ cliauth_io_reader_read(
 /*----------------------------------------------------------------------------*/
 /* reader - The reader interface to read from.                                */
 /*                                                                            */
-/* buffer - The buffer to read bytes into.  The data in this buffer will only */
-/*          be valid if the function returns 'CLIAUTH_IO_READ_ERROR_SUCCESS'. */
+/* buffer - A byte buffer to store the read contents to.  The buffer will     */
+/*          only be valid up to the number of bytes successfully read in the  */
+/*          returned read result.                                             */
 /*                                                                            */
 /* bytes - The length of 'buffer' in bytes.                                   */
 /*----------------------------------------------------------------------------*/
-/* Return value - An enum representing the result of reading.                 */
+/* Return value - A struct representing the result of reading.                */
 /*----------------------------------------------------------------------------*/
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_all(
    const struct CliAuthIoReader * reader,
    void * buffer,
@@ -134,76 +151,76 @@ cliauth_io_reader_read_all(
 /*                                                                            */
 /* output - A pointer to an integer which stores the read integer.  The data  */
 /*          will only be valid if the function returns                        */
-/*          'CLIAUTH_IO_READ_STATUS_SUCCESS'.                                 */
+/*          the read result status 'CLIAUTH_IO_READ_STATUS_SUCCESS'.          */
 /*----------------------------------------------------------------------------*/
-/* Return value - An enum representing the result of reading.                 */
+/* Return value - A struct representing the result of reading.                */
 /*----------------------------------------------------------------------------*/
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_uint8(
    const struct CliAuthIoReader * reader,
    CliAuthUInt8 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_sint8(
    const struct CliAuthIoReader * reader,
    CliAuthSInt8 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_uint16(
    const struct CliAuthIoReader * reader,
    CliAuthUInt16 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_uint32(
    const struct CliAuthIoReader * reader,
    CliAuthUInt32 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_uint64(
    const struct CliAuthIoReader * reader,
    CliAuthUInt64 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_sint16(
    const struct CliAuthIoReader * reader,
    CliAuthSInt16 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_sint32(
    const struct CliAuthIoReader * reader,
    CliAuthSInt32 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_sint64(
    const struct CliAuthIoReader * reader,
    CliAuthSInt64 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_uint16(
    const struct CliAuthIoReader * reader,
    CliAuthUInt16 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_uint32(
    const struct CliAuthIoReader * reader,
    CliAuthUInt32 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_uint64(
    const struct CliAuthIoReader * reader,
    CliAuthUInt64 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_sint16(
    const struct CliAuthIoReader * reader,
    CliAuthSInt16 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_sint32(
    const struct CliAuthIoReader * reader,
    CliAuthSInt32 * output
 );
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_sint64(
    const struct CliAuthIoReader * reader,
    CliAuthSInt64 * output
@@ -222,26 +239,21 @@ struct CliAuthIoWriter {
 };
 
 /*----------------------------------------------------------------------------*/
-/* Attempts to write bytes from a buffer into a writer.                       */
+/* Attempts to write bytes into a buffer info a writer.                       */
 /*----------------------------------------------------------------------------*/
 /* writer - The writer interface to write bytes into.                         */
 /*                                                                            */
-/* output_write_bytes - A pointer to an integer which stores the number of    */
-/*                      bytes which were written from the buffer.  The data   */
-/*                      will only be valid if the function returns            */
-/*                      'CLIAUTH_IO_WRITE_ERROR_SUCCESS'.                     */
+/* data - The bytes to write.  The number of bytes which are successfully     */
+/*        written will be contained in the returned write result.             */
 /*                                                                            */
-/* data - The bytes to write.                                                 */
-/*                                                                            */
-/* bytes - The number of bytes to attempt to write from 'data'.  The actual   */
-/*         number of bytes written is output in 'output_write_bytes'.         */
+/* bytes - The number of bytes to attempt to write.  The actual number of     */
+/*         bytes written is output in the 'bytes' result field.               */
 /*----------------------------------------------------------------------------*/
-/* Return value - An enum representing the result of writing.                 */
+/* Return value - A struct representing the result of writing.                */
 /*----------------------------------------------------------------------------*/
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write(
    const struct CliAuthIoWriter * writer,
-   CliAuthUInt32 * output_write_bytes,
    const void * data,
    CliAuthUInt32 bytes
 );
@@ -251,13 +263,14 @@ cliauth_io_writer_write(
 /*----------------------------------------------------------------------------*/
 /* writer - The writer interface to write bytes into.                         */
 /*                                                                            */
-/* data - The bytes to write.                                                 */
+/* data - The bytes to write.  The number of bytes which are successfully     */
+/*        written will be contained in the returned write result.             */
 /*                                                                            */
 /* bytes - The length of 'data' in bytes.                                     */
 /*----------------------------------------------------------------------------*/
-/* Return value - An enum representing the result of writing.                 */
+/* Return value - A struct representing the result of writing.                */
 /*----------------------------------------------------------------------------*/
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_all(
    const struct CliAuthIoWriter * writer,
    const void * data,
@@ -271,74 +284,74 @@ cliauth_io_writer_write_all(
 /*                                                                            */
 /* value - The integer to write.                                              */
 /*----------------------------------------------------------------------------*/
-/* Return value - An enum representing the result of writing.                 */
+/* Return value - A struct representing the result of writing.                */
 /*----------------------------------------------------------------------------*/
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_uint8(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt8 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_sint8(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt8 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_uint16(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt16 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_uint32(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt32 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_uint64(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt64 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_sint16(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt16 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_sint32(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt32 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_sint64(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt64 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_uint16(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt16 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_uint32(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt32 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_uint64(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt64 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_sint16(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt16 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_sint32(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt32 value
 );
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_sint64(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt64 value

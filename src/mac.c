@@ -78,7 +78,6 @@ cliauth_mac_hmac_calculate_k0_ipad_length_larger(
 ) {
    struct CliAuthIoByteStreamReader byte_stream_reader;
    struct CliAuthIoReader reader;
-   CliAuthUInt32 remaining_bytes;
    void * hash_digest;
    CliAuthUInt8 * key_buffer_iter;
    CliAuthUInt32 pad_bytes;
@@ -92,7 +91,6 @@ cliauth_mac_hmac_calculate_k0_ipad_length_larger(
 
    (void)hash_function->digest(
       hash_context,
-      &remaining_bytes,
       &reader,
       key_bytes
    );
@@ -150,7 +148,6 @@ cliauth_mac_hmac(
 ) {
    struct CliAuthIoByteStreamReader byte_stream_reader;
    struct CliAuthIoReader reader;
-   CliAuthUInt32 remaining_bytes;
    void * hash_digest;
 
    reader = cliauth_io_byte_stream_reader_interface(&byte_stream_reader);
@@ -191,7 +188,6 @@ cliauth_mac_hmac(
    byte_stream_reader.position = 0;
    (void)hash_function->digest(
       hash_context,
-      &remaining_bytes,
       &reader,
       block_bytes
    );
@@ -201,7 +197,6 @@ cliauth_mac_hmac(
    byte_stream_reader.position = 0;
    (void)hash_function->digest(
       hash_context,
-      &remaining_bytes,
       &reader,
       message_bytes
    );
@@ -224,7 +219,6 @@ cliauth_mac_hmac(
    byte_stream_reader.position = 0;
    (void)hash_function->digest(
       hash_context,
-      &remaining_bytes,
       &reader,
       block_bytes
    );
@@ -234,7 +228,6 @@ cliauth_mac_hmac(
    byte_stream_reader.position = 0;
    (void)hash_function->digest(
       hash_context,
-      &remaining_bytes,
       &reader,
       digest_bytes
    );

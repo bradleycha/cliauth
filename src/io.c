@@ -11,52 +11,55 @@
 #include <string.h>
 #include "endian.h"
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read(
    const struct CliAuthIoReader * reader,
-   CliAuthUInt32 * output_read_bytes,
    void * buffer,
    CliAuthUInt32 bytes
 ) {
    return reader->reader(
       reader->context,
-      output_read_bytes,
       buffer,
       bytes
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_all(
    const struct CliAuthIoReader * reader,
    void * buffer,
    CliAuthUInt32 bytes
 ) {
-   enum CliAuthIoReadStatus read_status;
+   struct CliAuthIoReadResult read_result;
    CliAuthUInt8 * buffer_iter;
    CliAuthUInt32 read_bytes;
 
    buffer_iter = (CliAuthUInt8 *)buffer;
+   read_bytes = 0;
 
    while (bytes != 0) {
-      read_status = cliauth_io_reader_read(
+      read_result = cliauth_io_reader_read(
          reader,
-         &read_bytes,
          buffer_iter,
          bytes
       );
-      if (read_status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-         return read_status;
+      read_bytes += read_result.bytes;
+
+      if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+         read_result.bytes = read_bytes;
+         return read_result;
       }
 
-      buffer_iter += read_bytes;
-      bytes -= read_bytes;
+      buffer_iter += read_result.bytes;
+      bytes -= read_result.bytes;
    }
-   
-   return CLIAUTH_IO_READ_STATUS_SUCCESS;
+
+   read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
+   read_result.bytes = read_bytes;
+   return read_result;
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_uint8(
    const struct CliAuthIoReader * reader,
    CliAuthUInt8 * output
@@ -68,7 +71,7 @@ cliauth_io_reader_read_uint8(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_sint8(
    const struct CliAuthIoReader * reader,
    CliAuthSInt8 * output
@@ -80,29 +83,29 @@ cliauth_io_reader_read_sint8(
    );
 }
 
-static enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little(
    const struct CliAuthIoReader * reader,
    void * output,
    CliAuthUInt8 bytes
 ) {
-   enum CliAuthIoReadStatus read_status;
+   struct CliAuthIoReadResult read_result;
 
-   read_status = cliauth_io_reader_read_all(
+   read_result = cliauth_io_reader_read_all(
       reader,
       output,
       bytes
    );
-   if (read_status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-      return read_status;
+   if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+      return read_result;
    }
 
    cliauth_endian_host_to_little_inplace(output, bytes);
 
-   return CLIAUTH_IO_READ_STATUS_SUCCESS;
+   return read_result;
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_uint16(
    const struct CliAuthIoReader * reader,
    CliAuthUInt16 * output
@@ -114,7 +117,7 @@ cliauth_io_reader_read_little_uint16(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_uint32(
    const struct CliAuthIoReader * reader,
    CliAuthUInt32 * output
@@ -126,7 +129,7 @@ cliauth_io_reader_read_little_uint32(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_uint64(
    const struct CliAuthIoReader * reader,
    CliAuthUInt64 * output
@@ -138,7 +141,7 @@ cliauth_io_reader_read_little_uint64(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_sint16(
    const struct CliAuthIoReader * reader,
    CliAuthSInt16 * output
@@ -150,7 +153,7 @@ cliauth_io_reader_read_little_sint16(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_sint32(
    const struct CliAuthIoReader * reader,
    CliAuthSInt32 * output
@@ -162,7 +165,7 @@ cliauth_io_reader_read_little_sint32(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_little_sint64(
    const struct CliAuthIoReader * reader,
    CliAuthSInt64 * output
@@ -174,29 +177,29 @@ cliauth_io_reader_read_little_sint64(
    );
 }
 
-static enum CliAuthIoReadStatus
+static struct CliAuthIoReadResult
 cliauth_io_reader_read_big(
    const struct CliAuthIoReader * reader,
    void * output,
    CliAuthUInt8 bytes
 ) {
-   enum CliAuthIoReadStatus read_status;
+   struct CliAuthIoReadResult read_result;
 
-   read_status = cliauth_io_reader_read_all(
+   read_result = cliauth_io_reader_read_all(
       reader,
       output,
       bytes
    );
-   if (read_status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-      return read_status;
+   if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+      return read_result;
    }
 
    cliauth_endian_host_to_big_inplace(output, bytes);
 
-   return CLIAUTH_IO_READ_STATUS_SUCCESS;
+   return read_result;
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_uint16(
    const struct CliAuthIoReader * reader,
    CliAuthUInt16 * output
@@ -208,7 +211,7 @@ cliauth_io_reader_read_big_uint16(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_uint32(
    const struct CliAuthIoReader * reader,
    CliAuthUInt32 * output
@@ -220,7 +223,7 @@ cliauth_io_reader_read_big_uint32(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_uint64(
    const struct CliAuthIoReader * reader,
    CliAuthUInt64 * output
@@ -232,7 +235,7 @@ cliauth_io_reader_read_big_uint64(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_sint16(
    const struct CliAuthIoReader * reader,
    CliAuthSInt16 * output
@@ -244,7 +247,7 @@ cliauth_io_reader_read_big_sint16(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_sint32(
    const struct CliAuthIoReader * reader,
    CliAuthSInt32 * output
@@ -256,7 +259,7 @@ cliauth_io_reader_read_big_sint32(
    );
 }
 
-enum CliAuthIoReadStatus
+struct CliAuthIoReadResult
 cliauth_io_reader_read_big_sint64(
    const struct CliAuthIoReader * reader,
    CliAuthSInt64 * output
@@ -268,52 +271,55 @@ cliauth_io_reader_read_big_sint64(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write(
    const struct CliAuthIoWriter * writer,
-   CliAuthUInt32 * output_write_bytes,
    const void * data,
    CliAuthUInt32 bytes
 ) {
    return writer->writer(
       writer->context,
-      output_write_bytes,
       data,
       bytes
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_all(
    const struct CliAuthIoWriter * writer,
    const void * data,
    CliAuthUInt32 bytes
 ) {
-   enum CliAuthIoWriteStatus write_status;
+   struct CliAuthIoWriteResult write_result;
    const CliAuthUInt8 * data_iter;
    CliAuthUInt32 write_bytes;
 
    data_iter = (const CliAuthUInt8 *)data;
+   write_bytes = 0;
 
    while (bytes != 0) {
-      write_status = cliauth_io_writer_write(
+      write_result = cliauth_io_writer_write(
          writer,
-         &write_bytes,
          data_iter,
          bytes
       );
-      if (write_status != CLIAUTH_IO_WRITE_STATUS_SUCCESS) {
-         return write_status;
+      write_bytes += write_result.bytes;
+
+      if (write_result.status != CLIAUTH_IO_WRITE_STATUS_SUCCESS) {
+         write_result.bytes = write_bytes;
+         return write_result;
       }
 
-      data_iter += write_bytes;
-      bytes -= write_bytes;
+      data_iter += write_result.bytes;
+      bytes -= write_result.bytes;
    }
    
-   return CLIAUTH_IO_WRITE_STATUS_SUCCESS;
+   write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
+   write_result.bytes = write_bytes;
+   return write_result;
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_uint8(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt8 value
@@ -325,7 +331,7 @@ cliauth_io_writer_write_uint8(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_sint8(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt8 value
@@ -337,7 +343,7 @@ cliauth_io_writer_write_sint8(
    );
 }
 
-static enum CliAuthIoWriteStatus
+static struct CliAuthIoWriteResult
 cliauth_io_writer_write_little(
    const struct CliAuthIoWriter * writer,
    void * value,
@@ -352,7 +358,7 @@ cliauth_io_writer_write_little(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_uint16(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt16 value
@@ -364,7 +370,7 @@ cliauth_io_writer_write_little_uint16(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_uint32(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt32 value
@@ -376,7 +382,7 @@ cliauth_io_writer_write_little_uint32(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_uint64(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt64 value
@@ -388,7 +394,7 @@ cliauth_io_writer_write_little_uint64(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_sint16(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt16 value
@@ -400,7 +406,7 @@ cliauth_io_writer_write_little_sint16(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_sint32(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt32 value
@@ -412,7 +418,7 @@ cliauth_io_writer_write_little_sint32(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_little_sint64(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt64 value
@@ -424,7 +430,7 @@ cliauth_io_writer_write_little_sint64(
    );
 }
 
-static enum CliAuthIoWriteStatus
+static struct CliAuthIoWriteResult
 cliauth_io_writer_write_big(
    const struct CliAuthIoWriter * writer,
    void * value,
@@ -439,7 +445,7 @@ cliauth_io_writer_write_big(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_uint16(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt16 value
@@ -451,7 +457,7 @@ cliauth_io_writer_write_big_uint16(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_uint32(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt32 value
@@ -463,7 +469,7 @@ cliauth_io_writer_write_big_uint32(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_uint64(
    const struct CliAuthIoWriter * writer,
    CliAuthUInt64 value
@@ -475,7 +481,7 @@ cliauth_io_writer_write_big_uint64(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_sint16(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt16 value
@@ -487,7 +493,7 @@ cliauth_io_writer_write_big_sint16(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_sint32(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt32 value
@@ -499,7 +505,7 @@ cliauth_io_writer_write_big_sint32(
    );
 }
 
-enum CliAuthIoWriteStatus
+struct CliAuthIoWriteResult
 cliauth_io_writer_write_big_sint64(
    const struct CliAuthIoWriter * writer,
    CliAuthSInt64 value
@@ -511,13 +517,13 @@ cliauth_io_writer_write_big_sint64(
    );
 }
 
-static enum CliAuthIoReadStatus
+static struct CliAuthIoReadResult
 cliauth_io_byte_stream_reader_read(
    void * context,
-   CliAuthUInt32 * output_read_bytes,
    void * buffer,
    CliAuthUInt32 bytes
 ) {
+   struct CliAuthIoReadResult read_result;
    struct CliAuthIoByteStreamReader * reader;
    CliAuthUInt32 bytes_remaining;
    CliAuthUInt32 bytes_read_count;
@@ -528,7 +534,9 @@ cliauth_io_byte_stream_reader_read(
    bytes_remaining = reader->length - reader->position;
 
    if (bytes_remaining == 0) {
-      return CLIAUTH_IO_READ_STATUS_END_OF_STREAM;
+      read_result.status = CLIAUTH_IO_READ_STATUS_END_OF_STREAM;
+      read_result.bytes = 0;
+      return read_result;
    }
 
    if (bytes > bytes_remaining) {
@@ -541,18 +549,19 @@ cliauth_io_byte_stream_reader_read(
 
    (void)memcpy(buffer, bytes_read_ptr, bytes_read_count);
    reader->position += bytes_read_count;
-   *output_read_bytes = bytes_read_count;
 
-   return CLIAUTH_IO_READ_STATUS_SUCCESS;
+   read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
+   read_result.bytes = bytes_read_count;
+   return read_result;
 }
 
-static enum CliAuthIoWriteStatus
+static struct CliAuthIoWriteResult
 cliauth_io_byte_stream_writer_write(
    void * context,
-   CliAuthUInt32 * output_write_bytes,
    const void * data,
    CliAuthUInt32 bytes
 ) {
+   struct CliAuthIoWriteResult write_result;
    struct CliAuthIoByteStreamWriter * writer;
    CliAuthUInt32 bytes_remaining;
    CliAuthUInt32 bytes_write_count;
@@ -563,7 +572,9 @@ cliauth_io_byte_stream_writer_write(
    bytes_remaining = writer->length - writer->position;
 
    if (bytes_remaining == 0) {
-      return CLIAUTH_IO_WRITE_STATUS_END_OF_STREAM;
+      write_result.status = CLIAUTH_IO_WRITE_STATUS_END_OF_STREAM;
+      write_result.bytes = 0;
+      return write_result;
    }
 
    if (bytes > bytes_remaining) {
@@ -576,9 +587,10 @@ cliauth_io_byte_stream_writer_write(
 
    (void)memcpy(bytes_write_ptr, data, bytes_write_count);
    writer->position += bytes_write_count;
-   *output_write_bytes = bytes_write_count;
    
-   return CLIAUTH_IO_WRITE_STATUS_SUCCESS;
+   write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
+   write_result.bytes = bytes_write_count;
+   return write_result;
 }
 
 struct CliAuthIoReader

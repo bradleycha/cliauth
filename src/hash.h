@@ -82,25 +82,18 @@ typedef void (*CliAuthHashFunctionInitialize)(
 /* context - The hash function context to digest the message into.  The       */
 /*           context must first be initialized.                               */
 /*                                                                            */
-/* remaining_bytes - A pointer to an integer which stores the remaining       */
-/*                   number of bytes to digest.  This will only be valid if   */
-/*                   the function does not return                             */
-/*                   'CLIAUTH_IO_READ_STATUS_SUCCESS'.                        */
-/*                                                                            */
 /* message_reader - The reader for the data to digest.                        */
 /*                                                                            */
 /* message_bytes - The number of bytes to read from 'message_reader'.         */
 /*----------------------------------------------------------------------------*/
 /* Return value - The result of reading the message from 'message_reader'.    */
-/*                the return value is not 'CLIAUTH_IO_READ_STATUS_SUCCESS',   */
-/*                'remaining_bytes' will contain the number of bytes which    */
-/*                were unable to be digested.  The caller can then handle the */
-/*                IO error and resume message digestion by digesting the      */
-/*                remaining message bytes.                                    */
+/*                If the returned read result status is not                   */
+/*                'CLIAUTH_IO_READ_STATUS_SUCCESS', the number of digested    */
+/*                bytes can be obtained from the 'bytes' field in the         */
+/*                returned read result.                                       */
 /*----------------------------------------------------------------------------*/
-typedef enum CliAuthIoReadStatus (*CliAuthHashFunctionDigest)(
+typedef struct CliAuthIoReadResult (*CliAuthHashFunctionDigest)(
    void * context,
-   CliAuthUInt32 * remaining_bytes,
    const struct CliAuthIoReader * message_reader,
    CliAuthUInt32 message_bytes
 );
