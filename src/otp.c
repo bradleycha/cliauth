@@ -54,74 +54,92 @@ cliauth_otp_hotp_trim_digits(
    return passcode % modulus;
 }
 
-CliAuthUInt32
-cliauth_otp_hotp(
+void
+cliauth_otp_hotp_initialize(
+   struct CliAuthOtpHotpContext * context,
+   void * key_buffer,
+   void * digest_buffer,
    const struct CliAuthHashFunction * hash_function,
    void * hash_context,
-   const void * key,
-   void * digest_buffer,
-   void * key_buffer,
-   CliAuthUInt32 key_bytes,
-   CliAuthUInt32 block_bytes,
-   CliAuthUInt32 digest_bytes,
+   CliAuthUInt8 block_bytes,
+   CliAuthUInt8 digest_bytes,
    CliAuthUInt64 counter,
    CliAuthUInt8 digits
 ) {
-   void * digest_hmac;
-   struct CliAuthMacHmacContext hmac_context;
-   struct CliAuthIoByteStreamReader byte_stream_reader;
-   struct CliAuthIoReader reader;
-   CliAuthUInt64 counter_big_endian;
-   CliAuthUInt32 passcode_untrimmed;
-   CliAuthUInt32 passcode_final;
-
-   /* convert counter to big-endian */
-   counter_big_endian = cliauth_endian_host_to_big_uint64(counter);
-
-   /* calculate HMAC digest */
-   reader = cliauth_io_byte_stream_reader_interface(&byte_stream_reader);
    cliauth_mac_hmac_initialize(
-      &hmac_context,
+      &context->hmac_context,
       key_buffer,
       digest_buffer,
       hash_function,
       hash_context,
-      (CliAuthUInt8)block_bytes,
-      (CliAuthUInt8)digest_bytes
+      block_bytes,
+      digest_bytes
    );
 
-   byte_stream_reader.bytes = (const CliAuthUInt8 *)key;
-   byte_stream_reader.length = key_bytes;
-   byte_stream_reader.position = 0;
-   (void)cliauth_mac_hmac_key_digest(
-      &hmac_context,
-      &reader,
-      byte_stream_reader.length
+   context->counter = counter;
+   context->digits = digits;
+   
+   return;
+}
+
+struct CliAuthIoReadResult
+cliauth_otp_hotp_key_digest(
+   struct CliAuthOtpHotpContext * context,
+   const struct CliAuthIoReader * key_reader,
+   CliAuthUInt32 key_bytes
+) {
+   return cliauth_mac_hmac_key_digest(
+      &context->hmac_context,
+      key_reader,
+      key_bytes
+   );
+}
+
+CliAuthUInt32
+cliauth_otp_hotp_finalize(
+   struct CliAuthOtpHotpContext * context
+) {
+   struct CliAuthIoByteStreamReader counter_byte_stream_reader;
+   struct CliAuthIoReader counter_reader;
+   CliAuthUInt64 counter_big_endian;
+   void * hmac_digest;
+   CliAuthUInt32 passcode_untrimmed;
+   CliAuthUInt32 passcode_final;
+
+   /* finalize the key digest */
+   cliauth_mac_hmac_key_finalize(&context->hmac_context);
+
+   /* convert the counter value to big-endian and digest it as the HMAC */
+   /* message */
+   counter_big_endian = cliauth_endian_host_to_big_uint64(context->counter);
+
+   counter_reader = cliauth_io_byte_stream_reader_interface(
+      &counter_byte_stream_reader
    );
 
-   cliauth_mac_hmac_key_finalize(&hmac_context);
+   counter_byte_stream_reader.bytes = (const CliAuthUInt8 *)(&counter_big_endian);
+   counter_byte_stream_reader.length = sizeof(counter_big_endian);
+   counter_byte_stream_reader.position = 0;
 
-   byte_stream_reader.bytes = (const CliAuthUInt8 *)(&counter_big_endian);
-   byte_stream_reader.length = sizeof(counter_big_endian);
-   byte_stream_reader.position = 0;
    (void)cliauth_mac_hmac_message_digest(
-      &hmac_context,
-      &reader,
-      byte_stream_reader.length
+      &context->hmac_context,
+      &counter_reader,
+      counter_byte_stream_reader.length
    );
 
-   digest_hmac = cliauth_mac_hmac_finalize(&hmac_context);
+   /* finalize the HMAC digest */
+   hmac_digest = cliauth_mac_hmac_finalize(&context->hmac_context);
 
    /* truncate to a 32-bit word and convert to native endian */
    passcode_untrimmed = cliauth_otp_hotp_truncate_digest(
-      digest_hmac,
-      digest_bytes
+      hmac_digest,
+      context->hmac_context.digest_bytes
    );
 
    /* modulo to keep only the desired number of digits*/
    passcode_final = cliauth_otp_hotp_trim_digits(
       passcode_untrimmed,
-      digits
+      context->digits
    );
 
    return passcode_final;

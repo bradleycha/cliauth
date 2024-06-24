@@ -10,6 +10,7 @@
 
 #include "hash.h"
 #include "otp.h"
+#include "io.h"
 
 /* used to convert a CliAuthAccountHashType into an executable form. */
 struct CliAuthAccountHashData {
@@ -98,6 +99,9 @@ cliauth_account_generate_passcode(
    const struct CliAuthAccountGeneratePasscodeTotpParameters * totp_parameters,
    CliAuthSInt64 index
 ) {
+   struct CliAuthOtpHotpContext hotp_context;
+   struct CliAuthIoByteStreamReader secrets_byte_stream_reader;
+   struct CliAuthIoReader secrets_reader;
    const struct CliAuthAccountHashData * hash_data;
    CliAuthUInt64 counter;
 
@@ -131,18 +135,33 @@ cliauth_account_generate_passcode(
    counter += index;
 
    /* run the HOTP algorithm to generate the passcode */
-   *output = cliauth_otp_hotp(
+   cliauth_otp_hotp_initialize(
+      &hotp_context,
+      &buffer->key,
+      &buffer->digest,
       hash_data->function,
       &buffer->context,
-      &account->secrets,
-      &buffer->digest,
-      &buffer->key,
-      account->secrets_bytes,
       hash_data->block_bytes,
       hash_data->digest_bytes,
       counter,
       account->digits
    );
+
+   secrets_reader = cliauth_io_byte_stream_reader_interface(
+      &secrets_byte_stream_reader
+   );
+
+   secrets_byte_stream_reader.bytes = account->secrets;
+   secrets_byte_stream_reader.length = account->secrets_bytes;
+   secrets_byte_stream_reader.position = 0;
+
+   (void)cliauth_otp_hotp_key_digest(
+      &hotp_context,
+      &secrets_reader,
+      secrets_byte_stream_reader.length
+   );
+
+   *output = cliauth_otp_hotp_finalize(&hotp_context);
 
    return CLIAUTH_GENERATE_PASSCODE_RESULT_SUCCESS;
 }

@@ -11,54 +11,109 @@
 
 #include "cliauth.h"
 #include "hash.h"
+#include "mac.h"
+#include "io.h"
 
 /*----------------------------------------------------------------------------*/
-/* Runs the HMAC-based One Time Password (HOTP) algorithm.                    */
+/* Stores internal variables used when calculaing an HMAC-based one time      */
+/* password (HOTP) value.                                                     */
 /*----------------------------------------------------------------------------*/
-/* hash_function - The hash function to use for the HMAC algorithm.           */
+struct CliAuthOtpHotpContext {
+   /* hmac context */
+   struct CliAuthMacHmacContext hmac_context;
+
+   /* the counter value */
+   CliAuthUInt64 counter;
+
+   /* the number of digits to generate */
+   CliAuthUInt8 digits;
+};
+
+/*----------------------------------------------------------------------------*/
+/* Initializes the HOTP context.                                              */
+/*----------------------------------------------------------------------------*/
+/* context - The HOTP context to initialize.                                  */
 /*                                                                            */
-/* hash_context - A pointer to a hash context struct which is valid for the   */
-/*                given hash function.                                        */
+/* key_buffer - The 'key_buffer' argument for the HMAC algorithm.  See the    */
+/*              documentation for 'cliauth_mac_hmac_initialize()' for more    */
+/*              information.                                                  */
 /*                                                                            */
-/* key - Generic byte data to use as the key input.                           */
+/* digest_buffer - The 'digest_buffer' argument for the HMAC algorithm.  See  */
+/*                 the documentation for 'cliauth_mac_hmac_initialize()' for  */
+/*                 more information.                                          */
 /*                                                                            */
-/* digest_buffer - A temporary byte buffer used internally.  Should be long   */
-/*                 enough to store the hash function's digest output.         */
+/* hash_function - The 'hash_function' argument for the HMAC algorithm.  See  */
+/*                 the documentation for 'cliauth_mac_hmac_initialize()' for  */
+/*                 more information.                                          */
 /*                                                                            */
-/* key_buffer - A temporary byte buffer used internally.  Should be long      */
-/*              enough to store a single block as defined by the hash         */
-/*              algorithm.                                                    */
+/* hash_context - The 'hash_context' argument for the HMAC algorithm.  See    */
+/*                the documentation for 'cliauth_mac_hmac_initialize()' for   */
+/*                more information.                                           */
 /*                                                                            */
-/* key_bytes - The number of bytes to read from 'key'.                        */
+/* block_bytes - The 'block_bytes' argument for the HMAC algorithm.  See the  */
+/*               documentation for 'cliauth_mac_hmac_initialize()' for more   */
+/*               information.                                                 */
 /*                                                                            */
-/* block_bytes - The byte length of the hash input blocks.  This is used      */
-/*               internally by the HMAC algorithm and does not affect the     */
-/*               expected length of the input block size.  The block length   */
-/*               must be greater than or equal to the digest length.          */
-/*                                                                            */
-/* digest_bytes - The byte length of the hash digest.  This is used           */
-/*                internally by the HMAC algorithm and does not affect the    */
-/*                expected length of the input block size.                    */
+/* digest_bytes - The 'digest_bytes' argument for the HMAC algorithm.  See    */
+/*                the documentation for 'cliauth_mac_hmac_initialize()' for   */
+/*                more information.                                           */
 /*                                                                            */
 /* counter - The counter value for the HOTP algorithm.                        */
 /*                                                                            */
 /* digits - The number of digits, base 10, to include in the final HOTP       */
 /*          output.  This must be at least 1, and may not be greater than 9.  */
 /*----------------------------------------------------------------------------*/
-/* Return value - A 'digits'-length base-10 one-time-password value.          */
-/*----------------------------------------------------------------------------*/
-CliAuthUInt32
-cliauth_otp_hotp(
+void
+cliauth_otp_hotp_initialize(
+   struct CliAuthOtpHotpContext * context,
+   void * key_buffer,
+   void * digest_buffer,
    const struct CliAuthHashFunction * hash_function,
    void * hash_context,
-   const void * key,
-   void * digest_buffer,
-   void * key_buffer,
-   CliAuthUInt32 key_bytes,
-   CliAuthUInt32 block_bytes,
-   CliAuthUInt32 digest_bytes,
+   CliAuthUInt8 block_bytes,
+   CliAuthUInt8 digest_bytes,
    CliAuthUInt64 counter,
    CliAuthUInt8 digits
+);
+
+/*----------------------------------------------------------------------------*/
+/* Digests bytes as the secret key for the HOTP algorithm.                    */
+/*----------------------------------------------------------------------------*/
+/* context - The HOTP context to digest into.  The given context must have    */
+/*           been initialized with 'cliauth_otp_hotp_initialize()' and must   */
+/*           not have been finalized with 'cliauth_otp_hotp_finalize()'.      */
+/*                                                                            */
+/* key_reader - The reader to source the key bytes from.                      */
+/*                                                                            */
+/* key_bytes - The number of bytes to read from 'key_reader'.                 */
+/*----------------------------------------------------------------------------*/
+/* Return value - The result of reading the key from 'key_reader'.  If the    */
+/*                returned read result statis is not                          */
+/*                'CLIAUTH_IO_READ_STATUS_SUCCESS', the number of digested    */
+/*                bytes can be obtained from the 'bytes' field in the         */
+/*                returned read result.                                       */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoReadResult
+cliauth_otp_hotp_key_digest(
+   struct CliAuthOtpHotpContext * context,
+   const struct CliAuthIoReader * key_reader,
+   CliAuthUInt32 key_bytes
+);
+
+/*----------------------------------------------------------------------------*/
+/* Finalizes the HOTP value, generating a one-time-password.                  */
+/*----------------------------------------------------------------------------*/
+/* context - The HOTP context to finalize.  The context must have been        */
+/*           initialized with 'cliauth_otp_hotp_initialize()'.  Key bytes may */
+/*           no longer be digested by 'cliauth_otp_hotp_key_digest()' after   */
+/*           execution.  To generate another code, the context must be        */
+/*           re-initialized.                                                  */
+/*----------------------------------------------------------------------------*/
+/* Return value - The final generated HMAC-based one-time-password.           */
+/*----------------------------------------------------------------------------*/
+CliAuthUInt32
+cliauth_otp_hotp_finalize(
+   struct CliAuthOtpHotpContext * context
 );
 
 /*----------------------------------------------------------------------------*/
