@@ -113,18 +113,20 @@ cliauth_otp_hotp_finalize(
    /* message */
    counter_big_endian = cliauth_endian_host_to_big_uint64(context->counter);
 
+   cliauth_io_byte_stream_reader_initialize(
+      &counter_byte_stream_reader,
+      &counter_big_endian,
+      sizeof(counter_big_endian)
+   );
+
    counter_reader = cliauth_io_byte_stream_reader_interface(
       &counter_byte_stream_reader
    );
 
-   counter_byte_stream_reader.bytes = (const CliAuthUInt8 *)(&counter_big_endian);
-   counter_byte_stream_reader.length = sizeof(counter_big_endian);
-   counter_byte_stream_reader.position = 0;
-
    (void)cliauth_mac_hmac_message_digest(
       &context->hmac_context,
       &counter_reader,
-      counter_byte_stream_reader.length
+      sizeof(counter_big_endian)
    );
 
    /* finalize the HMAC digest */

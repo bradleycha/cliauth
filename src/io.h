@@ -360,33 +360,62 @@ cliauth_io_writer_write_big_sint64(
 /*----------------------------------------------------------------------------*/
 /* A reader implementation over a constant byte buffer.                       */
 /*----------------------------------------------------------------------------*/
-/* bytes - A pointer to the byte buffer.  All data must be initialized up to  */
-/*         index 'length - 1'.                                                */
-/*                                                                            */
-/* length - The length of 'bytes' in bytes.                                   */
-/*                                                                            */
-/* position - The current seek position in 'bytes'.                           */
-/*----------------------------------------------------------------------------*/
 struct CliAuthIoByteStreamReader {
+   /* the backing byte array */
    const CliAuthUInt8 * bytes;
+
+   /* the length of the byte array in bytes */
    CliAuthUInt32 length;
+
+   /* the position for the next read operation */
    CliAuthUInt32 position;
 };
 
 /*----------------------------------------------------------------------------*/
 /* A writer implementation over a mutable byte buffer.                        */
 /*----------------------------------------------------------------------------*/
-/* bytes - A pointer to the byte buffer.                                      */
-/*                                                                            */
-/* length - The length of 'bytes' in bytes.                                   */
-/*                                                                            */
-/* position - The current seek position in 'bytes'.                           */
-/*----------------------------------------------------------------------------*/
 struct CliAuthIoByteStreamWriter {
+   /* the backing byte array */
    CliAuthUInt8 * bytes;
+
+   /* the length of the byte array in bytes */
    CliAuthUInt32 length;
+
+   /* the position for the next write operation */
    CliAuthUInt32 position;
 };
+
+/*----------------------------------------------------------------------------*/
+/* Initializes the byte stream reader.                                        */
+/*----------------------------------------------------------------------------*/
+/* context - The byte stream reader to initialize.                            */
+/*                                                                            */
+/* bytes - The backing byte array for the reader.                             */
+/*                                                                            */
+/* length - The length of 'bytes' in bytes.                                   */
+/*----------------------------------------------------------------------------*/
+void
+cliauth_io_byte_stream_reader_initialize(
+   struct CliAuthIoByteStreamReader * context,
+   const void * bytes,
+   CliAuthUInt32 length
+);
+
+/*----------------------------------------------------------------------------*/
+/* Initializes the byte stream writer.                                        */
+/*----------------------------------------------------------------------------*/
+/* context - The byte stream writer to initialize.                            */
+/*                                                                            */
+/* bytes - The backing byte array for the writer.                             */
+/*                                                                            */
+/* length - The length of 'bytes' in bytes.                                   */
+/*----------------------------------------------------------------------------*/
+void
+cliauth_io_byte_stream_writer_initialize(
+   struct CliAuthIoByteStreamWriter * context,
+   void * bytes,
+   CliAuthUInt32 length
+);
 
 /*----------------------------------------------------------------------------*/
 /* Creates a generic reader interface from the byte stream reader.            */

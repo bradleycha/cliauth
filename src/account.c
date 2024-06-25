@@ -147,13 +147,15 @@ cliauth_account_generate_passcode(
       account->digits
    );
 
+   cliauth_io_byte_stream_reader_initialize(
+      &secrets_byte_stream_reader,
+      account->secrets,
+      account->secrets_bytes
+   );
+
    secrets_reader = cliauth_io_byte_stream_reader_interface(
       &secrets_byte_stream_reader
    );
-
-   secrets_byte_stream_reader.bytes = account->secrets;
-   secrets_byte_stream_reader.length = account->secrets_bytes;
-   secrets_byte_stream_reader.position = 0;
 
    (void)cliauth_otp_hotp_key_digest(
       &hotp_context,

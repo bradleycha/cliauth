@@ -593,6 +593,32 @@ cliauth_io_byte_stream_writer_write(
    return write_result;
 }
 
+void
+cliauth_io_byte_stream_reader_initialize(
+   struct CliAuthIoByteStreamReader * context,
+   const void * bytes,
+   CliAuthUInt32 length
+) {
+   context->bytes = (const CliAuthUInt8 *)bytes;
+   context->length = length;
+   context->position = 0;
+
+   return;
+}
+
+void
+cliauth_io_byte_stream_writer_initialize(
+   struct CliAuthIoByteStreamWriter * context,
+   void * bytes,
+   CliAuthUInt32 length
+) {
+   context->bytes = (CliAuthUInt8 *)bytes;
+   context->length = length;
+   context->position = 0;
+
+   return;
+}
+
 struct CliAuthIoReader
 cliauth_io_byte_stream_reader_interface(
    struct CliAuthIoByteStreamReader * context

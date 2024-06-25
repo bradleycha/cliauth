@@ -92,14 +92,16 @@ cliauth_mac_hmac_key_digest_rollover(
    );
 
    /* digest the k0 buffer into the hash function */
-   buffer_byte_stream_reader.bytes = context->k0_buffer;
-   buffer_byte_stream_reader.length = context->block_bytes;
-   buffer_byte_stream_reader.position = 0;
+   cliauth_io_byte_stream_reader_initialize(
+      &buffer_byte_stream_reader,
+      context->k0_buffer,
+      context->block_bytes
+   );
 
    (void)context->hash_function->digest(
       context->hash_context,
       &buffer_reader,
-      buffer_byte_stream_reader.length
+      context->block_bytes
    );
 
    /* digest the rest of the key */
@@ -233,14 +235,16 @@ cliauth_mac_hmac_key_finalize(
       &k0_byte_stream_reader
    );
 
-   k0_byte_stream_reader.bytes = context->k0_buffer;
-   k0_byte_stream_reader.length = context->block_bytes;
-   k0_byte_stream_reader.position = 0;
+   cliauth_io_byte_stream_reader_initialize(
+      &k0_byte_stream_reader,
+      context->k0_buffer,
+      context->block_bytes
+   );
 
    (void)context->hash_function->digest(
       context->hash_context,
       &k0_reader,
-      k0_byte_stream_reader.length
+      context->block_bytes
    );
 
    return;
@@ -295,22 +299,28 @@ cliauth_mac_hmac_finalize(
       &byte_stream_reader
    );
 
-   byte_stream_reader.bytes = context->k0_buffer;
-   byte_stream_reader.length = context->block_bytes;
-   byte_stream_reader.position = 0;
-   (void)context->hash_function->digest(
-      context->hash_context,
-      &reader,
-      byte_stream_reader.length
+   cliauth_io_byte_stream_reader_initialize(
+      &byte_stream_reader,
+      context->k0_buffer,
+      context->block_bytes
    );
 
-   byte_stream_reader.bytes = context->digest_buffer;
-   byte_stream_reader.length = context->digest_bytes;
-   byte_stream_reader.position = 0;
    (void)context->hash_function->digest(
       context->hash_context,
       &reader,
-      byte_stream_reader.length
+      context->block_bytes
+   );
+
+   cliauth_io_byte_stream_reader_initialize(
+      &byte_stream_reader,
+      context->digest_buffer,
+      context->digest_bytes
+   );
+
+   (void)context->hash_function->digest(
+      context->hash_context,
+      &reader,
+      context->digest_bytes
    );
 
    digest = context->hash_function->finalize(context->hash_context);
