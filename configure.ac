@@ -26,6 +26,7 @@ config_enable_feature_hash_sha384=0
 config_enable_feature_hash_sha512=0
 config_enable_feature_hash_sha512_224=0
 config_enable_feature_hash_sha512_256=0
+config_enable_feature_io_buffering=0
 
 # TODO: avoid copy+pasting descriptions
 # TODO: figure out how to set some features to default to '1'
@@ -79,6 +80,11 @@ AC_ARG_ENABLE([hash-sha512-256],
    [config_enable_feature_hash_sha512_256=1],
    [config_enable_feature_hash_sha512_256=0]
 )
+AC_ARG_ENABLE([io-buffering],
+   AS_HELP_STRING([--enable-io-buffering], [Enable support for file IO buffering]),
+   [config_enable_feature_io_buffering=1],
+   [config_enable_feature_io_buffering=0]
+)
 
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE],
    [$config_enable_target_endian_is_be],
@@ -119,6 +125,10 @@ AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA512_224],
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA512_256],
    [$config_enable_feature_hash_sha512_256],
    [Enable support for the SHA-512-256 hash algorithm]
+)
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_IO_BUFFERING],
+   [$config_enable_feature_io_buffering],
+   [Enable support for file IO buffering]
 )
 
 AC_OUTPUT

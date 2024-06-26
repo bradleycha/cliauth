@@ -443,6 +443,128 @@ cliauth_io_byte_stream_writer_interface(
    struct CliAuthIoByteStreamWriter * context
 );
 
+#if CLIAUTH_CONFIG_IO_BUFFERING
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+/* A generic buffered reader implementation.                                  */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoBufferedReader {
+   /* the backing reader interface */
+   const struct CliAuthIoReader * backing_reader;
+
+   /* the buffer to read input blocks into */
+   CliAuthUInt8 * buffer;
+
+   /* the length of 'buffer' in bytes */
+   CliAuthUInt32 length;
+   
+   /* the index which represents the start of the buffered bytes */
+   CliAuthUInt32 start;
+
+   /* the remaining unused bytes in the buffer */
+   CliAuthUInt32 capacity;
+};
+
+/*----------------------------------------------------------------------------*/
+/* A generic buffered writer implementation.                                  */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoBufferedWriter {
+   /* the backing writer interface */
+   const struct CliAuthIoWriter * backing_writer;
+
+   /* the buffer to write input blocks into */
+   CliAuthUInt8 * buffer;
+
+   /* the length of 'buffer' in bytes */
+   CliAuthUInt32 length;
+   
+   /* the index which represents the start of the buffered bytes */
+   CliAuthUInt32 start;
+
+   /* the remaining unused bytes in the buffer */
+   CliAuthUInt32 capacity;
+};
+
+/*----------------------------------------------------------------------------*/
+/* Initializes the buffered reader.                                           */
+/*----------------------------------------------------------------------------*/
+/* context - The buffered reader to initialize.                               */
+/*                                                                            */
+/* backing_reader - The backing reader interface to buffer.                   */
+/*                                                                            */
+/* buffer - A byte array which will store the buffered reads.                 */
+/*                                                                            */
+/* length - The length of 'buffer' in bytes.                                  */
+/*----------------------------------------------------------------------------*/
+void
+cliauth_io_buffered_reader_initialize(
+   struct CliAuthIoBufferedReader * context,
+   const struct CliAuthIoReader * backing_reader,
+   void * buffer,
+   CliAuthUInt32 length
+);
+
+/*----------------------------------------------------------------------------*/
+/* Initializes the buffered writer.                                           */
+/*----------------------------------------------------------------------------*/
+/* context - The buffered writer to initialize.                               */
+/*                                                                            */
+/* backing_writer - The backing writer interface to buffer.                   */
+/*                                                                            */
+/* buffer - A byte array which will store the buffered writes.                */
+/*                                                                            */
+/* length - The length of 'buffer' in bytes.                                  */
+/*----------------------------------------------------------------------------*/
+void
+cliauth_io_buffered_writer_initialize(
+   struct CliAuthIoBufferedWriter * context,
+   const struct CliAuthIoWriter * backing_writer,
+   void * buffer,
+   CliAuthUInt32 length
+);
+
+/*----------------------------------------------------------------------------*/
+/* Creates a generic reader interface from the buffered reader.               */
+/*----------------------------------------------------------------------------*/
+/* context - The buffered reader to create a reader from.  The lifetime of    */
+/*           the reader interface is the same as the buffered reader.         */
+/*----------------------------------------------------------------------------*/
+/* Return value - A generic reader interface.                                 */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoReader
+cliauth_io_buffered_reader_interface(
+   struct CliAuthIoBufferedReader * context
+);
+
+/*----------------------------------------------------------------------------*/
+/* Creates a generic writer interface from the buffered writer.               */
+/*----------------------------------------------------------------------------*/
+/* context - The buffered writer to create a writer from.  The lifetime of    */
+/*           the writer interface is the same as the buffered writer.         */
+/*----------------------------------------------------------------------------*/
+/* Return value - A generic writer interface.                                 */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoWriter
+cliauth_io_buffered_writer_interface(
+   struct CliAuthIoBufferedWriter * context
+);
+
+/*----------------------------------------------------------------------------*/
+/* Flushes any buffered bytes to the writer, emptying the write buffer.       */
+/*----------------------------------------------------------------------------*/
+/* context - The buffered writer to flush.                                    */
+/*----------------------------------------------------------------------------*/
+/* Return value - The result of flushing the write buffer.                    */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoWriteResult
+cliauth_io_buffered_writer_flush(
+   struct CliAuthIoBufferedWriter * context
+);
+
+/*----------------------------------------------------------------------------*/
+#endif /* CLIAUTH_CONFIG_IO_BUFFERING */
+
 /*----------------------------------------------------------------------------*/
 #endif /* _CLIAUTH_IO_H */
 
