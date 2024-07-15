@@ -10,6 +10,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
+#include "endian.h"
 
 /*----------------------------------------------------------------------------*/
 /* A generic I/O read result status.                                          */
@@ -145,88 +146,6 @@ cliauth_io_reader_read_all(
 );
 
 /*----------------------------------------------------------------------------*/
-/* Reads an integer and performs endianess conversion from a reader.          */
-/*----------------------------------------------------------------------------*/
-/* reader - The reader interface to read from.                                */
-/*                                                                            */
-/* output - A pointer to an integer which stores the read integer.  The data  */
-/*          will only be valid if the function returns                        */
-/*          the read result status 'CLIAUTH_IO_READ_STATUS_SUCCESS'.          */
-/*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of reading.                */
-/*----------------------------------------------------------------------------*/
-struct CliAuthIoReadResult
-cliauth_io_reader_read_uint8(
-   const struct CliAuthIoReader * reader,
-   CliAuthUInt8 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_sint8(
-   const struct CliAuthIoReader * reader,
-   CliAuthSInt8 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_little_uint16(
-   const struct CliAuthIoReader * reader,
-   CliAuthUInt16 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_little_uint32(
-   const struct CliAuthIoReader * reader,
-   CliAuthUInt32 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_little_uint64(
-   const struct CliAuthIoReader * reader,
-   CliAuthUInt64 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_little_sint16(
-   const struct CliAuthIoReader * reader,
-   CliAuthSInt16 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_little_sint32(
-   const struct CliAuthIoReader * reader,
-   CliAuthSInt32 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_little_sint64(
-   const struct CliAuthIoReader * reader,
-   CliAuthSInt64 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_big_uint16(
-   const struct CliAuthIoReader * reader,
-   CliAuthUInt16 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_big_uint32(
-   const struct CliAuthIoReader * reader,
-   CliAuthUInt32 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_big_uint64(
-   const struct CliAuthIoReader * reader,
-   CliAuthUInt64 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_big_sint16(
-   const struct CliAuthIoReader * reader,
-   CliAuthSInt16 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_big_sint32(
-   const struct CliAuthIoReader * reader,
-   CliAuthSInt32 * output
-);
-struct CliAuthIoReadResult
-cliauth_io_reader_read_big_sint64(
-   const struct CliAuthIoReader * reader,
-   CliAuthSInt64 * output
-);
-
-/*----------------------------------------------------------------------------*/
 /* A generic writer interface.                                                */
 /*----------------------------------------------------------------------------*/
 /* writer - The writer function for the instance's implementation.            */
@@ -275,86 +194,6 @@ cliauth_io_writer_write_all(
    const struct CliAuthIoWriter * writer,
    const void * data,
    CliAuthUInt32 bytes
-);
-
-/*----------------------------------------------------------------------------*/
-/* Writes an integer and performs endianess conversion to a writer.           */
-/*----------------------------------------------------------------------------*/
-/* writer - The writer interface to write to.                                 */
-/*                                                                            */
-/* value - The integer to write.                                              */
-/*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of writing.                */
-/*----------------------------------------------------------------------------*/
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_uint8(
-   const struct CliAuthIoWriter * writer,
-   CliAuthUInt8 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_sint8(
-   const struct CliAuthIoWriter * writer,
-   CliAuthSInt8 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_little_uint16(
-   const struct CliAuthIoWriter * writer,
-   CliAuthUInt16 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_little_uint32(
-   const struct CliAuthIoWriter * writer,
-   CliAuthUInt32 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_little_uint64(
-   const struct CliAuthIoWriter * writer,
-   CliAuthUInt64 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_little_sint16(
-   const struct CliAuthIoWriter * writer,
-   CliAuthSInt16 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_little_sint32(
-   const struct CliAuthIoWriter * writer,
-   CliAuthSInt32 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_little_sint64(
-   const struct CliAuthIoWriter * writer,
-   CliAuthSInt64 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_big_uint16(
-   const struct CliAuthIoWriter * writer,
-   CliAuthUInt16 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_big_uint32(
-   const struct CliAuthIoWriter * writer,
-   CliAuthUInt32 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_big_uint64(
-   const struct CliAuthIoWriter * writer,
-   CliAuthUInt64 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_big_sint16(
-   const struct CliAuthIoWriter * writer,
-   CliAuthSInt16 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_big_sint32(
-   const struct CliAuthIoWriter * writer,
-   CliAuthSInt32 value
-);
-struct CliAuthIoWriteResult
-cliauth_io_writer_write_big_sint64(
-   const struct CliAuthIoWriter * writer,
-   CliAuthSInt64 value
 );
 
 /*----------------------------------------------------------------------------*/

@@ -188,7 +188,10 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
 
    /* calculate the message length in bits, convert to big endian, and append */
    /* to the end of the message */
-   message_length_bits_big_endian = cliauth_endian_host_to_big_uint64(context->total * 8);
+   message_length_bits_big_endian = cliauth_endian_convert_uint64(
+      context->total * 8,
+      CLIAUTH_ENDIAN_TARGET_BIG
+   );
    (void)memcpy(
       ring_buffer_iter,
       &message_length_bits_big_endian,
@@ -202,6 +205,47 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
    return;
 }
 
+static void
+cliauth_hash_sha1_2_load_message_block_big(
+   const CliAuthUInt8 * block,
+   void * schedule,
+   CliAuthUInt8 block_bytes,
+   CliAuthUInt8 schedule_bytes_per_word
+) {
+   (void)schedule_bytes_per_word;
+   (void)memcpy(schedule, block, block_bytes);
+
+   return;
+}
+
+static void
+cliauth_hash_sha1_2_load_message_block_little(
+   const CliAuthUInt8 * block,
+   void * schedule,
+   CliAuthUInt8 block_bytes,
+   CliAuthUInt8 schedule_bytes_per_word
+) {
+   const CliAuthUInt8 * block_iter;
+   CliAuthUInt8 * schedule_iter;
+
+   block_iter = block;
+   schedule_iter = (CliAuthUInt8 *)schedule;
+   while (block_bytes != 0) {
+      cliauth_endian_convert_copy(
+         schedule_iter,
+         block_iter,
+         schedule_bytes_per_word,
+         CLIAUTH_ENDIAN_TARGET_BIG
+      );
+
+      block_iter += schedule_bytes_per_word;
+      schedule_iter += schedule_bytes_per_word;
+      block_bytes -= schedule_bytes_per_word;
+   }
+
+   return;
+}
+
 /* loads the initial part of the message schedule from the input block */
 static void
 cliauth_hash_sha1_2_load_message_block(
@@ -210,49 +254,84 @@ cliauth_hash_sha1_2_load_message_block(
    CliAuthUInt8 block_bytes,
    CliAuthUInt8 schedule_bytes_per_word
 ) {
-#if CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE
-   (void)schedule_bytes_per_word;
-   (void)memcpy(schedule, block, block_bytes);
-#else /* CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
-   const CliAuthUInt8 * block_iter;
-   CliAuthUInt8 * schedule_iter;
+#if CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE
+   (void)cliauth_hash_sha1_2_load_message_block_little;
+   cliauth_hash_sha1_2_load_message_block_big(
+      block,
+      schedule,
+      block_bytes,
+      schedule_bytes_per_word
+   );
+#else /* CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE */
+   (void)cliauth_hash_sha1_2_load_message_block_big;
+   cliauth_hash_sha1_2_load_message_block_little(
+      block,
+      schedule,
+      block_bytes,
+      schedule_bytes_per_word
+   );
+#endif /* CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE */
 
-   block_iter = block;
-   schedule_iter = (CliAuthUInt8 *)schedule;
-   while (block_bytes != 0) {
-      cliauth_endian_host_to_big_copy(schedule_iter, block_iter, schedule_bytes_per_word);
+   return;
+}
 
-      block_iter += schedule_bytes_per_word;
-      schedule_iter += schedule_bytes_per_word;
-      block_bytes -= schedule_bytes_per_word;
+static void
+cliauth_hash_sha1_2_digest_endianess_finalize_big(
+   void * digest,
+   CliAuthUInt8 digest_bytes_per_word,
+   CliAuthUInt8 digest_words
+) {
+   (void)digest;
+   (void)digest_bytes_per_word;
+   (void)digest_words;
+   return;
+}
+
+static void
+cliauth_hash_sha1_2_digest_endianess_finalize_little(
+   void * digest,
+   CliAuthUInt8 digest_bytes_per_word,
+   CliAuthUInt8 digest_words
+) {
+   CliAuthUInt8 * digest_iter;
+
+   digest_iter = (CliAuthUInt8 *)digest;
+   while (digest_words != 0) {
+      cliauth_endian_convert_inplace(
+         digest_iter,
+         digest_bytes_per_word,
+         CLIAUTH_ENDIAN_TARGET_BIG
+      );
+      
+      digest_iter += digest_bytes_per_word;
+      digest_words--;
    }
-#endif /* CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
 
    return;
 }
 
 /* flips the endianess of a final digest to big-endian */
 static void
-cliauth_hash_sha1_2_digest_endian_host_to_big(
+cliauth_hash_sha1_2_digest_endianess_finalize(
    void * digest,
    CliAuthUInt8 digest_bytes_per_word,
    CliAuthUInt8 digest_words
 ) {
-#if CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE
-   (void)digest;
-   (void)digest_bytes_per_word;
-   (void)digest_words;
-#else /* CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
-   CliAuthUInt8 * digest_iter;
-
-   digest_iter = (CliAuthUInt8 *)digest;
-   while (digest_words != 0) {
-      cliauth_endian_host_to_big_inplace(digest_iter, digest_bytes_per_word);
-      
-      digest_iter += digest_bytes_per_word;
-      digest_words--;
-   }
-#endif /* CLIAUTH_CONFIG_ENDIAN_PLATFORM_IS_BE */
+#if CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE
+   (void)cliauth_hash_sha1_2_digest_endianess_finalize_little;
+   cliauth_hash_sha1_2_digest_endianess_finalize_big(
+      digest,
+      digest_bytes_per_word,
+      digest_words
+   );
+#else /* CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE */
+   (void)cliauth_hash_sha1_2_digest_endianess_finalize_big;
+   cliauth_hash_sha1_2_digest_endianess_finalize_little(
+      digest,
+      digest_bytes_per_word,
+      digest_words
+   );
+#endif /* CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE */
 
    return;
 }
@@ -508,7 +587,7 @@ cliauth_hash_sha1_finalize(void * context) {
       context_sha->ring_buffer
    );
 
-   cliauth_hash_sha1_2_digest_endian_host_to_big(
+   cliauth_hash_sha1_2_digest_endianess_finalize(
       context_sha->digest,
       sizeof(CliAuthUInt32),
       _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT
@@ -785,7 +864,7 @@ cliauth_hash_sha2_32_finalize(
    );
 
    /* flip the endianess to big-endian for each word */
-   cliauth_hash_sha1_2_digest_endian_host_to_big(
+   cliauth_hash_sha1_2_digest_endianess_finalize(
       context_sha->digest,
       sizeof(CliAuthUInt32),
       _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT
@@ -1089,7 +1168,7 @@ cliauth_hash_sha2_64_finalize(
       context_sha->ring_buffer
    );
 
-   cliauth_hash_sha1_2_digest_endian_host_to_big(
+   cliauth_hash_sha1_2_digest_endianess_finalize(
       context_sha->digest,
       sizeof(CliAuthUInt64),
       _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT

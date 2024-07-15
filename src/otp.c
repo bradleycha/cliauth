@@ -30,7 +30,10 @@ cliauth_otp_hotp_truncate_digest(
 
    /* read the bit stream using the offset and convert to the host endian */
    (void)memcpy(&passcode, &digest_bytes[offset], sizeof(passcode));
-   passcode = cliauth_endian_host_to_big_uint32(passcode);
+   passcode = cliauth_endian_convert_uint32(
+      passcode,
+      CLIAUTH_ENDIAN_TARGET_BIG
+   );
 
    /* discard the top-most bit */
    passcode &= ~(((CliAuthUInt32)1) << ((sizeof(passcode) * 8) - 1));
@@ -111,7 +114,10 @@ cliauth_otp_hotp_finalize(
 
    /* convert the counter value to big-endian and digest it as the HMAC */
    /* message */
-   counter_big_endian = cliauth_endian_host_to_big_uint64(context->counter);
+   counter_big_endian = cliauth_endian_convert_uint64(
+      context->counter,
+      CLIAUTH_ENDIAN_TARGET_BIG
+   );
 
    cliauth_io_byte_stream_reader_initialize(
       &counter_byte_stream_reader,
