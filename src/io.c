@@ -8,7 +8,7 @@
 #include "cliauth.h"
 #include "io.h"
 
-#include <string.h>
+#include "memory.h"
 #include "endian.h"
 
 struct CliAuthIoReadResult
@@ -137,7 +137,11 @@ cliauth_io_byte_stream_reader_read(
 
    bytes_read_ptr = &reader->bytes[reader->position];
 
-   (void)memcpy(buffer, bytes_read_ptr, bytes_read_count);
+   cliauth_memory_copy(
+      buffer,
+      bytes_read_ptr,
+      bytes_read_count
+   );
    reader->position += bytes_read_count;
 
    read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
@@ -175,7 +179,11 @@ cliauth_io_byte_stream_writer_write(
 
    bytes_write_ptr = &writer->bytes[writer->position];
 
-   (void)memcpy(bytes_write_ptr, data, bytes_write_count);
+   cliauth_memory_copy(
+      bytes_write_ptr,
+      data,
+      bytes_write_count
+   );
    writer->position += bytes_write_count;
    
    write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
@@ -258,7 +266,7 @@ cliauth_io_buffered_reader_read(
    /* if we already have the required number of bytes in the buffer, simply */
    /* take them from the buffer */
    if (bytes < context_reader->length - context_reader->capacity) {
-      (void)memcpy(
+      cliauth_memory_copy(
          buffer,
          read_buffer_start,
          bytes
@@ -285,7 +293,7 @@ cliauth_io_buffered_reader_read(
    residual_bytes = bytes - buffer_bytes;
 
    /* drain the entire read buffer */
-   (void)memcpy(
+   cliauth_memory_copy(
       buffer_iter,
       read_buffer_start,
       buffer_bytes
@@ -353,7 +361,11 @@ cliauth_io_buffered_writer_write(
    /* if the number of bytes we are writing is less than the remaining */
    /* buffer capacity, simply append the data into the buffer */
    if (bytes < context_writer->capacity) {
-      (void)memcpy(buffer_free, data, bytes);
+      cliauth_memory_copy(
+         buffer_free,
+         data,
+         bytes
+      );
 
       context_writer->capacity -= bytes;
 
@@ -375,7 +387,11 @@ cliauth_io_buffered_writer_write(
    block_bytes = bytes - fill_bytes - residual_bytes;
 
    /* fill the write buffer, capacity will be updated upon writing */
-   (void)memcpy(buffer_free, data_iter, fill_bytes);
+   cliauth_memory_copy(
+      buffer_free,
+      data_iter,
+      fill_bytes
+   );
    context_writer->capacity = 0;
 
    /* attempt to flush the write buffer */
@@ -403,7 +419,11 @@ cliauth_io_buffered_writer_write(
    }
 
    /* copy the remaining bytes into the write buffer */
-   (void)memcpy(context_writer->buffer, data_iter, residual_bytes);
+   cliauth_memory_copy(
+      context_writer->buffer,
+      data_iter,
+      residual_bytes
+   );
    context_writer->start = 0;
    context_writer->capacity = context_writer->length - residual_bytes;
    write_total += residual_bytes;

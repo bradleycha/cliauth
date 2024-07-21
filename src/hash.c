@@ -8,7 +8,7 @@
 #include "cliauth.h"
 #include "hash.h"
 
-#include <string.h>
+#include "memory.h"
 #include "endian.h"
 #include "bitwise.h"
 #include "io.h"
@@ -154,6 +154,10 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
    CliAuthUInt8 * ring_buffer_iter;
    CliAuthUInt8 zero_pad_bytes;
    CliAuthUInt64 message_length_bits_big_endian;
+   CliAuthUInt8 zero_pad_sentinel;
+
+   /* initialize the zero sentinel value used for padding */
+   zero_pad_sentinel = 0x00;
 
    /* initialize iterator to the start of free space */
    ring_buffer_iter = buffer + (implementation->bytes - context->capacity);
@@ -175,7 +179,12 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
    /* buffer and digest with as many zeroes as will fit and then fill the */
    /* next block with zeroes */
    if (zero_pad_bytes > context->capacity - 1) {
-      (void)memset(ring_buffer_iter, 0x00, context->capacity - 1);
+      cliauth_memory_fill(
+         ring_buffer_iter,
+         &zero_pad_sentinel,
+         context->capacity - 1,
+         1
+      );
       ring_buffer_iter = buffer;
       zero_pad_bytes -= context->capacity - 1;
 
@@ -183,7 +192,12 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
    }
 
    /* write the remaining pad zeroes */
-   (void)memset(ring_buffer_iter, 0x00, zero_pad_bytes);
+   cliauth_memory_fill(
+      ring_buffer_iter,
+      &zero_pad_sentinel,
+      zero_pad_bytes,
+      1
+   );
    ring_buffer_iter += zero_pad_bytes;
 
    /* calculate the message length in bits, convert to big endian, and append */
@@ -192,7 +206,7 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
       context->total * 8,
       CLIAUTH_ENDIAN_TARGET_BIG
    );
-   (void)memcpy(
+   cliauth_memory_copy(
       ring_buffer_iter,
       &message_length_bits_big_endian,
       sizeof(message_length_bits_big_endian)
@@ -213,7 +227,11 @@ cliauth_hash_sha1_2_load_message_block_big(
    CliAuthUInt8 schedule_bytes_per_word
 ) {
    (void)schedule_bytes_per_word;
-   (void)memcpy(schedule, block, block_bytes);
+   cliauth_memory_copy(
+      schedule,
+      block,
+      block_bytes
+   );
 
    return;
 }
@@ -503,7 +521,7 @@ cliauth_hash_sha1_digest_block(
       context_sha->schedule
    );
 
-   (void)memcpy(
+   cliauth_memory_copy(
       context_sha->work,
       context_sha->digest,
       _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)
@@ -540,7 +558,7 @@ cliauth_hash_sha1_initialize(void * context) {
 
    context_sha = (struct CliAuthHashContextSha1 *)context;
 
-   (void)memcpy(
+   cliauth_memory_copy(
       &context_sha->digest,
       cliauth_hash_sha1_constants_initialize,
       _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)
@@ -774,7 +792,7 @@ cliauth_hash_sha2_32_digest_block(
    );
 
    /* initialize the working variables */
-   (void)memcpy(
+   cliauth_memory_copy(
       context_sha->work,
       context_sha->digest,
       _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)
@@ -812,7 +830,7 @@ cliauth_hash_sha2_32_initialize(
    context_sha = (struct CliAuthHashContextSha232 *)context;
 
    /* initialize the digest to H(0). */
-   (void)memcpy(
+   cliauth_memory_copy(
       &context_sha->digest,
       constants_initialize,
       _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)
@@ -1085,7 +1103,7 @@ cliauth_hash_sha2_64_digest_block(
       context_sha->schedule
    );
 
-   (void)memcpy(
+   cliauth_memory_copy(
       context_sha->work,
       context_sha->digest,
       _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt64)
@@ -1119,7 +1137,7 @@ cliauth_hash_sha2_64_initialize(
 
    context_sha = (struct CliAuthHashContextSha264 *)context;
 
-   (void)memcpy(
+   cliauth_memory_copy(
       &context_sha->digest,
       constants_initialize,
       _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt64)

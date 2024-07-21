@@ -8,7 +8,7 @@
 #include "cliauth.h"
 #include "mac.h"
 
-#include <string.h>
+#include "memory.h"
 #include "hash.h"
 #include "io.h"
 
@@ -194,6 +194,7 @@ cliauth_mac_hmac_key_finalize(
    CliAuthUInt8 pad_bytes;
    struct CliAuthIoByteStreamReader k0_byte_stream_reader;
    struct CliAuthIoReader k0_reader;
+   CliAuthUInt8 ipad_constant;
 
    /* set the message source and pad pointers depending on if we hashed k0 or */
    /* not */
@@ -222,10 +223,12 @@ cliauth_mac_hmac_key_finalize(
    }
 
    /* pad any remainder bytes with ipad */
-   (void)memset(
+   ipad_constant = CLIAUTH_MAC_HMAC_IPAD;
+   cliauth_memory_fill(
       pad_ptr,
-      CLIAUTH_MAC_HMAC_IPAD,
-      pad_bytes
+      &ipad_constant,
+      pad_bytes,
+      1
    );
 
    /* re-initialize the hash context and digest k0 ^ ipad to prepare for */
@@ -276,7 +279,7 @@ cliauth_mac_hmac_finalize(
    /* finalize the hash value H((K0 ^ ipad) || text) and store in the digest */
    /* buffer */
    digest = context->hash_function->finalize(context->hash_context);
-   (void)memcpy(
+   cliauth_memory_copy(
       context->digest_buffer,
       digest,
       context->digest_bytes

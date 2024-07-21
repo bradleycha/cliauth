@@ -8,8 +8,8 @@
 #include "cliauth.h"
 #include "args.h"
 
-#include <string.h>
 #include <time.h>
+#include "memory.h"
 #include "account.h"
 
 #define TEST_SECRETS "\xde\xad\xbe\xef"
@@ -30,7 +30,8 @@ cliauth_args_parse(
    CliAuthUInt16 args_count
 ) {
    const char * key_uri;
-   CliAuthUInt32 key_uri_characters;
+   char key_uri_terminator;
+   struct CliAuthMemoryFindResult key_uri_terminator_find_result;
 
    if (args_count < 2) {
       cliauth_log(CLIAUTH_LOG_ERROR("no key URI was given as an argument"));
@@ -41,25 +42,43 @@ cliauth_args_parse(
    }
 
    key_uri = args[1];
-   key_uri_characters = strlen(key_uri);
+   key_uri_terminator = '\0';
+   key_uri_terminator_find_result = cliauth_memory_find(
+      key_uri,
+      &key_uri_terminator,
+      CLIAUTH_UINT32_MAX / sizeof(char),
+      sizeof(char)
+   );
 
    /* TODO: re-implement key URI parsing */
    cliauth_log(CLIAUTH_LOG_WARNING("key URI parsing is temporarily regressed, arguments parsing will use hard-coded values"));
    (void)key_uri;
-   (void)key_uri_characters;
+   (void)key_uri_terminator_find_result;
 
    payload->account.algorithm.type = CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP;
    payload->account.algorithm.parameters.totp.period = 30;
 
    payload->account.hash = CLIAUTH_ACCOUNT_HASH_TYPE_SHA1;
 
-   (void)memcpy(payload->account.secrets, TEST_SECRETS, TEST_SECRETS_BYTES);
+   cliauth_memory_copy(
+      payload->account.secrets,
+      TEST_SECRETS,
+      TEST_SECRETS_BYTES
+   );
    payload->account.secrets_bytes = TEST_SECRETS_BYTES;
 
-   (void)memcpy(payload->account.issuer, TEST_ISSUER, TEST_ISSUER_BYTES);
+   cliauth_memory_copy(
+      payload->account.issuer,
+      TEST_ISSUER,
+      TEST_ISSUER_BYTES
+   );
    payload->account.issuer_characters = TEST_ISSUER_BYTES / sizeof(char);
 
-   (void)memcpy(payload->account.name, TEST_NAME, TEST_NAME_BYTES);
+   cliauth_memory_copy(
+      payload->account.name,
+      TEST_NAME,
+      TEST_NAME_BYTES
+   );
    payload->account.name_characters = TEST_NAME_BYTES / sizeof(char);
 
    payload->account.digits = 6;

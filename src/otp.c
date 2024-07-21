@@ -8,7 +8,7 @@
 #include "cliauth.h"
 #include "otp.h"
 
-#include <string.h>
+#include "memory.h"
 #include "endian.h"
 #include "hash.h"
 #include "mac.h"
@@ -29,7 +29,11 @@ cliauth_otp_hotp_truncate_digest(
    offset = (digest_bytes[bytes - 1]) & 0x0f;
 
    /* read the bit stream using the offset and convert to the host endian */
-   (void)memcpy(&passcode, &digest_bytes[offset], sizeof(passcode));
+   cliauth_memory_copy(
+      &passcode,
+      &digest_bytes[offset],
+      sizeof(passcode)
+   );
    passcode = cliauth_endian_convert_uint32(
       passcode,
       CLIAUTH_ENDIAN_TARGET_BIG

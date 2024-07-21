@@ -8,7 +8,7 @@
 #include "cliauth.h"
 #include "endian.h"
 
-#include <string.h>
+#include "memory.h"
 
 static void
 cliauth_endian_swap_inplace(
@@ -79,7 +79,11 @@ cliauth_endian_convert_copy(
    if (target != CLIAUTH_ENDIAN_TARGET_NATIVE) {
       cliauth_endian_swap_copy(dest, source, bytes);
    } else {
-      (void)memcpy(dest, source, bytes);
+      cliauth_memory_copy(
+         dest,
+         source,
+         bytes
+      );
    }
 
    return;
