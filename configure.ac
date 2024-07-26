@@ -16,6 +16,10 @@ AC_CONFIG_FILES([Makefile])
 
 AC_PROG_CC
 
+AC_CHECK_FUNCS([memcpy])
+AC_CHECK_FUNCS([memset])
+AC_CHECK_FUNCS([memcmp])
+
 config_enable_platform_integer_sign_is_sign_magnitude=0
 config_enable_platform_integer_sign_is_ones_complement=0
 config_enable_platform_integer_sign_is_twos_complement=0
