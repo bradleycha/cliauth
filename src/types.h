@@ -79,8 +79,8 @@ union CliAuthInt64 {
 
 typedef CliAuthUInt8 CliAuthBoolean;
 
-#define CLIAUTH_BOOLEAN_FALSE (!(!(0)))
-#define CLIAUTH_BOOLEAN_TRUE  (!(0))
+#define CLIAUTH_BOOLEAN_FALSE ((CliAuthBoolean)(!(!(0))))
+#define CLIAUTH_BOOLEAN_TRUE  ((CliAuthBoolean)(!(0)))
 
 /*----------------------------------------------------------------------------*/
 #endif /* _CLIAUTH_TYPES_H */

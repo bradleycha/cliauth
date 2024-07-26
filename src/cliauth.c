@@ -8,6 +8,7 @@
 #include "cliauth.h"
 #include "args.h"
 #include "account.h"
+#include <inttypes.h>
 
 #define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION
 
@@ -42,22 +43,45 @@ cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
          return CLIAUTH_EXIT_STATUS_ARGS_PARSE_ERROR;
    }
 
-   cliauth_log(CLIAUTH_LOG_INFO("account issuer: %.*s"), args.account.issuer_characters, args.account.issuer);
-   cliauth_log(CLIAUTH_LOG_INFO("account name: %.*s"), args.account.name_characters, args.account.name);
+   cliauth_log(
+      CLIAUTH_LOG_INFO("account issuer: %.*s"),
+      args.account.issuer_characters,
+      args.account.issuer
+   );
+   cliauth_log(
+      CLIAUTH_LOG_INFO("account name: %.*s"),
+      args.account.name_characters,
+      args.account.name
+   );
 
    switch (args.account.algorithm.type) {
       case CLIAUTH_ACCOUNT_ALGORITHM_TYPE_HOTP:
-         cliauth_log(CLIAUTH_LOG_INFO("counter value: %llu"), args.account.algorithm.parameters.hotp.counter);
+         cliauth_log(
+            CLIAUTH_LOG_INFO("counter value: %" PRIu64),
+            args.account.algorithm.parameters.hotp.counter
+         );
          break;
 
       case CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP:
-         cliauth_log(CLIAUTH_LOG_INFO("initial timestamp: %llu seconds"), args.totp_parameters.time_initial);
-         cliauth_log(CLIAUTH_LOG_INFO("current timestamp: %llu seconds"), args.totp_parameters.time_current);
-         cliauth_log(CLIAUTH_LOG_INFO("period: %llu seconds"), args.account.algorithm.parameters.totp.period);
+         cliauth_log(
+            CLIAUTH_LOG_INFO("initial timestamp: %" PRIu64 " seconds"), 
+            args.totp_parameters.time_initial
+         );
+         cliauth_log(
+            CLIAUTH_LOG_INFO("current timestamp: %" PRIu64 " seconds"),
+            args.totp_parameters.time_current
+         );
+         cliauth_log(
+            CLIAUTH_LOG_INFO("period: %" PRIu64 " seconds"),
+            args.account.algorithm.parameters.totp.period
+         );
          break;
    }
 
-   cliauth_log(CLIAUTH_LOG_INFO("passcode index: %lld"), args.index);
+   cliauth_log(
+      CLIAUTH_LOG_INFO("passcode index: %" PRId64),
+      args.index
+   );
 
    cliauth_log(CLIAUTH_LOG_INFO("generating a passcode using the given parameters"));
 
@@ -70,7 +94,11 @@ cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
    );
    switch (passcode_result) {
       case CLIAUTH_GENERATE_PASSCODE_RESULT_SUCCESS:
-         cliauth_log(CLIAUTH_LOG_INFO("generated passcode: %0*u"), args.account.digits, passcode);
+         cliauth_log(
+            CLIAUTH_LOG_INFO("generated passcode: %0*" PRIu32),
+            args.account.digits,
+            passcode
+         );
          break;
 
       case CLIAUTH_GENERATE_PASSCODE_RESULT_DOES_NOT_EXIST:
