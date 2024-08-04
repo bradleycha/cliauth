@@ -5,35 +5,41 @@
 # Makefile.am - GNU Automake script                                            #
 #------------------------------------------------------------------------------#
 
-bin_PROGRAMS = cliauth
+bin_PROGRAMS = \
+	cliauth
 
-cliauth_CFLAGS = -Wall -Wextra -Wpedantic -Werror -std=c89
+cliauth_CFLAGS = \
+	-std=c89 \
+	-Wall \
+	-Wextra \
+	-Wpedantic \
+	-Werror
 
 cliauth_SOURCES = \
 	src/cliauth.c \
 	src/cliauth.h \
 	src/types.h \
+	src/imports.h \
 	src/log.c \
 	src/log.h \
-	src/endian.c \
-	src/endian.h \
 	src/bitwise.c \
 	src/bitwise.h \
+	src/memory.c \
+	src/memory.h \
+	src/endian.c \
+	src/endian.h \
+	src/io.c \
+	src/io.h \
+	src/parse.c \
+	src/parse.h \
 	src/hash.c \
 	src/hash.h \
 	src/mac.c \
 	src/mac.h \
 	src/otp.c \
 	src/otp.h \
-	src/parse.c \
-	src/parse.h \
-	src/args.c \
-	src/args.h \
 	src/account.c \
 	src/account.h \
-	src/io.c \
-	src/io.h \
-	src/memory.c \
-	src/memory.h \
-	src/imports.h
+	src/args.c \
+	src/args.h
 

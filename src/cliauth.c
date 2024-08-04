@@ -8,6 +8,7 @@
 #include "cliauth.h"
 #include "args.h"
 #include "account.h"
+#include "log.h"
 #include <inttypes.h>
 
 #define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION

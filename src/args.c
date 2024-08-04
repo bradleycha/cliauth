@@ -11,6 +11,7 @@
 #include <time.h>
 #include "memory.h"
 #include "account.h"
+#include "log.h"
 
 #define TEST_SECRETS "\xde\xad\xbe\xef"
 #define TEST_ISSUER  "Account Authority Inc."
