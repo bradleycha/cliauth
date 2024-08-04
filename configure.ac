@@ -24,6 +24,7 @@ config_enable_platform_integer_sign_is_sign_magnitude=0
 config_enable_platform_integer_sign_is_ones_complement=0
 config_enable_platform_integer_sign_is_twos_complement=0
 config_enable_platform_endian_is_be=0
+config_enable_feature_optional_library_imports=0
 config_enable_feature_ansi=0
 config_enable_feature_log_origin=0
 config_enable_feature_hash_sha1=0
@@ -48,6 +49,11 @@ config_enable_platform_integer_sign_is_twos_complement=1
 AC_C_BIGENDIAN(
    [config_enable_platform_endian_is_be=1],
    [config_enable_platform_endian_is_be=0],
+)
+AC_ARG_ENABLE([optional-library-imports],
+   AS_HELP_STRING([--enable-optional-library-imports], [Use optional library functions where possible]),
+   [config_enable_feature_optional_library_imports=1],
+   [config_enable_feature_optional_library_imports=0]
 )
 AC_ARG_ENABLE([ansi],
    AS_HELP_STRING([--enable-ansi], [Enable support for ANSI escape sequences]),
@@ -115,6 +121,10 @@ AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT],
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE],
    [$config_enable_platform_endian_is_be],
    [Whether the target platform is big-endian or not]
+)
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_OPTIONAL_LIBRARY_IMPORTS],
+   [$config_enable_feature_optional_library_imports],
+   [Use optional library functions where possible]
 )
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_ANSI],
    [$config_enable_feature_ansi],

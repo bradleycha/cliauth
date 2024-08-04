@@ -14,6 +14,7 @@
 #define CLIAUTH_NULLPTR ((void *)0)
 
 #include "types.h"
+#include "imports.h"
 #include "log.h"
 
 /*----------------------------------------------------------------------------*/
