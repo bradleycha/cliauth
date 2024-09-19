@@ -425,9 +425,9 @@ cliauth_parse_string_integer_state_digest_prefix(
    const struct CliAuthIoReader * reader
 ) {
    struct CliAuthParseStringIntegerResult result;
-   char prefix_buffer [CLIAUTH_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS];
+   CliAuthUInt8 prefix_buffer [CLIAUTH_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS];
    CliAuthUInt32 prefix_characters;
-   const char * prefix_iter;
+   const CliAuthUInt8 * prefix_iter;
 
    /* decide on the number of characters to read in.  if the length of the */
    /* entire string is less than the maximum prefix length, read in the whole */
@@ -477,7 +477,7 @@ cliauth_parse_string_integer_state_digest_magnitude(
 ) {
    struct CliAuthParseStringIntegerResult result;
    CliAuthUInt32 bytes_read;
-   char digit;
+   CliAuthUInt8 digit;
 
    bytes_read = 0;
    while (state->characters_remaining != 0) {

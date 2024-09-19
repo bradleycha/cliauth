@@ -137,8 +137,8 @@ cliauth_account_generate_passcode(
    /* run the HOTP algorithm to generate the passcode */
    cliauth_otp_hotp_initialize(
       &hotp_context,
-      &buffer->key,
-      &buffer->digest,
+      (CliAuthUInt8 *)(&buffer->key),
+      (CliAuthUInt8 *)(&buffer->digest),
       hash_data->function,
       &buffer->context,
       hash_data->block_bytes,

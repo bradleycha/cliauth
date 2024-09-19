@@ -66,8 +66,8 @@ struct CliAuthOtpHotpContext {
 void
 cliauth_otp_hotp_initialize(
    struct CliAuthOtpHotpContext * context,
-   void * key_buffer,
-   void * digest_buffer,
+   CliAuthUInt8 key_buffer [],
+   CliAuthUInt8 digest_buffer [],
    const struct CliAuthHashFunction * hash_function,
    void * hash_context,
    CliAuthUInt8 block_bytes,

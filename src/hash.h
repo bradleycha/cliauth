@@ -113,7 +113,7 @@ typedef struct CliAuthIoReadResult (*CliAuthHashFunctionDigest)(
 /*                algorithm.  The byte length of the output digest value can  */
 /*                be found from 'CLIAUTH_HASH_*_DIGEST_LENGTH'.               */
 /*----------------------------------------------------------------------------*/
-typedef void * (*CliAuthHashFunctionFinalize)(
+typedef CliAuthUInt8 * (*CliAuthHashFunctionFinalize)(
    void * context
 );
 

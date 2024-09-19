@@ -72,8 +72,8 @@ struct CliAuthMacHmacContext {
 void
 cliauth_mac_hmac_initialize(
    struct CliAuthMacHmacContext * context,
-   void * key_buffer,
-   void * digest_buffer,
+   CliAuthUInt8 key_buffer [],
+   CliAuthUInt8 digest_buffer [],
    const struct CliAuthHashFunction * hash_function,
    void * hash_context,
    CliAuthUInt8 block_bytes,
@@ -153,7 +153,7 @@ cliauth_mac_hmac_message_digest(
 /*                context was initialized.  For more information, see the     */
 /*                documentation for CliAuthHashFunctionFinalize.              */
 /*----------------------------------------------------------------------------*/
-void *
+CliAuthUInt8 *
 cliauth_mac_hmac_finalize(
    struct CliAuthMacHmacContext * context
 );

@@ -18,15 +18,15 @@
 void
 cliauth_mac_hmac_initialize(
    struct CliAuthMacHmacContext * context,
-   void * key_buffer,
-   void * digest_buffer,
+   CliAuthUInt8 key_buffer [],
+   CliAuthUInt8 digest_buffer [],
    const struct CliAuthHashFunction * hash_function,
    void * hash_context,
    CliAuthUInt8 block_bytes,
    CliAuthUInt8 digest_bytes
 ) {
-   context->k0_buffer = (CliAuthUInt8 *)key_buffer;
-   context->digest_buffer = (CliAuthUInt8 *)digest_buffer;
+   context->k0_buffer = key_buffer;
+   context->digest_buffer = digest_buffer;
    context->hash_function = hash_function;
    context->hash_context = hash_context;
    context->block_bytes = block_bytes;
@@ -266,7 +266,7 @@ cliauth_mac_hmac_message_digest(
    );
 }
 
-void *
+CliAuthUInt8 *
 cliauth_mac_hmac_finalize(
    struct CliAuthMacHmacContext * context
 ) {

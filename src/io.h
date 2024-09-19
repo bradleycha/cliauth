@@ -78,7 +78,7 @@ struct CliAuthIoWriteResult {
 /*----------------------------------------------------------------------------*/
 typedef struct CliAuthIoReadResult (*CliAuthIoReaderFunction)(
    void * context,
-   void * buffer,
+   CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 );
 
@@ -88,7 +88,7 @@ typedef struct CliAuthIoReadResult (*CliAuthIoReaderFunction)(
 /*----------------------------------------------------------------------------*/
 typedef struct CliAuthIoWriteResult (*CliAuthIoWriterFunction)(
    void * context,
-   const void * data,
+   const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 );
 
@@ -121,7 +121,7 @@ struct CliAuthIoReader {
 struct CliAuthIoReadResult
 cliauth_io_reader_read(
    const struct CliAuthIoReader * reader,
-   void * buffer,
+   CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 );
 
@@ -141,7 +141,7 @@ cliauth_io_reader_read(
 struct CliAuthIoReadResult
 cliauth_io_reader_read_all(
    const struct CliAuthIoReader * reader,
-   void * buffer,
+   CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 );
 
@@ -173,7 +173,7 @@ struct CliAuthIoWriter {
 struct CliAuthIoWriteResult
 cliauth_io_writer_write(
    const struct CliAuthIoWriter * writer,
-   const void * data,
+   const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 );
 
@@ -192,7 +192,7 @@ cliauth_io_writer_write(
 struct CliAuthIoWriteResult
 cliauth_io_writer_write_all(
    const struct CliAuthIoWriter * writer,
-   const void * data,
+   const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 );
 
@@ -236,7 +236,7 @@ struct CliAuthIoByteStreamWriter {
 void
 cliauth_io_byte_stream_reader_initialize(
    struct CliAuthIoByteStreamReader * context,
-   const void * bytes,
+   const CliAuthUInt8 bytes [],
    CliAuthUInt32 length
 );
 
@@ -252,7 +252,7 @@ cliauth_io_byte_stream_reader_initialize(
 void
 cliauth_io_byte_stream_writer_initialize(
    struct CliAuthIoByteStreamWriter * context,
-   void * bytes,
+   CliAuthUInt8 bytes [],
    CliAuthUInt32 length
 );
 
@@ -340,7 +340,7 @@ void
 cliauth_io_buffered_reader_initialize(
    struct CliAuthIoBufferedReader * context,
    const struct CliAuthIoReader * backing_reader,
-   void * buffer,
+   CliAuthUInt8 buffer [],
    CliAuthUInt32 length
 );
 
@@ -359,7 +359,7 @@ void
 cliauth_io_buffered_writer_initialize(
    struct CliAuthIoBufferedWriter * context,
    const struct CliAuthIoWriter * backing_writer,
-   void * buffer,
+   CliAuthUInt8 buffer [],
    CliAuthUInt32 length
 );
 
