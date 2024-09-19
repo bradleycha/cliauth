@@ -28,12 +28,12 @@ config_enable_feature_optional_library_imports=0
 config_enable_feature_ansi=0
 config_enable_feature_log_origin=0
 config_enable_feature_hash_sha1=0
-config_enable_feature_hash_sha224=0
-config_enable_feature_hash_sha256=0
-config_enable_feature_hash_sha384=0
-config_enable_feature_hash_sha512=0
-config_enable_feature_hash_sha512_224=0
-config_enable_feature_hash_sha512_256=0
+config_enable_feature_hash_sha2_224=0
+config_enable_feature_hash_sha2_256=0
+config_enable_feature_hash_sha2_384=0
+config_enable_feature_hash_sha2_512=0
+config_enable_feature_hash_sha2_512_224=0
+config_enable_feature_hash_sha2_512_256=0
 config_enable_feature_io_buffering=0
 
 # TODO: figure out how to detect this from the target platform
@@ -66,39 +66,39 @@ AC_ARG_ENABLE([log-origin],
    [config_enable_feature_log_origin=0]
 )
 AC_ARG_ENABLE([hash-sha1],
-   AS_HELP_STRING([--enable-hash-sha1], [Enable support for the SHA-1 hash algorithm]),
+   AS_HELP_STRING([--enable-hash-sha1], [Enable support for the SHA1 hash algorithm]),
    [config_enable_feature_hash_sha1=1],
    [config_enable_feature_hash_sha1=0]
 )
-AC_ARG_ENABLE([hash-sha224],
-   AS_HELP_STRING([--enable-hash-sha224], [Enable support for the SHA-224 hash algorithm]),
-   [config_enable_feature_hash_sha224=1],
-   [config_enable_feature_hash_sha224=0]
+AC_ARG_ENABLE([hash-sha2-224],
+   AS_HELP_STRING([--enable-hash-sha2-224], [Enable support for the SHA2-224 hash algorithm]),
+   [config_enable_feature_hash_sha2_224=1],
+   [config_enable_feature_hash_sha2_224=0]
 )
-AC_ARG_ENABLE([hash-sha256],
-   AS_HELP_STRING([--enable-hash-sha256], [Enable support for the SHA-256 hash algorithm]),
-   [config_enable_feature_hash_sha256=1],
-   [config_enable_feature_hash_sha256=0]
+AC_ARG_ENABLE([hash-sha2-256],
+   AS_HELP_STRING([--enable-hash-sha2-256], [Enable support for the SHA2-256 hash algorithm]),
+   [config_enable_feature_hash_sha2_256=1],
+   [config_enable_feature_hash_sha2_256=0]
 )
-AC_ARG_ENABLE([hash-sha384],
-   AS_HELP_STRING([--enable-hash-sha384], [Enable support for the SHA-384 hash algorithm]),
-   [config_enable_feature_hash_sha384=1],
-   [config_enable_feature_hash_sha384=0]
+AC_ARG_ENABLE([hash-sha2-384],
+   AS_HELP_STRING([--enable-hash-sha2-384], [Enable support for the SHA2-384 hash algorithm]),
+   [config_enable_feature_hash_sha2_384=1],
+   [config_enable_feature_hash_sha2_384=0]
 )
-AC_ARG_ENABLE([hash-sha512],
-   AS_HELP_STRING([--enable-hash-sha512], [Enable support for the SHA-512 hash algorithm]),
-   [config_enable_feature_hash_sha512=1],
-   [config_enable_feature_hash_sha512=0]
+AC_ARG_ENABLE([hash-sha2-512],
+   AS_HELP_STRING([--enable-hash-sha2-512], [Enable support for the SHA2-512 hash algorithm]),
+   [config_enable_feature_hash_sha2_512=1],
+   [config_enable_feature_hash_sha2_512=0]
 )
-AC_ARG_ENABLE([hash-sha512-224],
-   AS_HELP_STRING([--enable-hash-sha512-224], [Enable support for the SHA-512-224 hash algorithm]),
-   [config_enable_feature_hash_sha512_224=1],
-   [config_enable_feature_hash_sha512_224=0]
+AC_ARG_ENABLE([hash-sha2-512-224],
+   AS_HELP_STRING([--enable-hash-sha2-512-224], [Enable support for the SHA2-512-224 hash algorithm]),
+   [config_enable_feature_hash_sha2_512_224=1],
+   [config_enable_feature_hash_sha2_512_224=0]
 )
-AC_ARG_ENABLE([hash-sha512-256],
-   AS_HELP_STRING([--enable-hash-sha512-256], [Enable support for the SHA-512-256 hash algorithm]),
-   [config_enable_feature_hash_sha512_256=1],
-   [config_enable_feature_hash_sha512_256=0]
+AC_ARG_ENABLE([hash-sha2-512-256],
+   AS_HELP_STRING([--enable-hash-sha2-512-256], [Enable support for the SHA2-512-256 hash algorithm]),
+   [config_enable_feature_hash_sha2_512_256=1],
+   [config_enable_feature_hash_sha2_512_256=0]
 )
 AC_ARG_ENABLE([io-buffering],
    AS_HELP_STRING([--enable-io-buffering], [Enable support for file IO buffering]),
@@ -136,31 +136,31 @@ AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_LOG_ORIGIN],
 )
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA1],
    [$config_enable_feature_hash_sha1],
-   [Enable support for the SHA-1 hash algorithm]
+   [Enable support for the SHA1 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA224],
-   [$config_enable_feature_hash_sha224],
-   [Enable support for the SHA-224 hash algorithm]
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA2_224],
+   [$config_enable_feature_hash_sha2_224],
+   [Enable support for the SHA2-224 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA256],
-   [$config_enable_feature_hash_sha256],
-   [Enable support for the SHA-256 hash algorithm]
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA2_256],
+   [$config_enable_feature_hash_sha2_256],
+   [Enable support for the SHA2-256 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA384],
-   [$config_enable_feature_hash_sha384],
-   [Enable support for the SHA-384 hash algorithm]
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA2_384],
+   [$config_enable_feature_hash_sha2_384],
+   [Enable support for the SHA2-384 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA512],
-   [$config_enable_feature_hash_sha512],
-   [Enable support for the SHA-512 hash algorithm]
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA2_512],
+   [$config_enable_feature_hash_sha2_512],
+   [Enable support for the SHA2-512 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA512_224],
-   [$config_enable_feature_hash_sha512_224],
-   [Enable support for the SHA-512-224 hash algorithm]
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA2_512_224],
+   [$config_enable_feature_hash_sha2_512_224],
+   [Enable support for the SHA2-512-224 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA512_256],
-   [$config_enable_feature_hash_sha512_256],
-   [Enable support for the SHA-512-256 hash algorithm]
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_HASH_SHA2_512_256],
+   [$config_enable_feature_hash_sha2_512_256],
+   [Enable support for the SHA2-512-256 hash algorithm]
 )
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_IO_BUFFERING],
    [$config_enable_feature_io_buffering],

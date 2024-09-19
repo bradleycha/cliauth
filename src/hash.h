@@ -18,23 +18,23 @@
 /*----------------------------------------------------------------------------*/
 #define CLIAUTH_HASH_ENABLED_COUNT (\
       CLIAUTH_CONFIG_HASH_SHA1 +\
-      CLIAUTH_CONFIG_HASH_SHA224 +\
-      CLIAUTH_CONFIG_HASH_SHA256 +\
-      CLIAUTH_CONFIG_HASH_SHA384 +\
-      CLIAUTH_CONFIG_HASH_SHA512 +\
-      CLIAUTH_CONFIG_HASH_SHA512_224 +\
-      CLIAUTH_CONFIG_HASH_SHA512_256\
+      CLIAUTH_CONFIG_HASH_SHA2_224 +\
+      CLIAUTH_CONFIG_HASH_SHA2_256 +\
+      CLIAUTH_CONFIG_HASH_SHA2_384 +\
+      CLIAUTH_CONFIG_HASH_SHA2_512 +\
+      CLIAUTH_CONFIG_HASH_SHA2_512_224 +\
+      CLIAUTH_CONFIG_HASH_SHA2_512_256\
    )
 
 #if CLIAUTH_HASH_ENABLED_COUNT == 0
 #error all hash algorithms are disabled.  please verify the build was configured correctly.
 #endif
 
-/* enable shared constants and functions for 32-bit SHA-2 hash functions */
+/* enable shared constants and functions for 32-bit SHA2 hash functions */
 #define _CLIAUTH_HASH_SHA2_32\
    (\
-      CLIAUTH_CONFIG_HASH_SHA224 ||\
-      CLIAUTH_CONFIG_HASH_SHA256\
+      CLIAUTH_CONFIG_HASH_SHA2_224 ||\
+      CLIAUTH_CONFIG_HASH_SHA2_256\
    )
 
 /* enable shared constants and functions for SHA1 and SHA2-32 functions */
@@ -44,23 +44,23 @@
       _CLIAUTH_HASH_SHA2_32\
    )
 
-/* enable shared constants and functions for 64-bit SHA-2 hash functions */
+/* enable shared constants and functions for 64-bit SHA2 hash functions */
 #define _CLIAUTH_HASH_SHA2_64\
    (\
-      CLIAUTH_CONFIG_HASH_SHA384 ||\
-      CLIAUTH_CONFIG_HASH_SHA512 ||\
-      CLIAUTH_CONFIG_HASH_SHA512_224 ||\
-      CLIAUTH_CONFIG_HASH_SHA512_256\
+      CLIAUTH_CONFIG_HASH_SHA2_384 ||\
+      CLIAUTH_CONFIG_HASH_SHA2_512 ||\
+      CLIAUTH_CONFIG_HASH_SHA2_512_224 ||\
+      CLIAUTH_CONFIG_HASH_SHA2_512_256\
    )
 
-/* enable shared constants and functions for all SHA-2 hash functions */
+/* enable shared constants and functions for all SHA2 hash functions */
 #define _CLIAUTH_HASH_SHA2\
    (\
       _CLIAUTH_HASH_SHA2_32 ||\
       _CLIAUTH_HASH_SHA2_64\
    )
 
-/* enable shared constants and functions for all SHA1 and SHA2 function */
+/* enable shared constants and functions for all SHA1 and SHA2 functions */
 #define _CLIAUTH_HASH_SHA1_2\
    (\
       CLIAUTH_CONFIG_HASH_SHA1 ||\
@@ -230,23 +230,23 @@ struct CliAuthHashContextSha232 {
 /*----------------------------------------------------------------------------*/
 /* The type of 'context' should be CliAuthHashContextSha232.                  */
 /*                                                                            */
-/* The length of 'digest' is CLIAUTH_HASH_SHA224_DIGEST_LENGTH or             */
-/* CLIAUTH_HASH_SHA256_DIGEST_LENGTH, depending on the specific algorithm.    */
+/* The length of 'digest' is CLIAUTH_HASH_SHA2_224_DIGEST_LENGTH or           */
+/* CLIAUTH_HASH_SHA2_256_DIGEST_LENGTH, depending on the specific algorithm.  */
 /*----------------------------------------------------------------------------*/
 
-#if CLIAUTH_CONFIG_HASH_SHA224
-#define CLIAUTH_HASH_SHA224_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH
-#define CLIAUTH_HASH_SHA224_DIGEST_LENGTH 28
+#if CLIAUTH_CONFIG_HASH_SHA2_224
+#define CLIAUTH_HASH_SHA2_224_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH
+#define CLIAUTH_HASH_SHA2_224_DIGEST_LENGTH 28
 extern const struct CliAuthHashFunction
-cliauth_hash_sha224;
-#endif /* CLIAUTH_CONFIG_HASH_SHA224 */
+cliauth_hash_sha2_224;
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_224 */
 
-#if CLIAUTH_CONFIG_HASH_SHA256
-#define CLIAUTH_HASH_SHA256_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH
-#define CLIAUTH_HASH_SHA256_DIGEST_LENGTH 32
+#if CLIAUTH_CONFIG_HASH_SHA2_256
+#define CLIAUTH_HASH_SHA2_256_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH
+#define CLIAUTH_HASH_SHA2_256_DIGEST_LENGTH 32
 extern const struct CliAuthHashFunction
-cliauth_hash_sha256;
-#endif /* CLIAUTH_CONFIG_HASH_SHA256 */
+cliauth_hash_sha2_256;
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_256 */
 
 /*----------------------------------------------------------------------------*/
 #endif /* _CLIAUTH_HASH_SHA2_32 */
@@ -280,39 +280,40 @@ struct CliAuthHashContextSha264 {
 /*----------------------------------------------------------------------------*/
 /* The type of 'context' should be CliAuthHashContextSha264.                  */
 /*                                                                            */
-/* The length of 'digest' is CLIAUTH_HASH_SHA384_DIGEST_LENGTH,               */
-/* CLIAUTH_HASH_SHA512_DIGEST_LENGTH, CLIAUTH_HASH_SHA512_224_DIGEST_LENGTH,  */
-/* or CLIAUTH_HASH_SHA512_256_DIGEST_LENGTH, depending on the specific        */
+/* The length of 'digest' is CLIAUTH_HASH_SHA2_384_DIGEST_LENGTH,             */
+/* CLIAUTH_HASH_SHA2_512_DIGEST_LENGTH,                                       */
+/* CLIAUTH_HASH_SHA2_512_224_DIGEST_LENGTH, or                                */
+/* CLIAUTH_HASH_SHA2_512_256_DIGEST_LENGTH, depending on the specific         */
 /* algorithm.                                                                 */
 /*----------------------------------------------------------------------------*/
 
-#if CLIAUTH_CONFIG_HASH_SHA384
-#define CLIAUTH_HASH_SHA384_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
-#define CLIAUTH_HASH_SHA384_DIGEST_LENGTH 48
+#if CLIAUTH_CONFIG_HASH_SHA2_384
+#define CLIAUTH_HASH_SHA2_384_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
+#define CLIAUTH_HASH_SHA2_384_DIGEST_LENGTH 48
 extern const struct CliAuthHashFunction
-cliauth_hash_sha384;
-#endif /* CLIAUTH_CONFIG_HASH_SHA384 */
+cliauth_hash_sha2_384;
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_384 */
 
-#if CLIAUTH_CONFIG_HASH_SHA512
-#define CLIAUTH_HASH_SHA512_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
-#define CLIAUTH_HASH_SHA512_DIGEST_LENGTH 64
+#if CLIAUTH_CONFIG_HASH_SHA2_512
+#define CLIAUTH_HASH_SHA2_512_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
+#define CLIAUTH_HASH_SHA2_512_DIGEST_LENGTH 64
 extern const struct CliAuthHashFunction
-cliauth_hash_sha512;
-#endif /* CLIAUTH_CONFIG_HASH_SHA512 */
+cliauth_hash_sha2_512;
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_512 */
 
-#if CLIAUTH_CONFIG_HASH_SHA512_224
-#define CLIAUTH_HASH_SHA512_224_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
-#define CLIAUTH_HASH_SHA512_224_DIGEST_LENGTH 28
+#if CLIAUTH_CONFIG_HASH_SHA2_512_224
+#define CLIAUTH_HASH_SHA2_512_224_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
+#define CLIAUTH_HASH_SHA2_512_224_DIGEST_LENGTH 28
 extern const struct CliAuthHashFunction
-cliauth_hash_sha512_224;
-#endif /* CLIAUTH_CONFIG_HASH_SHA512_224 */
+cliauth_hash_sha2_512_224;
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_224 */
 
-#if CLIAUTH_CONFIG_HASH_SHA512_256
-#define CLIAUTH_HASH_SHA512_256_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
-#define CLIAUTH_HASH_SHA512_256_DIGEST_LENGTH 32
+#if CLIAUTH_CONFIG_HASH_SHA2_512_256
+#define CLIAUTH_HASH_SHA2_512_256_INPUT_BLOCK_LENGTH _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
+#define CLIAUTH_HASH_SHA2_512_256_DIGEST_LENGTH 32
 extern const struct CliAuthHashFunction
-cliauth_hash_sha512_256;
-#endif /* CLIAUTH_CONFIG_HASH_SHA512_256 */
+cliauth_hash_sha2_512_256;
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_256 */
 
 /*----------------------------------------------------------------------------*/
 #endif /* _CLIAUTH_HASH_SHA2_64 */
