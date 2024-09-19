@@ -16,14 +16,14 @@
 
 static CliAuthUInt32
 cliauth_otp_hotp_truncate_digest(
-   const void * digest,
+   const CliAuthUInt8 digest [],
    CliAuthUInt32 bytes
 ) {
    const CliAuthUInt8 * digest_bytes;
    CliAuthUInt32 passcode;
    CliAuthUInt8 offset;
 
-   digest_bytes = (const CliAuthUInt8 *)digest;
+   digest_bytes = digest;
 
    /* extracts 4 least significant bits */
    offset = (digest_bytes[bytes - 1]) & 0x0f;
@@ -108,8 +108,8 @@ cliauth_otp_hotp_finalize(
 ) {
    struct CliAuthIoByteStreamReader counter_byte_stream_reader;
    struct CliAuthIoReader counter_reader;
-   CliAuthUInt64 counter_big_endian;
-   void * hmac_digest;
+   union CliAuthInt64 counter_big_endian;
+   CliAuthUInt8 * hmac_digest;
    CliAuthUInt32 passcode_untrimmed;
    CliAuthUInt32 passcode_final;
 
@@ -118,14 +118,14 @@ cliauth_otp_hotp_finalize(
 
    /* convert the counter value to big-endian and digest it as the HMAC */
    /* message */
-   counter_big_endian = cliauth_endian_convert_uint64(
+   counter_big_endian.uint = cliauth_endian_convert_uint64(
       context->counter,
       CLIAUTH_ENDIAN_TARGET_BIG
    );
 
    cliauth_io_byte_stream_reader_initialize(
       &counter_byte_stream_reader,
-      (CliAuthUInt8 *)(&counter_big_endian),
+      counter_big_endian.bytes,
       sizeof(counter_big_endian)
    );
 

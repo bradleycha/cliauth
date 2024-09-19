@@ -379,7 +379,7 @@ cliauth_io_buffered_writer_write(
    write_total = 0;
 
    /* initialize the data iterator */
-   data_iter = (const CliAuthUInt8 *)data;
+   data_iter = data;
 
    /* calculate the bytes for the fill bytes, aligned block, and residual bytes */
    fill_bytes = context_writer->capacity;

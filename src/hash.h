@@ -165,13 +165,23 @@ struct _CliAuthHashSha12RingBufferContext {
 #define _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH\
    4
 
+/* internal union to allow treating word arrays as byte arrays */
+union _CliAuthHashContextSha1Digest {
+   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)];
+   CliAuthUInt32 words [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT];
+};
+union _CliAuthHashContextSha1Schedule {
+   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH * sizeof(CliAuthUInt32)];
+   CliAuthUInt32 words [_CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH];
+};
+
 /*----------------------------------------------------------------------------*/
 /* Context struct to be used with the SHA1 function.                          */
 /*----------------------------------------------------------------------------*/
 struct CliAuthHashContextSha1 {
-   CliAuthUInt32 digest [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT];
+   union _CliAuthHashContextSha1Digest digest;
+   union _CliAuthHashContextSha1Schedule schedule;
    CliAuthUInt32 work [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT];
-   CliAuthUInt32 schedule [_CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH];
    CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA1_BLOCK_LENGTH];
    struct _CliAuthHashSha12RingBufferContext ring_context;
 };
@@ -204,18 +214,29 @@ cliauth_hash_sha1;
 #define _CLIAUTH_HASH_SHA2_32_MESSAGE_SCHEDULE_LENGTH\
    _CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT
 
+
+/* internal union to allow treating word arrays as byte arrays */
+union _CliAuthHashContextSha232Digest {
+   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)];
+   CliAuthUInt32 words [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
+};
+union _CliAuthHashContextSha232Schedule {
+   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)];
+   CliAuthUInt32 words [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
+};
+
 /*----------------------------------------------------------------------------*/
 /* Context struct to be used with SHA2-32 class functions.                    */
 /*----------------------------------------------------------------------------*/
 struct CliAuthHashContextSha232 {
    /* the current state of the hash digest */
-   CliAuthUInt32 digest [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
+   union _CliAuthHashContextSha232Digest digest;
+
+   /* used internally by the block digest function */
+   union _CliAuthHashContextSha232Schedule schedule;
 
    /* used internally by the block digest function */
    CliAuthUInt32 work [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
-
-   /* used internally by the block digest function */
-   CliAuthUInt32 schedule [_CLIAUTH_HASH_SHA2_32_MESSAGE_SCHEDULE_LENGTH];
 
    /* the ring buffer bytes */
    CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH];
@@ -264,13 +285,22 @@ cliauth_hash_sha2_256;
 #define _CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH\
    _CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT
 
+union _CliAuthHashContextSha264Digest {
+   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt64)];
+   CliAuthUInt64 words [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
+};
+union _CliAuthHashContextSha264Schedule {
+   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt64)];
+   CliAuthUInt64 words [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
+};
+
 /*----------------------------------------------------------------------------*/
 /* Context struct to be used with SHA2-64 class functions.                    */
 /*----------------------------------------------------------------------------*/
 struct CliAuthHashContextSha264 {
-   CliAuthUInt64 digest [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
+   union _CliAuthHashContextSha264Digest digest;
+   union _CliAuthHashContextSha264Schedule schedule;
    CliAuthUInt64 work [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
-   CliAuthUInt64 schedule [_CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH];
    CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH];
    struct _CliAuthHashSha12RingBufferContext ring_context;
 };

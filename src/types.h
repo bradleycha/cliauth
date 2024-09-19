@@ -23,18 +23,22 @@ typedef int64_t   CliAuthSInt64;
 union CliAuthInt8 {
    CliAuthUInt8 uint;
    CliAuthSInt8 sint;
+   CliAuthUInt8 bytes [sizeof(CliAuthUInt8)];
 };
 union CliAuthInt16 {
    CliAuthUInt16 uint;
    CliAuthSInt16 sint;
+   CliAuthUInt8 bytes [sizeof(CliAuthUInt16)];
 };
 union CliAuthInt32 {
    CliAuthUInt32 uint;
    CliAuthSInt32 sint;
+   CliAuthUInt8 bytes [sizeof(CliAuthUInt32)];
 };
 union CliAuthInt64 {
    CliAuthUInt64 uint;
    CliAuthSInt64 sint;
+   CliAuthUInt8 bytes [sizeof(CliAuthUInt64)];
 };
 
 #define CLIAUTH_UINT8_MAX_LITERAL   (0xffu)

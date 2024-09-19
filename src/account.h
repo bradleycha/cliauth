@@ -307,8 +307,8 @@ union _CliAuthAccountGeneratePasscodeBufferKey {
 /*----------------------------------------------------------------------------*/
 struct CliAuthAccountGeneratePasscodeBuffer {
    union _CliAuthAccountGeneratePasscodeBufferContext context;
-   union _CliAuthAccountGeneratePasscodeBufferDigest digest;
-   union _CliAuthAccountGeneratePasscodeBufferKey key;
+   CliAuthUInt8 digest [sizeof(union _CliAuthAccountGeneratePasscodeBufferDigest)];
+   CliAuthUInt8 key [sizeof(union _CliAuthAccountGeneratePasscodeBufferKey)];
 };
 
 /*----------------------------------------------------------------------------*/

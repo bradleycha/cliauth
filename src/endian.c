@@ -12,7 +12,7 @@
 
 static void
 cliauth_endian_swap_inplace(
-   void * data,
+   CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
    CliAuthUInt8 * start;
@@ -20,7 +20,7 @@ cliauth_endian_swap_inplace(
    CliAuthUInt8 temp;
 
    /* This is basically just a CS 101 in-place array reversal. */
-   start = (CliAuthUInt8 *)data;
+   start = data;
    end = start + bytes - 1;
    while (start < end) {
       temp = *start;
@@ -36,15 +36,15 @@ cliauth_endian_swap_inplace(
 
 static void
 cliauth_endian_swap_copy(
-   void * dest,
-   const void * source,
+   CliAuthUInt8 dest [],
+   const CliAuthUInt8 source [],
    CliAuthUInt32 bytes
 ) {
    CliAuthUInt8 * dest_iter;
-   CliAuthUInt8 * source_iter;
+   const CliAuthUInt8 * source_iter;
 
-   dest_iter = (CliAuthUInt8 *)dest;
-   source_iter = ((CliAuthUInt8 *)source) + bytes - 1;
+   dest_iter = dest;
+   source_iter = source + bytes - 1;
    while (bytes != 0) {
       *dest_iter = *source_iter;
 
@@ -58,7 +58,7 @@ cliauth_endian_swap_copy(
 
 void
 cliauth_endian_convert_inplace(
-   void * data,
+   CliAuthUInt8 data [],
    CliAuthUInt32 bytes,
    enum CliAuthEndianTarget target
 ) {
@@ -71,8 +71,8 @@ cliauth_endian_convert_inplace(
 
 void
 cliauth_endian_convert_copy(
-   void * dest,
-   const void * source,
+   CliAuthUInt8 dest [],
+   const CliAuthUInt8 source [],
    CliAuthUInt32 bytes,
    enum CliAuthEndianTarget target
 ) {
@@ -94,13 +94,17 @@ cliauth_endian_convert_uint16(
    CliAuthUInt16 value,
    enum CliAuthEndianTarget target
 ) {
+   union CliAuthInt16 value_generic;
+
+   value_generic.uint = value;
+
    cliauth_endian_convert_inplace(
-      &value,
+      value_generic.bytes,
       sizeof(value),
       target
    );
 
-   return value;
+   return value_generic.uint;
 }
 
 CliAuthUInt32
@@ -108,13 +112,17 @@ cliauth_endian_convert_uint32(
    CliAuthUInt32 value,
    enum CliAuthEndianTarget target
 ) {
+   union CliAuthInt32 value_generic;
+
+   value_generic.uint = value;
+
    cliauth_endian_convert_inplace(
-      &value,
+      value_generic.bytes,
       sizeof(value),
       target
    );
 
-   return value;
+   return value_generic.uint;
 }
 
 CliAuthUInt64
@@ -122,13 +130,17 @@ cliauth_endian_convert_uint64(
    CliAuthUInt64 value,
    enum CliAuthEndianTarget target
 ) {
+   union CliAuthInt64 value_generic;
+
+   value_generic.uint = value;
+
    cliauth_endian_convert_inplace(
-      &value,
+      value_generic.bytes,
       sizeof(value),
       target
    );
 
-   return value;
+   return value_generic.uint;
 }
 
 CliAuthSInt16
@@ -136,13 +148,17 @@ cliauth_endian_convert_sint16(
    CliAuthSInt16 value,
    enum CliAuthEndianTarget target
 ) {
+   union CliAuthInt16 value_generic;
+
+   value_generic.sint = value;
+
    cliauth_endian_convert_inplace(
-      &value,
+      value_generic.bytes,
       sizeof(value),
       target
    );
 
-   return value;
+   return value_generic.sint;
 }
 
 CliAuthSInt32
@@ -150,13 +166,17 @@ cliauth_endian_convert_sint32(
    CliAuthSInt32 value,
    enum CliAuthEndianTarget target
 ) {
+   union CliAuthInt32 value_generic;
+
+   value_generic.sint = value;
+
    cliauth_endian_convert_inplace(
-      &value,
+      value_generic.bytes,
       sizeof(value),
       target
    );
 
-   return value;
+   return value_generic.sint;
 }
 
 CliAuthSInt64
@@ -164,12 +184,16 @@ cliauth_endian_convert_sint64(
    CliAuthSInt64 value,
    enum CliAuthEndianTarget target
 ) {
+   union CliAuthInt64 value_generic;
+
+   value_generic.sint = value;
+
    cliauth_endian_convert_inplace(
-      &value,
+      value_generic.bytes,
       sizeof(value),
       target
    );
 
-   return value;
+   return value_generic.sint;
 }
 

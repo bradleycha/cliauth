@@ -47,7 +47,7 @@ enum CliAuthEndianTarget {
 /*----------------------------------------------------------------------------*/
 void
 cliauth_endian_convert_inplace(
-   void * data,
+   CliAuthUInt8 data [],
    CliAuthUInt32 bytes,
    enum CliAuthEndianTarget target
 );
@@ -68,8 +68,8 @@ cliauth_endian_convert_inplace(
 /*----------------------------------------------------------------------------*/
 void
 cliauth_endian_convert_copy(
-   void * dest,
-   const void * source,
+   CliAuthUInt8 dest [],
+   const CliAuthUInt8 source [],
    CliAuthUInt32 bytes,
    enum CliAuthEndianTarget target
 );
