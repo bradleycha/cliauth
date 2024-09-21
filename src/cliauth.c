@@ -107,7 +107,6 @@ cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
          break;
    }
 
-
    return CLIAUTH_EXIT_STATUS_SUCCESS;
 }
 

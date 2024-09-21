@@ -270,7 +270,7 @@ CliAuthUInt8 *
 cliauth_mac_hmac_finalize(
    struct CliAuthMacHmacContext * context
 ) {
-   void * digest;
+   CliAuthUInt8 * digest;
    CliAuthUInt8 * k0_opad_iter;
    CliAuthUInt8 k0_opad_bytes;
    struct CliAuthIoByteStreamReader byte_stream_reader;

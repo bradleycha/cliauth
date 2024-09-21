@@ -49,7 +49,7 @@ cliauth_hash_sha1_2_ring_buffer_digest(
    const struct CliAuthHashSha12RingBufferImplementation * implementation,
    struct _CliAuthHashSha12RingBufferContext * context,
    void * state,
-   CliAuthUInt8 * buffer,
+   CliAuthUInt8 buffer [],
    const struct CliAuthIoReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
@@ -149,7 +149,7 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
    const struct CliAuthHashSha12RingBufferImplementation * implementation,
    struct _CliAuthHashSha12RingBufferContext * context,
    void * state,
-   CliAuthUInt8 * buffer
+   CliAuthUInt8 buffer []
 ) {
    CliAuthUInt8 * ring_buffer_iter;
    CliAuthUInt8 zero_pad_bytes;
@@ -221,7 +221,7 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
 
 static void
 cliauth_hash_sha1_2_load_message_block_big(
-   const CliAuthUInt8 * block,
+   const CliAuthUInt8 block [],
    CliAuthUInt8 schedule [],
    CliAuthUInt8 block_bytes,
    CliAuthUInt8 schedule_bytes_per_word
@@ -238,7 +238,7 @@ cliauth_hash_sha1_2_load_message_block_big(
 
 static void
 cliauth_hash_sha1_2_load_message_block_little(
-   const CliAuthUInt8 * block,
+   const CliAuthUInt8 block [],
    CliAuthUInt8 schedule [],
    CliAuthUInt8 block_bytes,
    CliAuthUInt8 schedule_bytes_per_word
@@ -267,7 +267,7 @@ cliauth_hash_sha1_2_load_message_block_little(
 /* loads the initial part of the message schedule from the input block */
 static void
 cliauth_hash_sha1_2_load_message_block(
-   const CliAuthUInt8 * block,
+   const CliAuthUInt8 block [],
    CliAuthUInt8 schedule [],
    CliAuthUInt8 block_bytes,
    CliAuthUInt8 schedule_bytes_per_word
@@ -377,8 +377,8 @@ cliauth_hash_sha1_2_32_parity(CliAuthUInt32 x, CliAuthUInt32 y, CliAuthUInt32 z)
 
 static void
 cliauth_hash_sha1_2_32_compute_intermediate_digest(
-   const CliAuthUInt32 * work,
-   CliAuthUInt32 * digest,
+   const CliAuthUInt32 work [],
+   CliAuthUInt32 digest [],
    CliAuthUInt8 digest_words_count
 ) {
    while (digest_words_count != 0) {
