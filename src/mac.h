@@ -18,23 +18,17 @@
 /* authentication code (HMAC) digest.                                         */
 /*----------------------------------------------------------------------------*/
 struct CliAuthMacHmacContext {
-   /* the buffer to compute and store k0 in */
-   CliAuthUInt8 * k0_buffer;
-
-   /* the buffer to compute intermediate digest values */
-   CliAuthUInt8 * digest_buffer;
-
    /* the hash function to use */
    const struct CliAuthHashFunction * hash_function;
 
    /* the hash context to use with the hash function */
-   void * hash_context;
+   union CliAuthHashContext hash_context;
 
-   /* the length of a single hash input block in bytes */
-   CliAuthUInt8 block_bytes;
+   /* the buffer to compute and store k0 in */
+   CliAuthUInt8 k0_buffer [CLIAUTH_HASH_MAXIMUM_INPUT_BLOCK_LENGTH];
 
-   /* the length of the hash digest in bytes */
-   CliAuthUInt8 digest_bytes;
+   /* the buffer to compute intermediate digest values */
+   CliAuthUInt8 digest_buffer [CLIAUTH_HASH_MAXIMUM_DIGEST_LENGTH];
 
    /* the number of remaining bytes in the k0 buffer */
    CliAuthUInt8 k0_capacity;
@@ -49,35 +43,12 @@ struct CliAuthMacHmacContext {
 /*----------------------------------------------------------------------------*/
 /* context - The HMAC context to initialize.                                  */
 /*                                                                            */
-/* key_buffer - An array of bytes used internally.  The given array must at   */
-/*              least be long enough to store a single hash input block as    */
-/*              given by 'block_bytes'.                                       */
-/*                                                                            */
-/* digest_buffer - An array of bytes used internally.  The given array must   */
-/*                 at least be long enough to store a hash digest value as    */
-/*                 given by 'digest_bytes'.                                   */
-/*                                                                            */
 /* hash_function - The hash function to compute the HMAC digest with.         */
-/*                                                                            */
-/* hash_context - The context struct specific to 'hash_function'.  This may   */
-/*                not be re-used until after                                  */
-/*                'cliauth_mac_hmac_message_finalize()' has been called.      */
-/*                                                                            */
-/* block_bytes - The number of bytes which consist of a single input block    */
-/*               specific to 'hash_function'.                                 */
-/*                                                                            */
-/* digest_bytes - The number of bytes which consist of the output digest      */
-/*                specific to 'hash_function'.                                */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_mac_hmac_initialize(
    struct CliAuthMacHmacContext * context,
-   CliAuthUInt8 key_buffer [],
-   CliAuthUInt8 digest_buffer [],
-   const struct CliAuthHashFunction * hash_function,
-   void * hash_context,
-   CliAuthUInt8 block_bytes,
-   CliAuthUInt8 digest_bytes
+   const struct CliAuthHashFunction * hash_function
 );
 
 /*----------------------------------------------------------------------------*/
@@ -148,10 +119,8 @@ cliauth_mac_hmac_message_digest(
 /*           again, it must be re-initialized with                            */
 /*           'cliauth_mac_hmac_initialize()'.                                 */
 /*----------------------------------------------------------------------------*/
-/* Return value - A pointer to the final digest value.  The pointer will have */
-/*                the same lifetime as the hash context given when the        */
-/*                context was initialized.  For more information, see the     */
-/*                documentation for CliAuthHashFunctionFinalize.              */
+/* Return value - A pointer to the final digest value.  The pointer will be   */
+/*                valid until the context is re-initialized.                  */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt8 *
 cliauth_mac_hmac_finalize(

@@ -7,6 +7,7 @@
 
 #include "cliauth.h"
 #include "args.h"
+#include "otp.h"
 #include "account.h"
 #include "log.h"
 #include <inttypes.h>
@@ -30,7 +31,7 @@ static enum CliAuthExitStatus
 cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
    struct CliAuthArgsPayload args;
    enum CliAuthAccountGeneratePasscodeResult passcode_result;
-   struct CliAuthAccountGeneratePasscodeBuffer passcode_generate_buffer;
+   struct CliAuthOtpHotpContext passcode_hotp_context;
    CliAuthUInt32 passcode;
 
    cliauth_log(CLIAUTH_LOG_INFO(CLIAUTH_ABOUT));
@@ -53,6 +54,11 @@ cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
       CLIAUTH_LOG_INFO("account name: %.*s"),
       args.account.name_characters,
       args.account.name
+   );
+   cliauth_log(
+      CLIAUTH_LOG_INFO("hash algorithm: %.*s"),
+      args.account.hash_function->identifier_characters,
+      args.account.hash_function->identifier
    );
 
    switch (args.account.algorithm.type) {
@@ -89,7 +95,7 @@ cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
    passcode_result = cliauth_account_generate_passcode(
       &args.account,
       &passcode,
-      &passcode_generate_buffer,
+      &passcode_hotp_context,
       &args.totp_parameters,
       args.index
    );

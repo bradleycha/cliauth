@@ -64,23 +64,13 @@ cliauth_otp_hotp_trim_digits(
 void
 cliauth_otp_hotp_initialize(
    struct CliAuthOtpHotpContext * context,
-   CliAuthUInt8 key_buffer [],
-   CliAuthUInt8 digest_buffer [],
    const struct CliAuthHashFunction * hash_function,
-   void * hash_context,
-   CliAuthUInt8 block_bytes,
-   CliAuthUInt8 digest_bytes,
    CliAuthUInt64 counter,
    CliAuthUInt8 digits
 ) {
    cliauth_mac_hmac_initialize(
       &context->hmac_context,
-      key_buffer,
-      digest_buffer,
-      hash_function,
-      hash_context,
-      block_bytes,
-      digest_bytes
+      hash_function
    );
 
    context->counter = counter;
@@ -145,7 +135,7 @@ cliauth_otp_hotp_finalize(
    /* truncate to a 32-bit word and convert to native endian */
    passcode_untrimmed = cliauth_otp_hotp_truncate_digest(
       hmac_digest,
-      context->hmac_context.digest_bytes
+      context->hmac_context.hash_function->digest_length
    );
 
    /* modulo to keep only the desired number of digits*/

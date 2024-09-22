@@ -18,20 +18,10 @@
 void
 cliauth_mac_hmac_initialize(
    struct CliAuthMacHmacContext * context,
-   CliAuthUInt8 key_buffer [],
-   CliAuthUInt8 digest_buffer [],
-   const struct CliAuthHashFunction * hash_function,
-   void * hash_context,
-   CliAuthUInt8 block_bytes,
-   CliAuthUInt8 digest_bytes
+   const struct CliAuthHashFunction * hash_function
 ) {
-   context->k0_buffer = key_buffer;
-   context->digest_buffer = digest_buffer;
    context->hash_function = hash_function;
-   context->hash_context = hash_context;
-   context->block_bytes = block_bytes;
-   context->digest_bytes = digest_bytes;
-   context->k0_capacity = block_bytes;
+   context->k0_capacity = hash_function->input_block_length;
    context->k0_hash_initiated = CLIAUTH_BOOLEAN_FALSE;
 
    return;
@@ -46,7 +36,7 @@ cliauth_mac_hmac_key_digest_hash(
    struct CliAuthIoReadResult read_result;
 
    read_result = context->hash_function->digest(
-      context->hash_context,
+      &context->hash_context,
       key_reader,
       key_bytes
    );
@@ -65,8 +55,11 @@ cliauth_mac_hmac_key_digest_rollover(
    CliAuthUInt8 key_bytes_residual;
    struct CliAuthIoByteStreamReader buffer_byte_stream_reader;
    struct CliAuthIoReader buffer_reader;
+   CliAuthUInt8 input_block_length;
 
-   buffer_free = &context->k0_buffer[context->block_bytes - context->k0_capacity];
+   input_block_length = context->hash_function->input_block_length;
+
+   buffer_free = &context->k0_buffer[input_block_length - context->k0_capacity];
 
    /* calculate the number of residual bytes to digest after filling the k0 */
    /* buffer */
@@ -86,7 +79,7 @@ cliauth_mac_hmac_key_digest_rollover(
    }
 
    /* initialize the hash context */
-   context->hash_function->initialize(context->hash_context);
+   context->hash_function->initialize(&context->hash_context);
    buffer_reader = cliauth_io_byte_stream_reader_interface(
       &buffer_byte_stream_reader
    );
@@ -95,18 +88,18 @@ cliauth_mac_hmac_key_digest_rollover(
    cliauth_io_byte_stream_reader_initialize(
       &buffer_byte_stream_reader,
       context->k0_buffer,
-      context->block_bytes
+      input_block_length
    );
 
    (void)context->hash_function->digest(
-      context->hash_context,
+      &context->hash_context,
       &buffer_reader,
-      context->block_bytes
+      input_block_length
    );
 
    /* digest the rest of the key */
    read_result = context->hash_function->digest(
-      context->hash_context,
+      &context->hash_context,
       key_reader,
       key_bytes_residual
    );
@@ -134,8 +127,11 @@ cliauth_mac_hmac_key_digest_append(
 ) {
    struct CliAuthIoReadResult read_result;
    CliAuthUInt8 * buffer_free;
+   CliAuthUInt8 input_block_length;
 
-   buffer_free = &context->k0_buffer[context->block_bytes - context->k0_capacity];
+   input_block_length = context->hash_function->input_block_length;
+
+   buffer_free = &context->k0_buffer[input_block_length - context->k0_capacity];
 
    read_result = cliauth_io_reader_read_all(
       key_reader,
@@ -195,20 +191,25 @@ cliauth_mac_hmac_key_finalize(
    struct CliAuthIoByteStreamReader k0_byte_stream_reader;
    struct CliAuthIoReader k0_reader;
    CliAuthUInt8 ipad_constant;
+   CliAuthUInt8 input_block_length;
+   CliAuthUInt8 digest_length;
+
+   input_block_length = context->hash_function->input_block_length;
+   digest_length = context->hash_function->digest_length;
 
    /* set the message source and pad pointers depending on if we hashed k0 or */
    /* not */
    if (context->k0_hash_initiated == CLIAUTH_BOOLEAN_TRUE) {
-      message_source = context->hash_function->finalize(context->hash_context);
-      message_bytes = context->digest_bytes;
+      message_source = context->hash_function->finalize(&context->hash_context);
+      message_bytes = digest_length;
 
-      pad_ptr = &context->k0_buffer[context->digest_bytes];
-      pad_bytes = context->block_bytes - context->digest_bytes;
+      pad_ptr = &context->k0_buffer[digest_length];
+      pad_bytes = input_block_length - digest_length;
    } else {
       message_source = context->k0_buffer;
-      message_bytes = context->block_bytes - context->k0_capacity;
+      message_bytes = input_block_length - context->k0_capacity;
 
-      pad_ptr = &context->k0_buffer[context->block_bytes - context->k0_capacity];
+      pad_ptr = &context->k0_buffer[input_block_length - context->k0_capacity];
       pad_bytes = context->k0_capacity;
    }
 
@@ -233,7 +234,7 @@ cliauth_mac_hmac_key_finalize(
 
    /* re-initialize the hash context and digest k0 ^ ipad to prepare for */
    /* digestion and appending of the message */
-   context->hash_function->initialize(context->hash_context);
+   context->hash_function->initialize(&context->hash_context);
    k0_reader = cliauth_io_byte_stream_reader_interface(
       &k0_byte_stream_reader
    );
@@ -241,13 +242,13 @@ cliauth_mac_hmac_key_finalize(
    cliauth_io_byte_stream_reader_initialize(
       &k0_byte_stream_reader,
       context->k0_buffer,
-      context->block_bytes
+      input_block_length
    );
 
    (void)context->hash_function->digest(
-      context->hash_context,
+      &context->hash_context,
       &k0_reader,
-      context->block_bytes
+      input_block_length
    );
 
    return;
@@ -260,7 +261,7 @@ cliauth_mac_hmac_message_digest(
    CliAuthUInt32 message_bytes
 ) {
    return context->hash_function->digest(
-      context->hash_context,
+      &context->hash_context,
       message_reader,
       message_bytes
    );
@@ -275,19 +276,24 @@ cliauth_mac_hmac_finalize(
    CliAuthUInt8 k0_opad_bytes;
    struct CliAuthIoByteStreamReader byte_stream_reader;
    struct CliAuthIoReader reader;
+   CliAuthUInt8 input_block_length;
+   CliAuthUInt8 digest_length;
+
+   input_block_length = context->hash_function->input_block_length;
+   digest_length = context->hash_function->digest_length;
 
    /* finalize the hash value H((K0 ^ ipad) || text) and store in the digest */
    /* buffer */
-   digest = context->hash_function->finalize(context->hash_context);
+   digest = context->hash_function->finalize(&context->hash_context);
    cliauth_memory_copy(
       context->digest_buffer,
       digest,
-      context->digest_bytes
+      digest_length
    );
 
    /* calculate k0 ^ opad */
    k0_opad_iter = context->k0_buffer;
-   k0_opad_bytes = context->block_bytes;
+   k0_opad_bytes = input_block_length;
    while (k0_opad_bytes != 0) {
       /* combined xors to undo ipad's xor in a single load/store */
       *k0_opad_iter ^= (CLIAUTH_MAC_HMAC_OPAD ^ CLIAUTH_MAC_HMAC_IPAD);
@@ -297,7 +303,7 @@ cliauth_mac_hmac_finalize(
    }
 
    /* calculate H((k0 ^ opad) || H((k0 ^ ipad) || message)) */
-   context->hash_function->initialize(context->hash_context);
+   context->hash_function->initialize(&context->hash_context);
    reader = cliauth_io_byte_stream_reader_interface(
       &byte_stream_reader
    );
@@ -305,28 +311,28 @@ cliauth_mac_hmac_finalize(
    cliauth_io_byte_stream_reader_initialize(
       &byte_stream_reader,
       context->k0_buffer,
-      context->block_bytes
+      input_block_length
    );
 
    (void)context->hash_function->digest(
-      context->hash_context,
+      &context->hash_context,
       &reader,
-      context->block_bytes
+      input_block_length
    );
 
    cliauth_io_byte_stream_reader_initialize(
       &byte_stream_reader,
       context->digest_buffer,
-      context->digest_bytes
+      digest_length
    );
 
    (void)context->hash_function->digest(
-      context->hash_context,
+      &context->hash_context,
       &reader,
-      context->digest_bytes
+      digest_length
    );
 
-   digest = context->hash_function->finalize(context->hash_context);
+   digest = context->hash_function->finalize(&context->hash_context);
 
    return digest;
 }

@@ -34,29 +34,10 @@ struct CliAuthOtpHotpContext {
 /*----------------------------------------------------------------------------*/
 /* context - The HOTP context to initialize.                                  */
 /*                                                                            */
-/* key_buffer - The 'key_buffer' argument for the HMAC algorithm.  See the    */
-/*              documentation for 'cliauth_mac_hmac_initialize()' for more    */
-/*              information.                                                  */
-/*                                                                            */
-/* digest_buffer - The 'digest_buffer' argument for the HMAC algorithm.  See  */
-/*                 the documentation for 'cliauth_mac_hmac_initialize()' for  */
-/*                 more information.                                          */
 /*                                                                            */
 /* hash_function - The 'hash_function' argument for the HMAC algorithm.  See  */
 /*                 the documentation for 'cliauth_mac_hmac_initialize()' for  */
 /*                 more information.                                          */
-/*                                                                            */
-/* hash_context - The 'hash_context' argument for the HMAC algorithm.  See    */
-/*                the documentation for 'cliauth_mac_hmac_initialize()' for   */
-/*                more information.                                           */
-/*                                                                            */
-/* block_bytes - The 'block_bytes' argument for the HMAC algorithm.  See the  */
-/*               documentation for 'cliauth_mac_hmac_initialize()' for more   */
-/*               information.                                                 */
-/*                                                                            */
-/* digest_bytes - The 'digest_bytes' argument for the HMAC algorithm.  See    */
-/*                the documentation for 'cliauth_mac_hmac_initialize()' for   */
-/*                more information.                                           */
 /*                                                                            */
 /* counter - The counter value for the HOTP algorithm.                        */
 /*                                                                            */
@@ -66,12 +47,7 @@ struct CliAuthOtpHotpContext {
 void
 cliauth_otp_hotp_initialize(
    struct CliAuthOtpHotpContext * context,
-   CliAuthUInt8 key_buffer [],
-   CliAuthUInt8 digest_buffer [],
    const struct CliAuthHashFunction * hash_function,
-   void * hash_context,
-   CliAuthUInt8 block_bytes,
-   CliAuthUInt8 digest_bytes,
    CliAuthUInt64 counter,
    CliAuthUInt8 digits
 );

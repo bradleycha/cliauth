@@ -10,6 +10,7 @@
 
 #include <time.h>
 #include "memory.h"
+#include "hash.h"
 #include "account.h"
 #include "log.h"
 
@@ -59,7 +60,7 @@ cliauth_args_parse(
    payload->account.algorithm.type = CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP;
    payload->account.algorithm.parameters.totp.period = 30;
 
-   payload->account.hash = CLIAUTH_ACCOUNT_HASH_TYPE_SHA1;
+   payload->account.hash_function = &cliauth_hash_sha1;
 
    cliauth_memory_copy(
       payload->account.secrets,
