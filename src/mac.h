@@ -18,11 +18,11 @@
 /* authentication code (HMAC) digest.                                         */
 /*----------------------------------------------------------------------------*/
 struct CliAuthMacHmacContext {
-   /* the hash function to use */
-   const struct CliAuthHashFunction * hash_function;
-
    /* the hash context to use with the hash function */
    union CliAuthHashContext hash_context;
+
+   /* the hash function to use */
+   const struct CliAuthHashFunction * hash_function;
 
    /* the buffer to compute and store k0 in */
    CliAuthUInt8 k0_buffer [CLIAUTH_HASH_MAXIMUM_INPUT_BLOCK_LENGTH];
