@@ -19,7 +19,7 @@
 /*----------------------------------------------------------------------------*/
 struct CliAuthMacHmacContext {
    /* the hash context to use with the hash function */
-   union CliAuthHashContext hash_context;
+   struct CliAuthHashContext hash_context;
 
    /* the hash function to use */
    const struct CliAuthHashFunction * hash_function;

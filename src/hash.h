@@ -67,8 +67,8 @@
       _CLIAUTH_HASH_SHA2\
    )
 
-/* forward declaration of union type required */
-union CliAuthHashContext;
+/* forward declaration of context type required */
+struct CliAuthHashContext;
 
 /*----------------------------------------------------------------------------*/
 /* Hash function to initialize a generic context.                             */
@@ -76,7 +76,7 @@ union CliAuthHashContext;
 /* context - The hash function context to initialize.                         */
 /*----------------------------------------------------------------------------*/
 typedef void (*CliAuthHashFunctionInitialize)(
-   union CliAuthHashContext * context
+   struct CliAuthHashContext * context
 );
 
 /*----------------------------------------------------------------------------*/
@@ -96,7 +96,7 @@ typedef void (*CliAuthHashFunctionInitialize)(
 /*                returned read result.                                       */
 /*----------------------------------------------------------------------------*/
 typedef struct CliAuthIoReadResult (*CliAuthHashFunctionDigest)(
-   union CliAuthHashContext * context,
+   struct CliAuthHashContext * context,
    const struct CliAuthIoReader * message_reader,
    CliAuthUInt32 message_bytes
 );
@@ -117,7 +117,7 @@ typedef struct CliAuthIoReadResult (*CliAuthHashFunctionDigest)(
 /*                be found from 'CLIAUTH_HASH_*_DIGEST_LENGTH'.               */
 /*----------------------------------------------------------------------------*/
 typedef CliAuthUInt8 * (*CliAuthHashFunctionFinalize)(
-   union CliAuthHashContext * context
+   struct CliAuthHashContext * context
 );
 
 /*----------------------------------------------------------------------------*/
@@ -180,18 +180,18 @@ struct _CliAuthHashSha12RingBufferContext {
 #define _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH\
    4
 
-union _CliAuthHashContextSha1Digest {
+union _CliAuthHashContextAlgorithmSha1Digest {
    CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)];
    CliAuthUInt32 words [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT];
 };
-union _CliAuthHashContextSha1Schedule {
+union _CliAuthHashContextAlgorithmSha1Schedule {
    CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH * sizeof(CliAuthUInt32)];
    CliAuthUInt32 words [_CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH];
 };
 
-struct _CliAuthHashContextSha1 {
-   union _CliAuthHashContextSha1Digest digest;
-   union _CliAuthHashContextSha1Schedule schedule;
+struct _CliAuthHashContextAlgorithmSha1 {
+   union _CliAuthHashContextAlgorithmSha1Digest digest;
+   union _CliAuthHashContextAlgorithmSha1Schedule schedule;
    CliAuthUInt32 work [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT];
    CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA1_BLOCK_LENGTH];
    struct _CliAuthHashSha12RingBufferContext ring_context;
@@ -229,23 +229,23 @@ cliauth_hash_sha1;
 
 
 /* internal union to allow treating word arrays as byte arrays */
-union _CliAuthHashContextSha232Digest {
+union _CliAuthHashContextAlgorithmSha232Digest {
    CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)];
    CliAuthUInt32 words [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
 };
-union _CliAuthHashContextSha232Schedule {
+union _CliAuthHashContextAlgorithmSha232Schedule {
    CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)];
    CliAuthUInt32 words [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
 };
 
-struct _CliAuthHashContextSha232 {
+struct _CliAuthHashContextAlgorithmSha232 {
    /* the current state of the hash digest */
-   union _CliAuthHashContextSha232Digest digest;
+   union _CliAuthHashContextAlgorithmSha232Digest digest;
 
    /* used internally by the block digest function */
-   union _CliAuthHashContextSha232Schedule schedule;
+   union _CliAuthHashContextAlgorithmSha232Schedule schedule;
 
-   /* used internally by the block digest function */
+   /* used internally by the block digest functionm */
    CliAuthUInt32 work [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
 
    /* the ring buffer bytes */
@@ -301,18 +301,18 @@ cliauth_hash_sha2_256;
 #define _CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH\
    _CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT
 
-union _CliAuthHashContextSha264Digest {
+union _CliAuthHashContextAlgorithmSha264Digest {
    CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt64)];
    CliAuthUInt64 words [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
 };
-union _CliAuthHashContextSha264Schedule {
+union _CliAuthHashContextAlgorithmSha264Schedule {
    CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt64)];
    CliAuthUInt64 words [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
 };
 
-struct _CliAuthHashContextSha264 {
-   union _CliAuthHashContextSha264Digest digest;
-   union _CliAuthHashContextSha264Schedule schedule;
+struct _CliAuthHashContextAlgorithmSha264 {
+   union _CliAuthHashContextAlgorithmSha264Digest digest;
+   union _CliAuthHashContextAlgorithmSha264Schedule schedule;
    CliAuthUInt64 work [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
    CliAuthUInt8 ring_buffer [_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH];
    struct _CliAuthHashSha12RingBufferContext ring_context;
@@ -375,19 +375,23 @@ cliauth_hash_sha2_512_256;
 /*----------------------------------------------------------------------------*/
 #endif /* _CLIAUTH_HASH_SHA2_64 */
 
+union _CliAuthHashContextAlgorithm {
+#if CLIAUTH_CONFIG_HASH_SHA1
+   struct _CliAuthHashContextAlgorithmSha1 sha1;
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
+#if _CLIAUTH_HASH_SHA2_32
+   struct _CliAuthHashContextAlgorithmSha232 sha2_32;
+#endif /* _CLIAUTH_HASH_SHA2_32 */
+#if _CLIAUTH_HASH_SHA2_64
+   struct _CliAuthHashContextAlgorithmSha264 sha2_64;
+#endif /* _CLIAUTH_HASH_SHA2_64 */
+};
+
 /*----------------------------------------------------------------------------*/
 /* Generic hash context data used internally to execute any hash algorithm.   */
 /*----------------------------------------------------------------------------*/
-union CliAuthHashContext {
-#if CLIAUTH_CONFIG_HASH_SHA1
-   struct _CliAuthHashContextSha1 sha1;
-#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
-#if _CLIAUTH_HASH_SHA2_32
-   struct _CliAuthHashContextSha232 sha2_32;
-#endif /* _CLIAUTH_HASH_SHA2_32 */
-#if _CLIAUTH_HASH_SHA2_64
-   struct _CliAuthHashContextSha264 sha2_64;
-#endif /* _CLIAUTH_HASH_SHA2_64 */
+struct CliAuthHashContext {
+   union _CliAuthHashContextAlgorithm algorithm;
 };
 
 union _CliAuthHashMaximumInputBlockLength {
