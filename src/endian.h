@@ -20,6 +20,7 @@
 /* CLIAUTH_ENDIAN_TARGET_BIG - Bytes will be ordered starting with most       */
 /*                             significant first.                             */
 /*----------------------------------------------------------------------------*/
+#define CLIAUTH_ENDIAN_TARGET_FIELD_COUNT 2u
 enum CliAuthEndianTarget {
    CLIAUTH_ENDIAN_TARGET_LITTLE = 0,
    CLIAUTH_ENDIAN_TARGET_BIG = 1

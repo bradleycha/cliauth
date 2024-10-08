@@ -111,11 +111,11 @@ cliauth_parse_string_integer_base_digit_context_parser_base_16(
       return CLIAUTH_PARSE_STRING_INTEGER_STATUS_SUCCESS;
    }
    if (digit >= 'a' && digit <= 'f') {
-      *output = (CliAuthUInt8)(digit - 'a') + 10;
+      *output = (CliAuthUInt8)(digit - 'a') + CLIAUTH_LITERAL_UINT8(10u);
       return CLIAUTH_PARSE_STRING_INTEGER_STATUS_SUCCESS;
    }
    if (digit >= 'A' && digit <= 'F') {
-      *output = (CliAuthUInt8)(digit - 'A') + 10;
+      *output = (CliAuthUInt8)(digit - 'A') + CLIAUTH_LITERAL_UINT8(10u);
       return CLIAUTH_PARSE_STRING_INTEGER_STATUS_SUCCESS;
    }
 
@@ -127,19 +127,19 @@ static const struct CliAuthParseStringIntegerBaseDigitContext
 cliauth_parse_string_integer_base_digit_contexts [CLIAUTH_PARSE_STRING_INTEGER_BASE_FIELD_COUNT - 1] = {
    { /* CLIAUTH_PARSE_STRING_INTEGER_BASE_2 */
       cliauth_parse_string_integer_base_digit_context_parser_base_2,
-      2
+      CLIAUTH_LITERAL_UINT8(2u)
    },
    { /* CLIAUTH_PARSE_STRING_INTEGER_BASE_8 */
       cliauth_parse_string_integer_base_digit_context_parser_base_8,
-      8
+      CLIAUTH_LITERAL_UINT8(8u)
    },
    { /* CLIAUTH_PARSE_STRING_INTEGER_BASE_10 */
       cliauth_parse_string_integer_base_digit_context_parser_base_10,
-      10
+      CLIAUTH_LITERAL_UINT8(10u)
    },
    { /* CLIAUTH_PARSE_STRING_INTEGER_BASE_16 */
       cliauth_parse_string_integer_base_digit_context_parser_base_16,
-      16
+      CLIAUTH_LITERAL_UINT8(16u)
    }
 };
 
@@ -151,7 +151,7 @@ cliauth_parse_string_integer_state_initialize(
    enum CliAuthParseStringIntegerBase base,
    CliAuthUInt32 characters
 ) {
-   state->value.magnitude = 0;
+   state->value.magnitude = CLIAUTH_LITERAL_UINT64(0u, 0u);
    state->characters_remaining = characters;
    state->encountered_sign = CLIAUTH_BOOLEAN_FALSE;
    state->encountered_base_prefix = CLIAUTH_BOOLEAN_FALSE;
@@ -417,7 +417,7 @@ cliauth_parse_string_integer_state_digest_prefix_character(
 /* the maximum possible number of characters the prefix can be */
 /* ex: -0x, +0b */
 #define CLIAUTH_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS\
-   3
+   3u
 
 static struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_state_digest_prefix(
@@ -432,19 +432,19 @@ cliauth_parse_string_integer_state_digest_prefix(
    /* decide on the number of characters to read in.  if the length of the */
    /* entire string is less than the maximum prefix length, read in the whole */
    /* string as the prefix characters. */
-   if (state->characters_remaining < CLIAUTH_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS) {
+   if (state->characters_remaining < CLIAUTH_LITERAL_UINT32(CLIAUTH_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS)) {
       prefix_characters = state->characters_remaining;
    } else {
-      prefix_characters = CLIAUTH_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS;
+      prefix_characters = CLIAUTH_LITERAL_UINT32(CLIAUTH_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS);
    }
 
    /* attempt to read in the prefix string */
    result.read_result = cliauth_io_reader_read_all(
       reader,
       prefix_buffer,
-      prefix_characters * sizeof(char)
+      prefix_characters * CLIAUTH_LITERAL_UINT32(sizeof(char))
    );
-   state->characters_remaining -= result.read_result.bytes / sizeof(char);
+   state->characters_remaining -= result.read_result.bytes / CLIAUTH_LITERAL_UINT32(sizeof(char));
 
    if (result.read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
       result.status = CLIAUTH_PARSE_STRING_INTEGER_STATUS_IO_ERROR;
@@ -453,7 +453,7 @@ cliauth_parse_string_integer_state_digest_prefix(
 
    /* parse all the characters in the prefix */
    prefix_iter = prefix_buffer;
-   while (prefix_characters != 0) {
+   while (prefix_characters != CLIAUTH_LITERAL_UINT32(0u)) {
       result.status = cliauth_parse_string_integer_state_digest_prefix_character(
          state,
          *prefix_iter
@@ -479,12 +479,12 @@ cliauth_parse_string_integer_state_digest_magnitude(
    CliAuthUInt32 bytes_read;
    CliAuthUInt8 digit;
 
-   bytes_read = 0;
-   while (state->characters_remaining != 0) {
+   bytes_read = CLIAUTH_LITERAL_UINT32(0u);
+   while (state->characters_remaining != CLIAUTH_LITERAL_UINT32(0u)) {
       result.read_result = cliauth_io_reader_read_all(
          reader,
          &digit,
-         sizeof(digit)
+         CLIAUTH_LITERAL_UINT32(sizeof(digit))
       );
       bytes_read += result.read_result.bytes;
 
@@ -503,7 +503,7 @@ cliauth_parse_string_integer_state_digest_magnitude(
          return result;
       }
 
-      state->characters_remaining -= 1;
+      state->characters_remaining -= CLIAUTH_LITERAL_UINT32(1u);
    }
 
    result.read_result.bytes = bytes_read;
@@ -530,7 +530,7 @@ cliauth_parse_string_integer_sign_magnitude(
       base,
       characters
    );
-   bytes_read = 0;
+   bytes_read = CLIAUTH_LITERAL_UINT32(0u);
 
    /* attempt to parse the sign character and base */
    result = cliauth_parse_string_integer_state_digest_prefix(
@@ -592,8 +592,8 @@ cliauth_parse_string_integer_uint(
    }
 
    /* guard against a corner case where a negative zero will be considered out of range */
-   if (sign_magnitude.magnitude == 0) {
-      *output = 0;
+   if (sign_magnitude.magnitude == CLIAUTH_LITERAL_UINT64(0u, 0u)) {
+      *output = CLIAUTH_LITERAL_UINT64(0u, 0u);
       return result;
    }
 
@@ -683,8 +683,8 @@ cliauth_parse_string_integer_sint(
 
    /* check for zero magnitude to prevent possible issues with checks and */
    /* conversion, similar to the check in the uint version */
-   if (sign_magnitude.magnitude == 0) {
-      *output = 0;
+   if (sign_magnitude.magnitude == CLIAUTH_LITERAL_UINT64(0u, 0u)) {
+      *output = CLIAUTH_LITERAL_UINT64(0u, 0u);
       return result;
    }
 

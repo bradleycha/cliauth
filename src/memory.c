@@ -36,7 +36,7 @@ cliauth_memory_copy_fallback(
    destination_iter = (CliAuthUInt8 *)destination;
    source_iter = (const CliAuthUInt8 *)source;
 
-   while (bytes != 0) {
+   while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
       *destination_iter = *source_iter;
 
       destination_iter++;
@@ -61,7 +61,7 @@ cliauth_memory_copy_libc(
    source_iter = (const CliAuthUInt8 *)source;
 
 #if CLIAUTH_MEMORY_LIBC_SIZE_T_IS_SMALL
-   while (bytes > CLIAUTH_MEMORY_LIBC_SIZE_T_MAX) {
+   while (bytes > CLIAUTH_LITERAL_UINT32(CLIAUTH_MEMORY_LIBC_SIZE_T_MAX)) {
       (void)memcpy(
          destination_iter,
          source_iter,
@@ -70,7 +70,7 @@ cliauth_memory_copy_libc(
 
       destination_iter += CLIAUTH_MEMORY_LIBC_SIZE_T_MAX;
       source_iter += CLIAUTH_MEMORY_LIBC_SIZE_T_MAX;
-      bytes -= CLIAUTH_MEMORY_LIBC_SIZE_T_MAX;
+      bytes -= CLIAUTH_LITERAL_UINT32(CLIAUTH_MEMORY_LIBC_SIZE_T_MAX);
    }
 #endif /* CLIAUTH_MEMORY_LIBC_SIZE_T_IS_SMALL */
 
@@ -116,7 +116,7 @@ cliauth_memory_fill_fallback(
 
    buffer_iter = (CliAuthUInt8 *)buffer;
 
-   while (elements != 0) {
+   while (elements != CLIAUTH_LITERAL_UINT32(0u)) {
       cliauth_memory_copy(
          buffer_iter,
          sentinel,
@@ -141,7 +141,7 @@ cliauth_memory_fill_libc(
    CliAuthUInt8 * buffer_iter;
    CliAuthUInt8 byte;
 
-   if (bytes_per_element != 1) {
+   if (bytes_per_element != CLIAUTH_LITERAL_UINT32(1u)) {
       cliauth_memory_fill_fallback(buffer, sentinel, elements, bytes_per_element);
       return;
    }
@@ -150,7 +150,7 @@ cliauth_memory_fill_libc(
    byte = *((const CliAuthUInt8 *)(sentinel));
 
 #if CLIAUTH_MEMORY_LIBC_SIZE_T_IS_SMALL
-   while (elements > CLIAUTH_MEMORY_LIBC_SIZE_T_MAX) {
+   while (elements > CLIAUTH_LITERAL_UINT32(CLIAUTH_MEMORY_LIBC_SIZE_T_MAX)) {
       (void)memset(
          buffer_iter,
          byte,
@@ -158,7 +158,7 @@ cliauth_memory_fill_libc(
       );
 
       buffer_iter += CLIAUTH_MEMORY_LIBC_SIZE_T_MAX;
-      elements -= CLIAUTH_MEMORY_LIBC_SIZE_T_MAX;
+      elements -= CLIAUTH_LITERAL_UINT32(CLIAUTH_MEMORY_LIBC_SIZE_T_MAX);
    }
 #endif /* CLIAUTH_MEMORY_LIBC_SIZE_T_IS_SMALL */
 
@@ -206,7 +206,7 @@ cliauth_memory_compare_fallback(
    data_lhs_iter = (const CliAuthUInt8 *)data_lhs;
    data_rhs_iter = (const CliAuthUInt8 *)data_rhs;
 
-   while (bytes != 0) {
+   while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
       if (*data_lhs_iter != *data_rhs_iter) {
          return CLIAUTH_BOOLEAN_FALSE;
       }
@@ -235,7 +235,7 @@ cliauth_memory_compare_libc(
    data_rhs_iter = (const CliAuthUInt8 *)data_rhs;
 
 #if CLIAUTH_MEMORY_LIBC_SIZE_T_IS_SMALL
-   while (bytes > CLIAUTH_MEMORY_LIBC_SIZE_T_MAX) {
+   while (bytes > CLIAUTH_LITERAL_UINT32(CLIAUTH_MEMORY_LIBC_SIZE_T_MAX)) {
       if (memcmp(
          data_lhs_iter,
          data_rhs_iter,
@@ -246,7 +246,7 @@ cliauth_memory_compare_libc(
 
       data_lhs_iter += CLIAUTH_MEMORY_LIBC_SIZE_T_MAX;
       data_rhs_iter += CLIAUTH_MEMORY_LIBC_SIZE_T_MAX;
-      bytes -= CLIAUTH_MEMORY_LIBC_SIZE_T_MAX;
+      bytes -= CLIAUTH_LITERAL_UINT32(CLIAUTH_MEMORY_LIBC_SIZE_T_MAX;
    }
 #endif /* CLIAUTH_MEMORY_LIBC_SIZE_T_IS_SMALL */
 
@@ -300,9 +300,9 @@ cliauth_memory_find(
    CliAuthUInt32 position;
 
    data_iter = (const CliAuthUInt8 *)data;
-   position = 0;
+   position = CLIAUTH_LITERAL_UINT32(0u);
 
-   while (elements != 0) {
+   while (elements != CLIAUTH_LITERAL_UINT32(0u)) {
       if (cliauth_memory_compare(
          data_iter,
          sentinel,

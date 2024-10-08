@@ -34,7 +34,7 @@
 /*                                                       found when the sign  */
 /*                                                       was already given.   */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_PARSE_STRING_INTEGER_STATUS_FIELD_COUNT 5
+#define CLIAUTH_PARSE_STRING_INTEGER_STATUS_FIELD_COUNT 5u
 enum CliAuthParseStringIntegerStatus {
    CLIAUTH_PARSE_STRING_INTEGER_STATUS_SUCCESS,
    CLIAUTH_PARSE_STRING_INTEGER_STATUS_IO_ERROR,
@@ -69,7 +69,7 @@ struct CliAuthParseStringIntegerResult {
 /*                                               will be determined from the  */
 /*                                               prefix character.            */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_PARSE_STRING_INTEGER_SIGN_FIELD_COUNT 3
+#define CLIAUTH_PARSE_STRING_INTEGER_SIGN_FIELD_COUNT 3u
 enum CliAuthParseStringIntegerSign {
    CLIAUTH_PARSE_STRING_INTEGER_SIGN_POSITIVE,
    CLIAUTH_PARSE_STRING_INTEGER_SIGN_NEGATIVE,
@@ -157,7 +157,7 @@ enum CliAuthParseStringIntegerSign {
 /*                                               automatically from the       */
 /*                                               prefix character.            */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_PARSE_STRING_INTEGER_BASE_FIELD_COUNT 5
+#define CLIAUTH_PARSE_STRING_INTEGER_BASE_FIELD_COUNT 5u
 enum CliAuthParseStringIntegerBase {
    /* this is only used to define enum values and should never be used */
    _CLIAUTH_PARSE_STRING_INTEGER_BASE_START_INDEX = -1,

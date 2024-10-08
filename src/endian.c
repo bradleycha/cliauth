@@ -21,7 +21,7 @@ cliauth_endian_swap_inplace(
 
    /* This is basically just a CS 101 in-place array reversal. */
    start = data;
-   end = start + bytes - 1;
+   end = start + bytes - 1u;
    while (start < end) {
       temp = *start;
       *start = *end;
@@ -44,8 +44,8 @@ cliauth_endian_swap_copy(
    const CliAuthUInt8 * source_iter;
 
    dest_iter = dest;
-   source_iter = source + bytes - 1;
-   while (bytes != 0) {
+   source_iter = source + bytes - 1u;
+   while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
       *dest_iter = *source_iter;
 
       dest_iter++;
@@ -100,7 +100,7 @@ cliauth_endian_convert_uint16(
 
    cliauth_endian_convert_inplace(
       value_generic.bytes,
-      sizeof(value),
+      CLIAUTH_LITERAL_UINT32(sizeof(value)),
       target
    );
 
@@ -118,7 +118,7 @@ cliauth_endian_convert_uint32(
 
    cliauth_endian_convert_inplace(
       value_generic.bytes,
-      sizeof(value),
+      CLIAUTH_LITERAL_UINT32(sizeof(value)),
       target
    );
 
@@ -136,7 +136,7 @@ cliauth_endian_convert_uint64(
 
    cliauth_endian_convert_inplace(
       value_generic.bytes,
-      sizeof(value),
+      CLIAUTH_LITERAL_UINT32(sizeof(value)),
       target
    );
 
@@ -154,7 +154,7 @@ cliauth_endian_convert_sint16(
 
    cliauth_endian_convert_inplace(
       value_generic.bytes,
-      sizeof(value),
+      CLIAUTH_LITERAL_UINT32(sizeof(value)),
       target
    );
 
@@ -172,7 +172,7 @@ cliauth_endian_convert_sint32(
 
    cliauth_endian_convert_inplace(
       value_generic.bytes,
-      sizeof(value),
+      CLIAUTH_LITERAL_UINT32(sizeof(value)),
       target
    );
 
@@ -190,7 +190,7 @@ cliauth_endian_convert_sint64(
 
    cliauth_endian_convert_inplace(
       value_generic.bytes,
-      sizeof(value),
+      CLIAUTH_LITERAL_UINT32(sizeof(value)),
       target
    );
 

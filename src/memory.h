@@ -82,7 +82,7 @@ cliauth_memory_compare(
 /* CLIAUTH_MEMORY_FIND_STATUS_MISSING - The sentinel was unable to be         */
 /*                                      located.                              */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_MEMORY_FIND_STATUS_FIELD_COUNT 2
+#define CLIAUTH_MEMORY_FIND_STATUS_FIELD_COUNT 2u
 enum CliAuthMemoryFindStatus {
    CLIAUTH_MEMORY_FIND_STATUS_FOUND,
    CLIAUTH_MEMORY_FIND_STATUS_MISSING

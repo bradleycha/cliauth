@@ -15,7 +15,7 @@
 #define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION
 
 /* Return status enum for cliauth_main(). */
-#define CLIAUTH_EXIT_STATUS_FIELD_COUNT 3
+#define CLIAUTH_EXIT_STATUS_FIELD_COUNT 3u
 enum CliAuthExitStatus {
    /* The program executed successfully without any errors. */
    CLIAUTH_EXIT_STATUS_SUCCESS = 0,

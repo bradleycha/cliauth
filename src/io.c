@@ -35,9 +35,9 @@ cliauth_io_reader_read_all(
    CliAuthUInt32 read_bytes;
 
    buffer_iter = buffer;
-   read_bytes = 0;
+   read_bytes = CLIAUTH_LITERAL_UINT32(0u);
 
-   while (bytes != 0) {
+   while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
       read_result = cliauth_io_reader_read(
          reader,
          buffer_iter,
@@ -83,9 +83,9 @@ cliauth_io_writer_write_all(
    CliAuthUInt32 write_bytes;
 
    data_iter = data;
-   write_bytes = 0;
+   write_bytes = CLIAUTH_LITERAL_UINT32(0u);
 
-   while (bytes != 0) {
+   while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
       write_result = cliauth_io_writer_write(
          writer,
          data_iter,
@@ -123,9 +123,9 @@ cliauth_io_byte_stream_reader_read(
 
    bytes_remaining = reader->length - reader->position;
 
-   if (bytes_remaining == 0) {
+   if (bytes_remaining == CLIAUTH_LITERAL_UINT32(0u)) {
       read_result.status = CLIAUTH_IO_READ_STATUS_END_OF_STREAM;
-      read_result.bytes = 0;
+      read_result.bytes = CLIAUTH_LITERAL_UINT32(0u);
       return read_result;
    }
 
@@ -165,9 +165,9 @@ cliauth_io_byte_stream_writer_write(
 
    bytes_remaining = writer->length - writer->position;
 
-   if (bytes_remaining == 0) {
+   if (bytes_remaining == CLIAUTH_LITERAL_UINT32(0u)) {
       write_result.status = CLIAUTH_IO_WRITE_STATUS_END_OF_STREAM;
-      write_result.bytes = 0;
+      write_result.bytes = CLIAUTH_LITERAL_UINT32(0u);
       return write_result;
    }
 
@@ -199,7 +199,7 @@ cliauth_io_byte_stream_reader_initialize(
 ) {
    context->bytes = bytes;
    context->length = length;
-   context->position = 0;
+   context->position = CLIAUTH_LITERAL_UINT32(0u);
 
    return;
 }
@@ -212,7 +212,7 @@ cliauth_io_byte_stream_writer_initialize(
 ) {
    context->bytes = bytes;
    context->length = length;
-   context->position = 0;
+   context->position = CLIAUTH_LITERAL_UINT32(0u);
 
    return;
 }
@@ -282,7 +282,7 @@ cliauth_io_buffered_reader_read(
    }
 
    /* initialize the total number of read bytes */
-   read_total = 0;
+   read_total = CLIAUTH_LITERAL_UINT32(0u);
 
    /* initialize the buffer iterator */
    buffer_iter = buffer;
@@ -299,7 +299,7 @@ cliauth_io_buffered_reader_read(
       buffer_bytes
    );
 
-   context_reader->start = 0;
+   context_reader->start = CLIAUTH_LITERAL_UINT32(0u);
    context_reader->capacity = context_reader->length;
 
    read_total += buffer_bytes;
@@ -376,7 +376,7 @@ cliauth_io_buffered_writer_write(
    }
 
    /* initialize the total number of written bytes */
-   write_total = 0;
+   write_total = CLIAUTH_LITERAL_UINT32(0u);
 
    /* initialize the data iterator */
    data_iter = data;
@@ -392,7 +392,7 @@ cliauth_io_buffered_writer_write(
       data_iter,
       fill_bytes
    );
-   context_writer->capacity = 0;
+   context_writer->capacity = CLIAUTH_LITERAL_UINT32(0u);
 
    /* attempt to flush the write buffer */
    write_result = cliauth_io_buffered_writer_flush(context_writer);
@@ -424,7 +424,7 @@ cliauth_io_buffered_writer_write(
       data_iter,
       residual_bytes
    );
-   context_writer->start = 0;
+   context_writer->start = CLIAUTH_LITERAL_UINT32(0u);
    context_writer->capacity = context_writer->length - residual_bytes;
    write_total += residual_bytes;
 
@@ -443,7 +443,7 @@ cliauth_io_buffered_reader_initialize(
    context->backing_reader = backing_reader;
    context->buffer = buffer;
    context->length = length;
-   context->start = 0;
+   context->start = CLIAUTH_LITERAL_UINT32(0u);
    context->capacity = length;
 
    return;
@@ -459,7 +459,7 @@ cliauth_io_buffered_writer_initialize(
    context->backing_writer = backing_writer;
    context->buffer = buffer;
    context->length = length;
-   context->start = 0;
+   context->start = CLIAUTH_LITERAL_UINT32(0u);
    context->capacity = length;
 
    return;

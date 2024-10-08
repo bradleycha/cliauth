@@ -24,6 +24,7 @@
 /* CLIAUTH_IO_READ_STATUS_ERROR_UNKNOWN - An uncategorized, usually platform  */
 /*                                        or implementation specific error.   */
 /*----------------------------------------------------------------------------*/
+#define CLIAUTH_IO_READ_STATUS_FIELD_COUNT 3u
 enum CliAuthIoReadStatus {
    CLIAUTH_IO_READ_STATUS_SUCCESS,
    CLIAUTH_IO_READ_STATUS_END_OF_STREAM,
@@ -54,6 +55,7 @@ struct CliAuthIoReadResult {
 /* CLIAUTH_IO_WRITE_STATUS_ERROR_UNKNOWN - An uncategorized, usually platform */
 /*                                         or implementation specific error.  */
 /*----------------------------------------------------------------------------*/
+#define CLIAUTH_IO_WRITE_STATUS_FIELD_COUNT 3u
 enum CliAuthIoWriteStatus {
    CLIAUTH_IO_WRITE_STATUS_SUCCESS,
    CLIAUTH_IO_WRITE_STATUS_END_OF_STREAM,

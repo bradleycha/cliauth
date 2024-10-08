@@ -25,7 +25,7 @@
 /* Each enum field is given an explicit value to ensure a well-defined        */
 /* in-memory representation.                                                  */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_ACCOUNT_ALGORITHM_TYPE_FIELD_COUNT 2
+#define CLIAUTH_ACCOUNT_ALGORITHM_TYPE_FIELD_COUNT 2u
 enum CliAuthAccountAlgorithmType {
    CLIAUTH_ACCOUNT_ALGORITHM_TYPE_HOTP = 0,
    CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP = 1
@@ -94,19 +94,21 @@ struct CliAuthAccountAlgorithm {
    CLIAUTH_HASH_SHA1_IDENTIFIER
 #endif /* CLIAUTH_ACCOUNT_DEFAULT_HASH_IS_AVAILABLE */
 #define CLIAUTH_ACCOUNT_DEFAULT_DIGITS\
-   6
-#define CLIAUTH_ACCOUNT_DEFAULT_TOTP_PERIOD\
-   30
+   6u
+#define CLIAUTH_ACCOUNT_DEFAULT_TOTP_PERIOD_HWORD0\
+   0u
+#define CLIAUTH_ACCOUNT_DEFAULT_TOTP_PERIOD_HWORD1\
+   30u
 
 /*----------------------------------------------------------------------------*/
 /* Buffer lengths for account array fields.                                   */
 /*----------------------------------------------------------------------------*/
 #define CLIAUTH_ACCOUNT_SECRETS_MAX_LENGTH\
-   128
+   128u
 #define CLIAUTH_ACCOUNT_ISSUER_MAX_LENGTH\
-   64
+   64u
 #define CLIAUTH_ACCOUNT_ACCOUNT_NAME_MAX_LENGTH\
-   64
+   64u
 
 /*----------------------------------------------------------------------------*/
 /* The in-memory representation of a single authenticator account.            */

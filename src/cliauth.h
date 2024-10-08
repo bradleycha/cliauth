@@ -13,7 +13,7 @@
 /* times */
 #include "config.h"
 
-#define _CLIAUTH_NULLPTR_SENTINEL   (0)
+#define _CLIAUTH_NULLPTR_SENTINEL   (0u)
 #define CLIAUTH_NULLPTR             ((void *)_CLIAUTH_NULLPTR_SENTINEL)
 
 /* implicit includes are at the bottom to ensure all previous project */

@@ -18,10 +18,16 @@ cliauth_account_generate_passcode_index_exists(
 ) {
    /* basically just checks for integer underflow/overflow, has to be done */
    /* carefully to avoid undefined behavior due to integer wrappping */
-   if (index < 0 && CLIAUTH_UINT64_MIN - index > counter_initial) {
+   if (
+      index < CLIAUTH_LITERAL_SINT64(0, 0, 0, 0) &&
+      CLIAUTH_UINT64_MIN - index > counter_initial
+   ) {
       return CLIAUTH_BOOLEAN_FALSE;
    }
-   if (index > 0 && CLIAUTH_UINT64_MAX - index < counter_initial) {
+   if (
+      index > CLIAUTH_LITERAL_SINT64(0, 0, 0, 0) &&
+      CLIAUTH_UINT64_MAX - index < counter_initial
+   ) {
       return CLIAUTH_BOOLEAN_FALSE;
    }
 

@@ -26,7 +26,7 @@ cliauth_otp_hotp_truncate_digest(
    digest_bytes = digest;
 
    /* extracts 4 least significant bits */
-   offset = (digest_bytes[bytes - 1]) & 0x0f;
+   offset = (digest_bytes[bytes - CLIAUTH_LITERAL_UINT32(1u)]) & CLIAUTH_LITERAL_UINT8(0x0fu);
 
    /* read the bit stream using the offset and convert to the host endian */
    cliauth_memory_copy(
@@ -40,7 +40,7 @@ cliauth_otp_hotp_truncate_digest(
    );
 
    /* discard the top-most bit */
-   passcode &= ~(((CliAuthUInt32)1) << ((sizeof(passcode) * 8) - 1));
+   passcode &= ~(CLIAUTH_LITERAL_UINT32(1u) << ((sizeof(passcode) * 8) - 1));
 
    return passcode;
 }
@@ -52,9 +52,9 @@ cliauth_otp_hotp_trim_digits(
 ) {
    CliAuthUInt32 modulus;
 
-   modulus = 1;
-   while (digits != 0) {
-      modulus *= 10;
+   modulus = CLIAUTH_LITERAL_UINT32(1u);
+   while (digits != CLIAUTH_LITERAL_UINT8(0u)) {
+      modulus *= CLIAUTH_LITERAL_UINT32(10u);
       digits--;
    }
 
@@ -116,7 +116,7 @@ cliauth_otp_hotp_finalize(
    cliauth_io_byte_stream_reader_initialize(
       &counter_byte_stream_reader,
       counter_big_endian.bytes,
-      sizeof(counter_big_endian)
+      CLIAUTH_LITERAL_UINT32(sizeof(counter_big_endian))
    );
 
    counter_reader = cliauth_io_byte_stream_reader_interface(
@@ -126,7 +126,7 @@ cliauth_otp_hotp_finalize(
    (void)cliauth_mac_hmac_message_digest(
       &context->hmac_context,
       &counter_reader,
-      sizeof(counter_big_endian)
+      CLIAUTH_LITERAL_UINT32(sizeof(counter_big_endian))
    );
 
    /* finalize the HMAC digest */

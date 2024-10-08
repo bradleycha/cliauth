@@ -24,7 +24,7 @@
 /* CLIAUTH_ARGS_PARSE_RESULT_INVALID - One or more arguments were given an    */
 /*                                     invalid value.                         */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_ARGS_PARSE_RESULT_FIELD_COUNT 3
+#define CLIAUTH_ARGS_PARSE_RESULT_FIELD_COUNT 3u
 enum CliAuthArgsParseResult {
    CLIAUTH_ARGS_PARSE_RESULT_SUCCESS,
    CLIAUTH_ARGS_PARSE_RESULT_MISSING,

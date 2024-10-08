@@ -12,8 +12,8 @@
 #include "hash.h"
 #include "io.h"
 
-#define CLIAUTH_MAC_HMAC_IPAD 0x36
-#define CLIAUTH_MAC_HMAC_OPAD 0x5c
+#define CLIAUTH_MAC_HMAC_IPAD CLIAUTH_LITERAL_UINT8(0x36u)
+#define CLIAUTH_MAC_HMAC_OPAD CLIAUTH_LITERAL_UINT8(0x5cu)
 
 void
 cliauth_mac_hmac_initialize(
@@ -108,7 +108,7 @@ cliauth_mac_hmac_key_digest_rollover(
    /* this prevents a corner-case where we could fail to read the remainder */
    /* key bytes, and then the caller finalizes the key hash as-is. */
    /* without this, key length == block length but we initiated hashing. */
-   if (read_result.bytes != 0) {
+   if (read_result.bytes != CLIAUTH_LITERAL_UINT32(0u)) {
       context->k0_hash_initiated = CLIAUTH_BOOLEAN_TRUE;
    }
 
@@ -215,7 +215,7 @@ cliauth_mac_hmac_key_finalize(
 
    /* copy and xor the message (non-padded) portion of k0 */
    message_dest = context->k0_buffer;
-   while (message_bytes != 0) {
+   while (message_bytes != CLIAUTH_LITERAL_UINT8(0u)) {
       *message_dest = *message_source ^ CLIAUTH_MAC_HMAC_IPAD;
 
       message_source++;
@@ -229,7 +229,7 @@ cliauth_mac_hmac_key_finalize(
       pad_ptr,
       &ipad_constant,
       pad_bytes,
-      1
+      CLIAUTH_LITERAL_UINT32(1u)
    );
 
    /* re-initialize the hash context and digest k0 ^ ipad to prepare for */
@@ -294,7 +294,7 @@ cliauth_mac_hmac_finalize(
    /* calculate k0 ^ opad */
    k0_opad_iter = context->k0_buffer;
    k0_opad_bytes = input_block_length;
-   while (k0_opad_bytes != 0) {
+   while (k0_opad_bytes != CLIAUTH_LITERAL_UINT8(0u)) {
       /* combined xors to undo ipad's xor in a single load/store */
       *k0_opad_iter ^= (CLIAUTH_MAC_HMAC_OPAD ^ CLIAUTH_MAC_HMAC_IPAD);
 

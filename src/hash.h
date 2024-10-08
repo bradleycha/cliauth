@@ -26,7 +26,7 @@
       CLIAUTH_CONFIG_HASH_SHA2_512_256\
    )
 
-#if CLIAUTH_HASH_ENABLED_COUNT == 0
+#if CLIAUTH_HASH_ENABLED_COUNT == 0u
 #error all hash algorithms are disabled.  please verify the build was configured correctly.
 #endif
 
@@ -170,15 +170,15 @@ struct _CliAuthHashSha12RingBufferContext {
 
 /* constants for SHA1 */
 #define _CLIAUTH_HASH_SHA1_BLOCK_LENGTH\
-   64
+   64u
 #define _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT\
-   5
+   5u
 #define _CLIAUTH_HASH_SHA1_ROUNDS_COUNT\
-   80
+   80u
 #define _CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH\
    _CLIAUTH_HASH_SHA1_ROUNDS_COUNT
 #define _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH\
-   4
+   4u
 
 union _CliAuthHashContextAlgorithmSha1Digest {
    CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)];
@@ -205,7 +205,7 @@ struct _CliAuthHashContextAlgorithmSha1 {
 #define CLIAUTH_HASH_SHA1_INPUT_BLOCK_LENGTH\
    _CLIAUTH_HASH_SHA1_BLOCK_LENGTH
 #define CLIAUTH_HASH_SHA1_DIGEST_LENGTH\
-   20
+   20u
 #define CLIAUTH_HASH_SHA1_IDENTIFIER\
    "sha1"
 extern const struct CliAuthHashFunction
@@ -219,11 +219,11 @@ cliauth_hash_sha1;
 
 /* constants for 32-bit SHA2 */
 #define _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH\
-   64
+   64u
 #define _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT\
-   8
+   8u
 #define _CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT\
-   64
+   64u
 #define _CLIAUTH_HASH_SHA2_32_MESSAGE_SCHEDULE_LENGTH\
    _CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT
 
@@ -267,7 +267,7 @@ struct _CliAuthHashContextAlgorithmSha232 {
 #define CLIAUTH_HASH_SHA2_224_INPUT_BLOCK_LENGTH\
    _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH
 #define CLIAUTH_HASH_SHA2_224_DIGEST_LENGTH\
-   28
+   28u
 #define CLIAUTH_HASH_SHA2_224_IDENTIFIER\
    "sha224"
 extern const struct CliAuthHashFunction
@@ -278,7 +278,7 @@ cliauth_hash_sha2_224;
 #define CLIAUTH_HASH_SHA2_256_INPUT_BLOCK_LENGTH\
    _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH
 #define CLIAUTH_HASH_SHA2_256_DIGEST_LENGTH\
-   32
+   32u
 #define CLIAUTH_HASH_SHA2_256_IDENTIFIER\
    "sha256"
 extern const struct CliAuthHashFunction
@@ -293,11 +293,11 @@ cliauth_hash_sha2_256;
 
 /* constants for 64-bit SHA2 */
 #define _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH\
-   128
+   128u
 #define _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT\
-   8
+   8u
 #define _CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT\
-   80
+   80u
 #define _CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH\
    _CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT
 
@@ -332,7 +332,7 @@ struct _CliAuthHashContextAlgorithmSha264 {
 #define CLIAUTH_HASH_SHA2_384_INPUT_BLOCK_LENGTH\
    _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
 #define CLIAUTH_HASH_SHA2_384_DIGEST_LENGTH\
-   48
+   48u
 #define CLIAUTH_HASH_SHA2_384_IDENTIFIER\
    "sha384"
 extern const struct CliAuthHashFunction
@@ -343,7 +343,7 @@ cliauth_hash_sha2_384;
 #define CLIAUTH_HASH_SHA2_512_INPUT_BLOCK_LENGTH\
    _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
 #define CLIAUTH_HASH_SHA2_512_DIGEST_LENGTH\
-   64
+   64u
 #define CLIAUTH_HASH_SHA2_512_IDENTIFIER\
    "sha512"
 extern const struct CliAuthHashFunction
@@ -354,7 +354,7 @@ cliauth_hash_sha2_512;
 #define CLIAUTH_HASH_SHA2_512_224_INPUT_BLOCK_LENGTH\
    _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
 #define CLIAUTH_HASH_SHA2_512_224_DIGEST_LENGTH\
-   28
+   28u
 #define CLIAUTH_HASH_SHA2_512_224_IDENTIFIER\
    "sha512/224"
 extern const struct CliAuthHashFunction
@@ -365,7 +365,7 @@ cliauth_hash_sha2_512_224;
 #define CLIAUTH_HASH_SHA2_512_256_INPUT_BLOCK_LENGTH\
    _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH
 #define CLIAUTH_HASH_SHA2_512_256_DIGEST_LENGTH\
-   32
+   32u
 #define CLIAUTH_HASH_SHA2_512_256_IDENTIFIER\
    "sha512/256"
 extern const struct CliAuthHashFunction

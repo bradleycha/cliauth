@@ -19,11 +19,11 @@
 #define TEST_NAME    "user@email.com"
 
 #define TEST_SECRETS_BYTES\
-   (((sizeof(TEST_SECRETS) / sizeof(char)) - 1) * sizeof(char))
+   (((sizeof(TEST_SECRETS) / sizeof(char)) - 1u) * sizeof(char))
 #define TEST_ISSUER_BYTES\
-   (((sizeof(TEST_ISSUER) / sizeof(char)) - 1) * sizeof(char))
+   (((sizeof(TEST_ISSUER) / sizeof(char)) - 1u) * sizeof(char))
 #define TEST_NAME_BYTES\
-   (((sizeof(TEST_NAME) / sizeof(char)) - 1) * sizeof(char))
+   (((sizeof(TEST_NAME) / sizeof(char)) - 1u) * sizeof(char))
 
 enum CliAuthArgsParseResult
 cliauth_args_parse(
@@ -35,21 +35,21 @@ cliauth_args_parse(
    char key_uri_terminator;
    struct CliAuthMemoryFindResult key_uri_terminator_find_result;
 
-   if (args_count < 2) {
+   if (args_count < CLIAUTH_LITERAL_UINT16(2u)) {
       cliauth_log(CLIAUTH_LOG_ERROR("no key URI was given as an argument"));
       return CLIAUTH_ARGS_PARSE_RESULT_MISSING;
    }
-   if (args_count > 2) {
+   if (args_count > CLIAUTH_LITERAL_UINT16(2u)) {
       cliauth_log(CLIAUTH_LOG_WARNING("more than 1 argument was given, any excess arguments will be ignored"));
    }
 
-   key_uri = args[1];
+   key_uri = args[1u];
    key_uri_terminator = '\0';
    key_uri_terminator_find_result = cliauth_memory_find(
       key_uri,
       &key_uri_terminator,
-      CLIAUTH_UINT32_MAX / sizeof(char),
-      sizeof(char)
+      CLIAUTH_LITERAL_UINT32(CLIAUTH_UINT32_MAX / sizeof(char)),
+      CLIAUTH_LITERAL_UINT32(sizeof(char))
    );
 
    /* TODO: re-implement key URI parsing */
@@ -58,37 +58,37 @@ cliauth_args_parse(
    (void)key_uri_terminator_find_result;
 
    payload->account.algorithm.type = CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP;
-   payload->account.algorithm.parameters.totp.period = 30;
+   payload->account.algorithm.parameters.totp.period = CLIAUTH_LITERAL_UINT64(0u, 30u);
 
    payload->account.hash_function = &cliauth_hash_sha1;
 
    cliauth_memory_copy(
       payload->account.secrets,
       TEST_SECRETS,
-      TEST_SECRETS_BYTES
+      CLIAUTH_LITERAL_UINT32(TEST_SECRETS_BYTES)
    );
    payload->account.secrets_bytes = TEST_SECRETS_BYTES;
 
    cliauth_memory_copy(
       payload->account.issuer,
       TEST_ISSUER,
-      TEST_ISSUER_BYTES
+      CLIAUTH_LITERAL_UINT32(TEST_ISSUER_BYTES)
    );
-   payload->account.issuer_characters = TEST_ISSUER_BYTES / sizeof(char);
+   payload->account.issuer_characters = CLIAUTH_LITERAL_UINT8(TEST_ISSUER_BYTES / sizeof(char));
 
    cliauth_memory_copy(
       payload->account.name,
       TEST_NAME,
       TEST_NAME_BYTES
    );
-   payload->account.name_characters = TEST_NAME_BYTES / sizeof(char);
+   payload->account.name_characters = CLIAUTH_LITERAL_UINT8(TEST_NAME_BYTES / sizeof(char));
 
-   payload->account.digits = 6;
+   payload->account.digits = CLIAUTH_LITERAL_UINT8(6u);
 
-   payload->totp_parameters.time_initial = 0;
+   payload->totp_parameters.time_initial = CLIAUTH_LITERAL_UINT64(0u, 0u);
    payload->totp_parameters.time_current = time(CLIAUTH_NULLPTR);
 
-   payload->index = 0;
+   payload->index = CLIAUTH_LITERAL_SINT64(0u, 0u, 0u, 0u);
 
    return CLIAUTH_ARGS_PARSE_RESULT_SUCCESS;
 }

@@ -38,7 +38,7 @@ cliauth_hash_sha1_2_ring_buffer_initialize(
    struct _CliAuthHashSha12RingBufferContext * context
 ) {
    context->capacity = implementation->bytes;
-   context->total = 0;
+   context->total = CLIAUTH_LITERAL_UINT32(0u);
 
    return;
 }
@@ -80,7 +80,7 @@ cliauth_hash_sha1_2_ring_buffer_digest(
    }
    
    /* initialize the number of digested bytes */
-   digest_bytes = 0;
+   digest_bytes = CLIAUTH_LITERAL_UINT32(0u);
 
    /* calculate the number of full blocks and residual bytes after filling */
    /* the ring buffer */
@@ -170,23 +170,23 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
    /* calculate the number of zeroes to pad with */
    zero_pad_bytes = (
       implementation->bytes
-      - 1
-      - sizeof(message_length_bits_big_endian)
+      - CLIAUTH_LITERAL_UINT32(1u)
+      - CLIAUTH_LITERAL_UINT32(sizeof(message_length_bits_big_endian))
       + context->capacity
    ) % implementation->bytes;
 
    /* if the amount of pad bytes will require a new block, fill the ring */
    /* buffer and digest with as many zeroes as will fit and then fill the */
    /* next block with zeroes */
-   if (zero_pad_bytes > context->capacity - 1) {
+   if (zero_pad_bytes > context->capacity - CLIAUTH_LITERAL_UINT32(1u)) {
       cliauth_memory_fill(
          ring_buffer_iter,
          &zero_pad_sentinel,
-         context->capacity - 1,
-         1
+         context->capacity - CLIAUTH_LITERAL_UINT32(1u),
+         CLIAUTH_LITERAL_UINT32(1u)
       );
       ring_buffer_iter = buffer;
-      zero_pad_bytes -= context->capacity - 1;
+      zero_pad_bytes -= context->capacity - CLIAUTH_LITERAL_UINT32(1u);
 
       implementation->digest(hash_context, buffer);
    }
@@ -196,22 +196,22 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
       ring_buffer_iter,
       &zero_pad_sentinel,
       zero_pad_bytes,
-      1
+      CLIAUTH_LITERAL_UINT32(1u)
    );
    ring_buffer_iter += zero_pad_bytes;
 
    /* calculate the message length in bits, convert to big endian, and append */
    /* to the end of the message */
    message_length_bits_big_endian = cliauth_endian_convert_uint64(
-      context->total * 8,
+      context->total * CLIAUTH_LITERAL_UINT32(8u),
       CLIAUTH_ENDIAN_TARGET_BIG
    );
    cliauth_memory_copy(
       ring_buffer_iter,
       &message_length_bits_big_endian,
-      sizeof(message_length_bits_big_endian)
+      CLIAUTH_LITERAL_UINT32(sizeof(message_length_bits_big_endian))
    );
-   ring_buffer_iter += sizeof(message_length_bits_big_endian);
+   ring_buffer_iter += CLIAUTH_LITERAL_UINT32(sizeof(message_length_bits_big_endian));
 
    /* digest the final block */
    implementation->digest(hash_context, buffer);
@@ -248,7 +248,7 @@ cliauth_hash_sha1_2_load_message_block_little(
 
    block_iter = block;
    schedule_iter = schedule;
-   while (block_bytes != 0) {
+   while (block_bytes != CLIAUTH_LITERAL_UINT8(0u)) {
       cliauth_endian_convert_copy(
          schedule_iter,
          block_iter,
@@ -314,7 +314,7 @@ cliauth_hash_sha1_2_digest_endianess_finalize_little(
    CliAuthUInt8 * digest_iter;
 
    digest_iter = digest;
-   while (digest_words != 0) {
+   while (digest_words != CLIAUTH_LITERAL_UINT8(0u)) {
       cliauth_endian_convert_inplace(
          digest_iter,
          digest_bytes_per_word,
@@ -381,7 +381,7 @@ cliauth_hash_sha1_2_32_compute_intermediate_digest(
    CliAuthUInt32 digest [],
    CliAuthUInt8 digest_words_count
 ) {
-   while (digest_words_count != 0) {
+   while (digest_words_count != CLIAUTH_LITERAL_UINT8(0u)) {
       *digest += *work;
 
       digest++;
@@ -410,10 +410,10 @@ cliauth_hash_sha1_constants_rounds_function [_CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS
 
 static const CliAuthUInt32
 cliauth_hash_sha1_constants_rounds_value [_CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH] = {
-   0x5a827999,
-   0x6ed9eba1,
-   0x8f1bbcdc,
-   0xca62c1d6
+   CLIAUTH_LITERAL_UINT32(0x5a827999u),
+   CLIAUTH_LITERAL_UINT32(0x6ed9eba1u),
+   CLIAUTH_LITERAL_UINT32(0x8f1bbcdcu),
+   CLIAUTH_LITERAL_UINT32(0xca62c1d6u)
 };
 
 static void
@@ -431,21 +431,21 @@ cliauth_hash_sha1_create_message_schedule(
    cliauth_hash_sha1_2_load_message_block(
       block,
       schedule->bytes,
-      _CLIAUTH_HASH_SHA1_BLOCK_LENGTH,
-      sizeof(CliAuthUInt32)
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA1_BLOCK_LENGTH),
+      CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt32))
    );
-   schedule_iter += _CLIAUTH_HASH_SHA1_BLOCK_LENGTH / sizeof(CliAuthUInt32);
+   schedule_iter +=  _CLIAUTH_HASH_SHA1_BLOCK_LENGTH / sizeof(CliAuthUInt32);
 
    /* 16 <= t <= 79 */
-   t = 64;
-   while (t != 0) {
+   t = CLIAUTH_LITERAL_UINT8(64u);
+   while (t != CLIAUTH_LITERAL_UINT8(0u)) {
       a = schedule_iter[-3];
       b = schedule_iter[-8];
       c = schedule_iter[-14];
       d = schedule_iter[-16];
       e = a ^ b ^ c ^ d;
 
-      *schedule_iter = cliauth_bitwise_rotate_left_uint32(e, 1);
+      *schedule_iter = cliauth_bitwise_rotate_left_uint32(e, CLIAUTH_LITERAL_UINT8(1u));
 
       schedule_iter++;
       t--;
@@ -467,36 +467,42 @@ cliauth_hash_sha1_perform_rounds_and_additions(
    const CliAuthUInt32 * constants_value_iter;
    CliAuthUInt32 * work_iter;
 
-   t = _CLIAUTH_HASH_SHA1_ROUNDS_COUNT;
-   j = _CLIAUTH_HASH_SHA1_ROUNDS_COUNT / _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH;
+   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA1_ROUNDS_COUNT);
+   j = CLIAUTH_LITERAL_UINT8(
+      _CLIAUTH_HASH_SHA1_ROUNDS_COUNT /
+      _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH
+   );
    schedule_iter = schedule;
    constants_function_iter = cliauth_hash_sha1_constants_rounds_function;
    constants_value_iter = cliauth_hash_sha1_constants_rounds_value;
 
-   while (t != 0) {
-      if (j == 0) {
-         j = _CLIAUTH_HASH_SHA1_ROUNDS_COUNT / _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH;
+   while (t != CLIAUTH_LITERAL_UINT8(0u)) {
+      if (j == CLIAUTH_LITERAL_UINT8(0u)) {
+         j = CLIAUTH_LITERAL_UINT8(
+            _CLIAUTH_HASH_SHA1_ROUNDS_COUNT /
+            _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH
+         );
          constants_function_iter++;
          constants_value_iter++;
       }
 
-      a = cliauth_bitwise_rotate_left_uint32(work[0], 5);
+      a = cliauth_bitwise_rotate_left_uint32(work[0], CLIAUTH_LITERAL_UINT8(5u));
       b = (*constants_function_iter)(work[1], work[2], work[3]);
       c = work[4];
       d = *constants_value_iter;
       e = *schedule_iter;
       t1 = a + b + c + d + e;
 
-      i = 4;
+      i = CLIAUTH_LITERAL_UINT8(4u);
       work_iter = &work[4];
-      while (i != 0) {
+      while (i != CLIAUTH_LITERAL_UINT8(0u)) {
          *work_iter = work_iter[-1];
 
          work_iter--;
          i--;
       }
 
-      work[2] = cliauth_bitwise_rotate_left_uint32(work[2], 30);
+      work[2] = cliauth_bitwise_rotate_left_uint32(work[2], CLIAUTH_LITERAL_UINT8(30u));
       work[0] = t1;
 
       schedule_iter++;
@@ -524,7 +530,10 @@ cliauth_hash_sha1_digest_block(
    cliauth_memory_copy(
       context_sha->work,
       context_sha->digest.words,
-      _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)
+      CLIAUTH_LITERAL_UINT32(
+         _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT *
+         sizeof(CliAuthUInt32)
+      )
    );
 
    cliauth_hash_sha1_perform_rounds_and_additions(
@@ -535,7 +544,7 @@ cliauth_hash_sha1_digest_block(
    cliauth_hash_sha1_2_32_compute_intermediate_digest(
       context_sha->work,
       context_sha->digest.words,
-      _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT)
    );
 
    return;
@@ -544,12 +553,16 @@ cliauth_hash_sha1_digest_block(
 static const struct CliAuthHashSha12RingBufferImplementation
 cliauth_hash_sha1_ring_buffer_implementation = {
    cliauth_hash_sha1_digest_block,
-   _CLIAUTH_HASH_SHA1_BLOCK_LENGTH
+   CLIAUTH_LITERAL_UINT32(_CLIAUTH_HASH_SHA1_BLOCK_LENGTH)
 };
 
 static const CliAuthUInt32
 cliauth_hash_sha1_constants_initialize [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT] = {
-   0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0
+   CLIAUTH_LITERAL_UINT32(0x67452301u),
+   CLIAUTH_LITERAL_UINT32(0xefcdab89u),
+   CLIAUTH_LITERAL_UINT32(0x98badcfeu),
+   CLIAUTH_LITERAL_UINT32(0x10325476u),
+   CLIAUTH_LITERAL_UINT32(0xc3d2e1f0u)
 };
 
 static void
@@ -561,7 +574,10 @@ cliauth_hash_sha1_initialize(struct CliAuthHashContext * context) {
    cliauth_memory_copy(
       &context_sha->digest,
       cliauth_hash_sha1_constants_initialize,
-      _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)
+      CLIAUTH_LITERAL_UINT32(
+         _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT *
+         sizeof(CliAuthUInt32)
+      )
    );
 
    cliauth_hash_sha1_2_ring_buffer_initialize(
@@ -607,8 +623,8 @@ cliauth_hash_sha1_finalize(struct CliAuthHashContext * context) {
 
    cliauth_hash_sha1_2_digest_endianess_finalize(
       context_sha->digest.bytes,
-      sizeof(CliAuthUInt32),
-      _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT
+      CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt32)),
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT)
    );
 
    return context_sha->digest.bytes;
@@ -620,9 +636,9 @@ cliauth_hash_sha1 = {
    cliauth_hash_sha1_digest,
    cliauth_hash_sha1_finalize,
    CLIAUTH_HASH_SHA1_IDENTIFIER,
-   sizeof(CLIAUTH_HASH_SHA1_IDENTIFIER) / sizeof(char),
-   CLIAUTH_HASH_SHA1_INPUT_BLOCK_LENGTH,
-   CLIAUTH_HASH_SHA1_DIGEST_LENGTH
+   CLIAUTH_LITERAL_UINT32(sizeof(CLIAUTH_HASH_SHA1_IDENTIFIER) / sizeof(char)),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA1_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA1_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
@@ -633,31 +649,79 @@ cliauth_hash_sha1 = {
 
 static const CliAuthUInt32
 cliauth_hash_sha2_32_constants_rounds [_CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT] = {
-   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
-   0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
-   0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
-   0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
-   0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc,
-   0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-   0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
-   0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
-   0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
-   0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
-   0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3,
-   0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-   0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5,
-   0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-   0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
-   0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+   CLIAUTH_LITERAL_UINT32(0x428a2f98u),
+   CLIAUTH_LITERAL_UINT32(0x71374491u),
+   CLIAUTH_LITERAL_UINT32(0xb5c0fbcfu),
+   CLIAUTH_LITERAL_UINT32(0xe9b5dba5u),
+   CLIAUTH_LITERAL_UINT32(0x3956c25bu),
+   CLIAUTH_LITERAL_UINT32(0x59f111f1u),
+   CLIAUTH_LITERAL_UINT32(0x923f82a4u),
+   CLIAUTH_LITERAL_UINT32(0xab1c5ed5u),
+   CLIAUTH_LITERAL_UINT32(0xd807aa98u),
+   CLIAUTH_LITERAL_UINT32(0x12835b01u),
+   CLIAUTH_LITERAL_UINT32(0x243185beu),
+   CLIAUTH_LITERAL_UINT32(0x550c7dc3u),
+   CLIAUTH_LITERAL_UINT32(0x72be5d74u),
+   CLIAUTH_LITERAL_UINT32(0x80deb1feu),
+   CLIAUTH_LITERAL_UINT32(0x9bdc06a7u),
+   CLIAUTH_LITERAL_UINT32(0xc19bf174u),
+   CLIAUTH_LITERAL_UINT32(0xe49b69c1u),
+   CLIAUTH_LITERAL_UINT32(0xefbe4786u),
+   CLIAUTH_LITERAL_UINT32(0x0fc19dc6u),
+   CLIAUTH_LITERAL_UINT32(0x240ca1ccu),
+   CLIAUTH_LITERAL_UINT32(0x2de92c6fu),
+   CLIAUTH_LITERAL_UINT32(0x4a7484aau),
+   CLIAUTH_LITERAL_UINT32(0x5cb0a9dcu),
+   CLIAUTH_LITERAL_UINT32(0x76f988dau),
+   CLIAUTH_LITERAL_UINT32(0x983e5152u),
+   CLIAUTH_LITERAL_UINT32(0xa831c66du),
+   CLIAUTH_LITERAL_UINT32(0xb00327c8u),
+   CLIAUTH_LITERAL_UINT32(0xbf597fc7u),
+   CLIAUTH_LITERAL_UINT32(0xc6e00bf3u),
+   CLIAUTH_LITERAL_UINT32(0xd5a79147u),
+   CLIAUTH_LITERAL_UINT32(0x06ca6351u),
+   CLIAUTH_LITERAL_UINT32(0x14292967u),
+   CLIAUTH_LITERAL_UINT32(0x27b70a85u),
+   CLIAUTH_LITERAL_UINT32(0x2e1b2138u),
+   CLIAUTH_LITERAL_UINT32(0x4d2c6dfcu),
+   CLIAUTH_LITERAL_UINT32(0x53380d13u),
+   CLIAUTH_LITERAL_UINT32(0x650a7354u),
+   CLIAUTH_LITERAL_UINT32(0x766a0abbu),
+   CLIAUTH_LITERAL_UINT32(0x81c2c92eu),
+   CLIAUTH_LITERAL_UINT32(0x92722c85u),
+   CLIAUTH_LITERAL_UINT32(0xa2bfe8a1u),
+   CLIAUTH_LITERAL_UINT32(0xa81a664bu),
+   CLIAUTH_LITERAL_UINT32(0xc24b8b70u),
+   CLIAUTH_LITERAL_UINT32(0xc76c51a3u),
+   CLIAUTH_LITERAL_UINT32(0xd192e819u),
+   CLIAUTH_LITERAL_UINT32(0xd6990624u),
+   CLIAUTH_LITERAL_UINT32(0xf40e3585u),
+   CLIAUTH_LITERAL_UINT32(0x106aa070u),
+   CLIAUTH_LITERAL_UINT32(0x19a4c116u),
+   CLIAUTH_LITERAL_UINT32(0x1e376c08u),
+   CLIAUTH_LITERAL_UINT32(0x2748774cu),
+   CLIAUTH_LITERAL_UINT32(0x34b0bcb5u),
+   CLIAUTH_LITERAL_UINT32(0x391c0cb3u),
+   CLIAUTH_LITERAL_UINT32(0x4ed8aa4au),
+   CLIAUTH_LITERAL_UINT32(0x5b9cca4fu),
+   CLIAUTH_LITERAL_UINT32(0x682e6ff3u),
+   CLIAUTH_LITERAL_UINT32(0x748f82eeu),
+   CLIAUTH_LITERAL_UINT32(0x78a5636fu),
+   CLIAUTH_LITERAL_UINT32(0x84c87814u),
+   CLIAUTH_LITERAL_UINT32(0x8cc70208u),
+   CLIAUTH_LITERAL_UINT32(0x90befffau),
+   CLIAUTH_LITERAL_UINT32(0xa4506cebu),
+   CLIAUTH_LITERAL_UINT32(0xbef9a3f7u),
+   CLIAUTH_LITERAL_UINT32(0xc67178f2u)
 };
 
 static CliAuthUInt32
 cliauth_hash_sha2_32_sigma_u0(CliAuthUInt32 x) {
    CliAuthUInt32 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint32(x, 2);
-   b = cliauth_bitwise_rotate_right_uint32(x, 13);
-   c = cliauth_bitwise_rotate_right_uint32(x, 22);
+   a = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(2u));
+   b = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(13u));
+   c = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(22u));
 
    return cliauth_hash_sha1_2_32_parity(a, b, c);
 }
@@ -666,9 +730,9 @@ static CliAuthUInt32
 cliauth_hash_sha2_32_sigma_u1(CliAuthUInt32 x) {
    CliAuthUInt32 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint32(x, 6);
-   b = cliauth_bitwise_rotate_right_uint32(x, 11);
-   c = cliauth_bitwise_rotate_right_uint32(x, 25);
+   a = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(6u));
+   b = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(11u));
+   c = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(25u));
 
    return cliauth_hash_sha1_2_32_parity(a, b, c);
 }
@@ -677,9 +741,9 @@ static CliAuthUInt32
 cliauth_hash_sha2_32_sigma_l0(CliAuthUInt32 x) {
    CliAuthUInt32 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint32(x, 7);
-   b = cliauth_bitwise_rotate_right_uint32(x, 18);
-   c = (x >> 3);
+   a = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(7u));
+   b = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(18u));
+   c = (x >> CLIAUTH_LITERAL_UINT8(3u));
 
    return cliauth_hash_sha1_2_32_parity(a, b, c);
 }
@@ -688,9 +752,9 @@ static CliAuthUInt32
 cliauth_hash_sha2_32_sigma_l1(CliAuthUInt32 x) {
    CliAuthUInt32 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint32(x, 17);
-   b = cliauth_bitwise_rotate_right_uint32(x, 19);
-   c = (x >> 10);
+   a = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(17u));
+   b = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(19u));
+   c = (x >> CLIAUTH_LITERAL_UINT8(10u));
 
    return cliauth_hash_sha1_2_32_parity(a, b, c);
 }
@@ -710,14 +774,14 @@ cliauth_hash_sha2_32_create_message_schedule(
    cliauth_hash_sha1_2_load_message_block(
       block,
       schedule->bytes,
-      _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH,
-      sizeof(CliAuthUInt32)
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH),
+      CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt32))
    );
    schedule_iter += _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH / sizeof(CliAuthUInt32);
 
    /* 16 <= t <= 63 */
-   t = 48;
-   while (t != 0) {
+   t = CLIAUTH_LITERAL_UINT8(48u);
+   while (t != CLIAUTH_LITERAL_UINT8(0u)) {
       a = cliauth_hash_sha2_32_sigma_l1(schedule_iter[-2]);
       b = schedule_iter[-7];
       c = cliauth_hash_sha2_32_sigma_l0(schedule_iter[-15]);
@@ -744,11 +808,11 @@ cliauth_hash_sha2_32_perform_rounds_and_additions(
    const CliAuthUInt32 * constants_iter;
    CliAuthUInt32 * work_iter;
 
-   t = _CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT;
+   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT);
    schedule_iter = schedule;
    constants_iter = cliauth_hash_sha2_32_constants_rounds;
 
-   while (t != 0) {
+   while (t != CLIAUTH_LITERAL_UINT8(0u)) {
       a = work[7];
       b = cliauth_hash_sha2_32_sigma_u1(work[4]);
       c = cliauth_hash_sha1_2_32_ch(work[4], work[5], work[6]);
@@ -760,9 +824,9 @@ cliauth_hash_sha2_32_perform_rounds_and_additions(
       g = cliauth_hash_sha1_2_32_maj(work[0], work[1], work[2]);
       t2 = f + g;
 
-      i = 7;
+      i = CLIAUTH_LITERAL_UINT8(7u);
       work_iter = &work[7];
-      while (i != 0) {
+      while (i != CLIAUTH_LITERAL_UINT8(0u)) {
          *work_iter = work_iter[-1];
          
          work_iter--;
@@ -799,7 +863,10 @@ cliauth_hash_sha2_32_digest_block(
    cliauth_memory_copy(
       context_sha->work,
       context_sha->digest.words,
-      _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)
+      CLIAUTH_LITERAL_UINT32(
+         _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * 
+         sizeof(CliAuthUInt32)
+      )
    );
 
    /* perform the rounds and additions */
@@ -812,7 +879,7 @@ cliauth_hash_sha2_32_digest_block(
    cliauth_hash_sha1_2_32_compute_intermediate_digest(
       context_sha->work,
       context_sha->digest.words,
-      _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT)
    );
    
    return;
@@ -821,7 +888,7 @@ cliauth_hash_sha2_32_digest_block(
 static const struct CliAuthHashSha12RingBufferImplementation
 cliauth_hash_sha2_32_ring_buffer_implementation = {
    cliauth_hash_sha2_32_digest_block,  
-   _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH,
+   CLIAUTH_LITERAL_UINT32(_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH),
 };
 
 static void
@@ -837,7 +904,10 @@ cliauth_hash_sha2_32_initialize(
    cliauth_memory_copy(
       &context_sha->digest,
       constants_initialize,
-      _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)
+      CLIAUTH_LITERAL_UINT32(
+         _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT *
+         sizeof(CliAuthUInt32)
+      )
    );
 
    /* initialize the ring buffer */
@@ -888,8 +958,8 @@ cliauth_hash_sha2_32_finalize(
    /* flip the endianess to big-endian for each word */
    cliauth_hash_sha1_2_digest_endianess_finalize(
       context_sha->digest.bytes,
-      sizeof(CliAuthUInt32),
-      _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT
+      CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt32)),
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT)
    );
 
    return context_sha->digest.bytes;
@@ -903,26 +973,86 @@ cliauth_hash_sha2_32_finalize(
 
 static const CliAuthUInt64
 cliauth_hash_sha2_64_constants_rounds [_CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT] = {
-   0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
-   0x3956c25bf348b538, 0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118,
-   0xd807aa98a3030242, 0x12835b0145706fbe, 0x243185be4ee4b28c, 0x550c7dc3d5ffb4e2,
-   0x72be5d74f27b896f, 0x80deb1fe3b1696b1, 0x9bdc06a725c71235, 0xc19bf174cf692694,
-   0xe49b69c19ef14ad2, 0xefbe4786384f25e3, 0x0fc19dc68b8cd5b5, 0x240ca1cc77ac9c65,
-   0x2de92c6f592b0275, 0x4a7484aa6ea6e483, 0x5cb0a9dcbd41fbd4, 0x76f988da831153b5,
-   0x983e5152ee66dfab, 0xa831c66d2db43210, 0xb00327c898fb213f, 0xbf597fc7beef0ee4,
-   0xc6e00bf33da88fc2, 0xd5a79147930aa725, 0x06ca6351e003826f, 0x142929670a0e6e70,
-   0x27b70a8546d22ffc, 0x2e1b21385c26c926, 0x4d2c6dfc5ac42aed, 0x53380d139d95b3df,
-   0x650a73548baf63de, 0x766a0abb3c77b2a8, 0x81c2c92e47edaee6, 0x92722c851482353b,
-   0xa2bfe8a14cf10364, 0xa81a664bbc423001, 0xc24b8b70d0f89791, 0xc76c51a30654be30,
-   0xd192e819d6ef5218, 0xd69906245565a910, 0xf40e35855771202a, 0x106aa07032bbd1b8,
-   0x19a4c116b8d2d0c8, 0x1e376c085141ab53, 0x2748774cdf8eeb99, 0x34b0bcb5e19b48a8,
-   0x391c0cb3c5c95a63, 0x4ed8aa4ae3418acb, 0x5b9cca4f7763e373, 0x682e6ff3d6b2b8a3,
-   0x748f82ee5defb2fc, 0x78a5636f43172f60, 0x84c87814a1f0ab72, 0x8cc702081a6439ec,
-   0x90befffa23631e28, 0xa4506cebde82bde9, 0xbef9a3f7b2c67915, 0xc67178f2e372532b,
-   0xca273eceea26619c, 0xd186b8c721c0c207, 0xeada7dd6cde0eb1e, 0xf57d4f7fee6ed178,
-   0x06f067aa72176fba, 0x0a637dc5a2c898a6, 0x113f9804bef90dae, 0x1b710b35131c471b,
-   0x28db77f523047d84, 0x32caab7b40c72493, 0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c,
-   0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817
+   CLIAUTH_LITERAL_UINT64(0x428a2f98u, 0xd728ae22u),
+   CLIAUTH_LITERAL_UINT64(0x71374491u, 0x23ef65cdu),
+   CLIAUTH_LITERAL_UINT64(0xb5c0fbcfu, 0xec4d3b2fu),
+   CLIAUTH_LITERAL_UINT64(0xe9b5dba5u, 0x8189dbbcu),
+   CLIAUTH_LITERAL_UINT64(0x3956c25bu, 0xf348b538u),
+   CLIAUTH_LITERAL_UINT64(0x59f111f1u, 0xb605d019u),
+   CLIAUTH_LITERAL_UINT64(0x923f82a4u, 0xaf194f9bu),
+   CLIAUTH_LITERAL_UINT64(0xab1c5ed5u, 0xda6d8118u),
+   CLIAUTH_LITERAL_UINT64(0xd807aa98u, 0xa3030242u),
+   CLIAUTH_LITERAL_UINT64(0x12835b01u, 0x45706fbeu),
+   CLIAUTH_LITERAL_UINT64(0x243185beu, 0x4ee4b28cu),
+   CLIAUTH_LITERAL_UINT64(0x550c7dc3u, 0xd5ffb4e2u),
+   CLIAUTH_LITERAL_UINT64(0x72be5d74u, 0xf27b896fu),
+   CLIAUTH_LITERAL_UINT64(0x80deb1feu, 0x3b1696b1u),
+   CLIAUTH_LITERAL_UINT64(0x9bdc06a7u, 0x25c71235u),
+   CLIAUTH_LITERAL_UINT64(0xc19bf174u, 0xcf692694u),
+   CLIAUTH_LITERAL_UINT64(0xe49b69c1u, 0x9ef14ad2u),
+   CLIAUTH_LITERAL_UINT64(0xefbe4786u, 0x384f25e3u),
+   CLIAUTH_LITERAL_UINT64(0x0fc19dc6u, 0x8b8cd5b5u),
+   CLIAUTH_LITERAL_UINT64(0x240ca1ccu, 0x77ac9c65u),
+   CLIAUTH_LITERAL_UINT64(0x2de92c6fu, 0x592b0275u),
+   CLIAUTH_LITERAL_UINT64(0x4a7484aau, 0x6ea6e483u),
+   CLIAUTH_LITERAL_UINT64(0x5cb0a9dcu, 0xbd41fbd4u),
+   CLIAUTH_LITERAL_UINT64(0x76f988dau, 0x831153b5u),
+   CLIAUTH_LITERAL_UINT64(0x983e5152u, 0xee66dfabu),
+   CLIAUTH_LITERAL_UINT64(0xa831c66du, 0x2db43210u),
+   CLIAUTH_LITERAL_UINT64(0xb00327c8u, 0x98fb213fu),
+   CLIAUTH_LITERAL_UINT64(0xbf597fc7u, 0xbeef0ee4u),
+   CLIAUTH_LITERAL_UINT64(0xc6e00bf3u, 0x3da88fc2u),
+   CLIAUTH_LITERAL_UINT64(0xd5a79147u, 0x930aa725u),
+   CLIAUTH_LITERAL_UINT64(0x06ca6351u, 0xe003826fu),
+   CLIAUTH_LITERAL_UINT64(0x14292967u, 0x0a0e6e70u),
+   CLIAUTH_LITERAL_UINT64(0x27b70a85u, 0x46d22ffcu),
+   CLIAUTH_LITERAL_UINT64(0x2e1b2138u, 0x5c26c926u),
+   CLIAUTH_LITERAL_UINT64(0x4d2c6dfcu, 0x5ac42aedu),
+   CLIAUTH_LITERAL_UINT64(0x53380d13u, 0x9d95b3dfu),
+   CLIAUTH_LITERAL_UINT64(0x650a7354u, 0x8baf63deu),
+   CLIAUTH_LITERAL_UINT64(0x766a0abbu, 0x3c77b2a8u),
+   CLIAUTH_LITERAL_UINT64(0x81c2c92eu, 0x47edaee6u),
+   CLIAUTH_LITERAL_UINT64(0x92722c85u, 0x1482353bu),
+   CLIAUTH_LITERAL_UINT64(0xa2bfe8a1u, 0x4cf10364u),
+   CLIAUTH_LITERAL_UINT64(0xa81a664bu, 0xbc423001u),
+   CLIAUTH_LITERAL_UINT64(0xc24b8b70u, 0xd0f89791u),
+   CLIAUTH_LITERAL_UINT64(0xc76c51a3u, 0x0654be30u),
+   CLIAUTH_LITERAL_UINT64(0xd192e819u, 0xd6ef5218u),
+   CLIAUTH_LITERAL_UINT64(0xd6990624u, 0x5565a910u),
+   CLIAUTH_LITERAL_UINT64(0xf40e3585u, 0x5771202au),
+   CLIAUTH_LITERAL_UINT64(0x106aa070u, 0x32bbd1b8u),
+   CLIAUTH_LITERAL_UINT64(0x19a4c116u, 0xb8d2d0c8u),
+   CLIAUTH_LITERAL_UINT64(0x1e376c08u, 0x5141ab53u),
+   CLIAUTH_LITERAL_UINT64(0x2748774cu, 0xdf8eeb99u),
+   CLIAUTH_LITERAL_UINT64(0x34b0bcb5u, 0xe19b48a8u),
+   CLIAUTH_LITERAL_UINT64(0x391c0cb3u, 0xc5c95a63u),
+   CLIAUTH_LITERAL_UINT64(0x4ed8aa4au, 0xe3418acbu),
+   CLIAUTH_LITERAL_UINT64(0x5b9cca4fu, 0x7763e373u),
+   CLIAUTH_LITERAL_UINT64(0x682e6ff3u, 0xd6b2b8a3u),
+   CLIAUTH_LITERAL_UINT64(0x748f82eeu, 0x5defb2fcu),
+   CLIAUTH_LITERAL_UINT64(0x78a5636fu, 0x43172f60u),
+   CLIAUTH_LITERAL_UINT64(0x84c87814u, 0xa1f0ab72u),
+   CLIAUTH_LITERAL_UINT64(0x8cc70208u, 0x1a6439ecu),
+   CLIAUTH_LITERAL_UINT64(0x90befffau, 0x23631e28u),
+   CLIAUTH_LITERAL_UINT64(0xa4506cebu, 0xde82bde9u),
+   CLIAUTH_LITERAL_UINT64(0xbef9a3f7u, 0xb2c67915u),
+   CLIAUTH_LITERAL_UINT64(0xc67178f2u, 0xe372532bu),
+   CLIAUTH_LITERAL_UINT64(0xca273eceu, 0xea26619cu),
+   CLIAUTH_LITERAL_UINT64(0xd186b8c7u, 0x21c0c207u),
+   CLIAUTH_LITERAL_UINT64(0xeada7dd6u, 0xcde0eb1eu),
+   CLIAUTH_LITERAL_UINT64(0xf57d4f7fu, 0xee6ed178u),
+   CLIAUTH_LITERAL_UINT64(0x06f067aau, 0x72176fbau),
+   CLIAUTH_LITERAL_UINT64(0x0a637dc5u, 0xa2c898a6u),
+   CLIAUTH_LITERAL_UINT64(0x113f9804u, 0xbef90daeu),
+   CLIAUTH_LITERAL_UINT64(0x1b710b35u, 0x131c471bu),
+   CLIAUTH_LITERAL_UINT64(0x28db77f5u, 0x23047d84u),
+   CLIAUTH_LITERAL_UINT64(0x32caab7bu, 0x40c72493u),
+   CLIAUTH_LITERAL_UINT64(0x3c9ebe0au, 0x15c9bebcu),
+   CLIAUTH_LITERAL_UINT64(0x431d67c4u, 0x9c100d4cu),
+   CLIAUTH_LITERAL_UINT64(0x4cc5d4beu, 0xcb3e42b6u),
+   CLIAUTH_LITERAL_UINT64(0x597f299cu, 0xfc657e2au),
+   CLIAUTH_LITERAL_UINT64(0x5fcb6fabu, 0x3ad6faecu),
+   CLIAUTH_LITERAL_UINT64(0x6c44198cu, 0x4a475817u)
 };
 
 static CliAuthUInt64
@@ -944,9 +1074,9 @@ static CliAuthUInt64
 cliauth_hash_sha2_64_sigma_u0(CliAuthUInt64 x) {
    CliAuthUInt64 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint64(x, 28);
-   b = cliauth_bitwise_rotate_right_uint64(x, 34);
-   c = cliauth_bitwise_rotate_right_uint64(x, 39);
+   a = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(28u));
+   b = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(34u));
+   c = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(39u));
 
    return cliauth_hash_sha2_64_parity(a, b, c);
 }
@@ -955,9 +1085,9 @@ static CliAuthUInt64
 cliauth_hash_sha2_64_sigma_u1(CliAuthUInt64 x) {
    CliAuthUInt64 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint64(x, 14);
-   b = cliauth_bitwise_rotate_right_uint64(x, 18);
-   c = cliauth_bitwise_rotate_right_uint64(x, 41);
+   a = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(14u));
+   b = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(18u));
+   c = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(41u));
 
    return cliauth_hash_sha2_64_parity(a, b, c);
 }
@@ -966,9 +1096,9 @@ static CliAuthUInt64
 cliauth_hash_sha2_64_sigma_l0(CliAuthUInt64 x) {
    CliAuthUInt64 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint64(x, 1);
-   b = cliauth_bitwise_rotate_right_uint64(x, 8);
-   c = (x >> 7);
+   a = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(1u));
+   b = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(8u));
+   c = (x >> CLIAUTH_LITERAL_UINT8(7u));
 
    return cliauth_hash_sha2_64_parity(a, b, c);
 }
@@ -977,9 +1107,9 @@ static CliAuthUInt64
 cliauth_hash_sha2_64_sigma_l1(CliAuthUInt64 x) {
    CliAuthUInt64 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint64(x, 19);
-   b = cliauth_bitwise_rotate_right_uint64(x, 61);
-   c = (x >> 6);
+   a = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(19u));
+   b = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(61u));
+   c = (x >> CLIAUTH_LITERAL_UINT8(6u));
 
    return cliauth_hash_sha2_64_parity(a, b, c);
 }
@@ -999,14 +1129,14 @@ cliauth_hash_sha2_64_create_message_schedule(
    cliauth_hash_sha1_2_load_message_block(
       block,
       schedule->bytes,
-      _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH,
-      sizeof(CliAuthUInt64)
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH),
+      CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt64))
    );
    schedule_iter += _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH / sizeof(CliAuthUInt64);
 
    /* 16 <= t <= 79 */
-   t = 64;
-   while (t != 0) {
+   t = CLIAUTH_LITERAL_UINT8(64u);
+   while (t != CLIAUTH_LITERAL_UINT8(0u)) {
       a = cliauth_hash_sha2_64_sigma_l1(schedule_iter[-2]);
       b = schedule_iter[-7];
       c = cliauth_hash_sha2_64_sigma_l0(schedule_iter[-15]);
@@ -1033,11 +1163,11 @@ cliauth_hash_sha2_64_perform_rounds_and_additions(
    const CliAuthUInt64 * constants_iter;
    CliAuthUInt64 * work_iter;
 
-   t = _CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT;
+   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT);
    schedule_iter = schedule;
    constants_iter = cliauth_hash_sha2_64_constants_rounds;
 
-   while (t != 0) {
+   while (t != CLIAUTH_LITERAL_UINT8(0u)) {
       a = work[7];
       b = cliauth_hash_sha2_64_sigma_u1(work[4]);
       c = cliauth_hash_sha2_64_ch(work[4], work[5], work[6]);
@@ -1049,9 +1179,9 @@ cliauth_hash_sha2_64_perform_rounds_and_additions(
       g = cliauth_hash_sha2_64_maj(work[0], work[1], work[2]);
       t2 = f + g;
 
-      i = 7;
+      i = CLIAUTH_LITERAL_UINT8(7u);
       work_iter = &work[7];
-      while (i != 0) {
+      while (i != CLIAUTH_LITERAL_UINT8(0u)) {
          *work_iter = work_iter[-1];
          
          work_iter--;
@@ -1078,11 +1208,11 @@ cliauth_hash_sha2_64_compute_intermediate_digest(
    CliAuthUInt64 * digest_iter;
    const CliAuthUInt64 * work_iter;
 
-   t = _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT;
+   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT);
    digest_iter = digest;
    work_iter = work;
 
-   while (t != 0) {
+   while (t != CLIAUTH_LITERAL_UINT8(0u)) {
       *digest_iter += *work_iter;
 
       digest_iter++;
@@ -1110,7 +1240,10 @@ cliauth_hash_sha2_64_digest_block(
    cliauth_memory_copy(
       context_sha->work,
       context_sha->digest.words,
-      _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt64)
+      CLIAUTH_LITERAL_UINT32(
+         _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT *
+         sizeof(CliAuthUInt64)
+      )
    );
 
    cliauth_hash_sha2_64_perform_rounds_and_additions(
@@ -1129,7 +1262,7 @@ cliauth_hash_sha2_64_digest_block(
 static const struct CliAuthHashSha12RingBufferImplementation
 cliauth_hash_sha2_64_ring_buffer_implementation = {
    cliauth_hash_sha2_64_digest_block,  
-   _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH,
+   CLIAUTH_LITERAL_UINT32(_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH),
 };
 
 static void
@@ -1144,7 +1277,10 @@ cliauth_hash_sha2_64_initialize(
    cliauth_memory_copy(
       &context_sha->digest,
       constants_initialize,
-      _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt64)
+      CLIAUTH_LITERAL_UINT32(
+         _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT *
+         sizeof(CliAuthUInt64)
+      )
    );
 
    cliauth_hash_sha1_2_ring_buffer_initialize(
@@ -1192,8 +1328,8 @@ cliauth_hash_sha2_64_finalize(
 
    cliauth_hash_sha1_2_digest_endianess_finalize(
       context_sha->digest.bytes,
-      sizeof(CliAuthUInt64),
-      _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT
+      CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt64)),
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT)
    );
 
    return context_sha->digest.bytes;
@@ -1207,8 +1343,14 @@ cliauth_hash_sha2_64_finalize(
 
 static const CliAuthUInt32
 cliauth_hash_sha2_224_constants_initialize [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT] = {
-   0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,
-   0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4
+   CLIAUTH_LITERAL_UINT32(0xc1059ed8u),
+   CLIAUTH_LITERAL_UINT32(0x367cd507u),
+   CLIAUTH_LITERAL_UINT32(0x3070dd17u),
+   CLIAUTH_LITERAL_UINT32(0xf70e5939u),
+   CLIAUTH_LITERAL_UINT32(0xffc00b31u),
+   CLIAUTH_LITERAL_UINT32(0x68581511u),
+   CLIAUTH_LITERAL_UINT32(0x64f98fa7u),
+   CLIAUTH_LITERAL_UINT32(0xbefa4fa4u)
 };
 
 static void
@@ -1223,9 +1365,9 @@ cliauth_hash_sha2_224 = {
    cliauth_hash_sha2_32_digest,
    cliauth_hash_sha2_32_finalize,
    CLIAUTH_HASH_SHA2_224_IDENTIFIER,
-   sizeof(CLIAUTH_HASH_SHA2_224_IDENTIFIER) / sizeof(char),
-   CLIAUTH_HASH_SHA2_224_INPUT_BLOCK_LENGTH,
-   CLIAUTH_HASH_SHA2_224_DIGEST_LENGTH
+   CLIAUTH_LITERAL_UINT32(sizeof(CLIAUTH_HASH_SHA2_224_IDENTIFIER) / sizeof(char)),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_224_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_224_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1236,8 +1378,14 @@ cliauth_hash_sha2_224 = {
 
 static const CliAuthUInt32
 cliauth_hash_sha2_256_constants_initialize [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT] = {
-   0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-   0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+   CLIAUTH_LITERAL_UINT32(0x6a09e667u),
+   CLIAUTH_LITERAL_UINT32(0xbb67ae85u),
+   CLIAUTH_LITERAL_UINT32(0x3c6ef372u),
+   CLIAUTH_LITERAL_UINT32(0xa54ff53au),
+   CLIAUTH_LITERAL_UINT32(0x510e527fu),
+   CLIAUTH_LITERAL_UINT32(0x9b05688cu),
+   CLIAUTH_LITERAL_UINT32(0x1f83d9abu),
+   CLIAUTH_LITERAL_UINT32(0x5be0cd19u)
 };
 
 static void
@@ -1252,9 +1400,9 @@ cliauth_hash_sha2_256 = {
    cliauth_hash_sha2_32_digest,
    cliauth_hash_sha2_32_finalize,
    CLIAUTH_HASH_SHA2_256_IDENTIFIER,
-   sizeof(CLIAUTH_HASH_SHA2_256_IDENTIFIER) / sizeof(char),
-   CLIAUTH_HASH_SHA2_256_INPUT_BLOCK_LENGTH,
-   CLIAUTH_HASH_SHA2_256_DIGEST_LENGTH
+   CLIAUTH_LITERAL_UINT32(sizeof(CLIAUTH_HASH_SHA2_256_IDENTIFIER) / sizeof(char)),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_256_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_256_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1265,8 +1413,14 @@ cliauth_hash_sha2_256 = {
 
 static const CliAuthUInt64
 cliauth_hash_sha2_384_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
-   0xcbbb9d5dc1059ed8, 0x629a292a367cd507, 0x9159015a3070dd17, 0x152fecd8f70e5939,
-   0x67332667ffc00b31, 0x8eb44a8768581511, 0xdb0c2e0d64f98fa7, 0x47b5481dbefa4fa4
+   CLIAUTH_LITERAL_UINT64(0xcbbb9d5du, 0xc1059ed8u),
+   CLIAUTH_LITERAL_UINT64(0x629a292au, 0x367cd507u),
+   CLIAUTH_LITERAL_UINT64(0x9159015au, 0x3070dd17u),
+   CLIAUTH_LITERAL_UINT64(0x152fecd8u, 0xf70e5939u),
+   CLIAUTH_LITERAL_UINT64(0x67332667u, 0xffc00b31u),
+   CLIAUTH_LITERAL_UINT64(0x8eb44a87u, 0x68581511u),
+   CLIAUTH_LITERAL_UINT64(0xdb0c2e0du, 0x64f98fa7u),
+   CLIAUTH_LITERAL_UINT64(0x47b5481du, 0xbefa4fa4u)
 };
 
 static void
@@ -1281,9 +1435,9 @@ cliauth_hash_sha2_384 = {
    cliauth_hash_sha2_64_digest,
    cliauth_hash_sha2_64_finalize,
    CLIAUTH_HASH_SHA2_384_IDENTIFIER,
-   sizeof(CLIAUTH_HASH_SHA2_384_IDENTIFIER) / sizeof(char),
-   CLIAUTH_HASH_SHA2_384_INPUT_BLOCK_LENGTH,
-   CLIAUTH_HASH_SHA2_384_DIGEST_LENGTH
+   CLIAUTH_LITERAL_UINT32(sizeof(CLIAUTH_HASH_SHA2_384_IDENTIFIER) / sizeof(char)),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_384_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_384_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1294,8 +1448,14 @@ cliauth_hash_sha2_384 = {
 
 static const CliAuthUInt64
 cliauth_hash_sha2_512_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
-   0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1,
-   0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179
+   CLIAUTH_LITERAL_UINT64(0x6a09e667u, 0xf3bcc908u),
+   CLIAUTH_LITERAL_UINT64(0xbb67ae85u, 0x84caa73bu),
+   CLIAUTH_LITERAL_UINT64(0x3c6ef372u, 0xfe94f82bu),
+   CLIAUTH_LITERAL_UINT64(0xa54ff53au, 0x5f1d36f1u),
+   CLIAUTH_LITERAL_UINT64(0x510e527fu, 0xade682d1u),
+   CLIAUTH_LITERAL_UINT64(0x9b05688cu, 0x2b3e6c1fu),
+   CLIAUTH_LITERAL_UINT64(0x1f83d9abu, 0xfb41bd6bu),
+   CLIAUTH_LITERAL_UINT64(0x5be0cd19u, 0x137e2179u)
 };
 
 static void
@@ -1310,9 +1470,9 @@ cliauth_hash_sha2_512 = {
    cliauth_hash_sha2_64_digest,
    cliauth_hash_sha2_64_finalize,
    CLIAUTH_HASH_SHA2_512_IDENTIFIER,
-   sizeof(CLIAUTH_HASH_SHA2_512_IDENTIFIER) / sizeof(char),
-   CLIAUTH_HASH_SHA2_512_INPUT_BLOCK_LENGTH,
-   CLIAUTH_HASH_SHA2_512_DIGEST_LENGTH
+   CLIAUTH_LITERAL_UINT32(sizeof(CLIAUTH_HASH_SHA2_512_IDENTIFIER) / sizeof(char)),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1323,8 +1483,14 @@ cliauth_hash_sha2_512 = {
 
 static const CliAuthUInt64
 cliauth_hash_sha2_512_224_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
-   0x8c3d37c819544da2, 0x73e1996689dcd4d6, 0x1dfab7ae32ff9c82, 0x679dd514582f9fcf,
-   0x0f6d2b697bd44da8, 0x77e36f7304c48942, 0x3f9d85a86a1d36c8, 0x1112e6ad91d692a1
+   CLIAUTH_LITERAL_UINT64(0x8c3d37c8u, 0x19544da2u),
+   CLIAUTH_LITERAL_UINT64(0x73e19966u, 0x89dcd4d6u),
+   CLIAUTH_LITERAL_UINT64(0x1dfab7aeu, 0x32ff9c82u),
+   CLIAUTH_LITERAL_UINT64(0x679dd514u, 0x582f9fcfu),
+   CLIAUTH_LITERAL_UINT64(0x0f6d2b69u, 0x7bd44da8u),
+   CLIAUTH_LITERAL_UINT64(0x77e36f73u, 0x04c48942u),
+   CLIAUTH_LITERAL_UINT64(0x3f9d85a8u, 0x6a1d36c8u),
+   CLIAUTH_LITERAL_UINT64(0x1112e6adu, 0x91d692a1u)
 };
 
 static void
@@ -1339,9 +1505,9 @@ cliauth_hash_sha2_512_224 = {
    cliauth_hash_sha2_64_digest,
    cliauth_hash_sha2_64_finalize,
    CLIAUTH_HASH_SHA2_512_224_IDENTIFIER,
-   sizeof(CLIAUTH_HASH_SHA2_512_224_IDENTIFIER) / sizeof(char),
-   CLIAUTH_HASH_SHA2_512_224_INPUT_BLOCK_LENGTH,
-   CLIAUTH_HASH_SHA2_512_224_DIGEST_LENGTH
+   CLIAUTH_LITERAL_UINT32(sizeof(CLIAUTH_HASH_SHA2_512_224_IDENTIFIER) / sizeof(char)),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_224_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_224_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1352,8 +1518,14 @@ cliauth_hash_sha2_512_224 = {
 
 static const CliAuthUInt64
 cliauth_hash_sha2_512_256_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
-   0x22312194fc2bf72c, 0x9f555fa3c84c64c2, 0x2393b86b6f53b151, 0x963877195940eabd,
-   0x96283ee2a88effe3, 0xbe5e1e2553863992, 0x2b0199fc2c85b8aa, 0x0eb72ddc81c52ca2
+   CLIAUTH_LITERAL_UINT64(0x22312194u, 0xfc2bf72cu),
+   CLIAUTH_LITERAL_UINT64(0x9f555fa3u, 0xc84c64c2u),
+   CLIAUTH_LITERAL_UINT64(0x2393b86bu, 0x6f53b151u),
+   CLIAUTH_LITERAL_UINT64(0x96387719u, 0x5940eabdu),
+   CLIAUTH_LITERAL_UINT64(0x96283ee2u, 0xa88effe3u),
+   CLIAUTH_LITERAL_UINT64(0xbe5e1e25u, 0x53863992u),
+   CLIAUTH_LITERAL_UINT64(0x2b0199fcu, 0x2c85b8aau),
+   CLIAUTH_LITERAL_UINT64(0x0eb72ddcu, 0x81c52ca2u)
 };
 
 static void
@@ -1368,9 +1540,9 @@ cliauth_hash_sha2_512_256 = {
    cliauth_hash_sha2_64_digest,
    cliauth_hash_sha2_64_finalize,
    CLIAUTH_HASH_SHA2_512_256_IDENTIFIER,
-   sizeof(CLIAUTH_HASH_SHA2_512_256_IDENTIFIER) / sizeof(char),
-   CLIAUTH_HASH_SHA2_512_256_INPUT_BLOCK_LENGTH,
-   CLIAUTH_HASH_SHA2_512_256_DIGEST_LENGTH
+   CLIAUTH_LITERAL_UINT32(sizeof(CLIAUTH_HASH_SHA2_512_256_IDENTIFIER) / sizeof(char)),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_256_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_256_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/

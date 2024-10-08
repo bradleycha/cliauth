@@ -20,7 +20,7 @@ cliauth_bitwise_rotate_left_uint8(
    CliAuthUInt8 bits
 ) {
    return CLIAUTH_BITWISE_ROTATE_LEFT(
-      sizeof(CliAuthUInt8) * 8,
+      sizeof(CliAuthUInt8) * 8u,
       value,
       bits
    );
@@ -32,7 +32,7 @@ cliauth_bitwise_rotate_left_uint16(
    CliAuthUInt8 bits
 ) {
    return CLIAUTH_BITWISE_ROTATE_LEFT(
-      sizeof(CliAuthUInt16) * 8,
+      sizeof(CliAuthUInt16) * 8u,
       value,
       bits
    );
@@ -44,7 +44,7 @@ cliauth_bitwise_rotate_left_uint32(
    CliAuthUInt8 bits
 ) {
    return CLIAUTH_BITWISE_ROTATE_LEFT(
-      sizeof(CliAuthUInt32) * 8,
+      sizeof(CliAuthUInt32) * 8u,
       value,
       bits
    );
@@ -56,7 +56,7 @@ cliauth_bitwise_rotate_left_uint64(
    CliAuthUInt8 bits
 ) {
    return CLIAUTH_BITWISE_ROTATE_LEFT(
-      sizeof(CliAuthUInt64) * 8,
+      sizeof(CliAuthUInt64) * 8u,
       value,
       bits
    );
@@ -68,7 +68,7 @@ cliauth_bitwise_rotate_right_uint8(
    CliAuthUInt8 bits
 ) {
    return CLIAUTH_BITWISE_ROTATE_RIGHT(
-      sizeof(CliAuthUInt8) * 8,
+      sizeof(CliAuthUInt8) * 8u,
       value,
       bits
    );
@@ -80,7 +80,7 @@ cliauth_bitwise_rotate_right_uint16(
    CliAuthUInt8 bits
 ) {
    return CLIAUTH_BITWISE_ROTATE_RIGHT(
-      sizeof(CliAuthUInt16) * 8,
+      sizeof(CliAuthUInt16) * 8u,
       value,
       bits
    );
@@ -92,7 +92,7 @@ cliauth_bitwise_rotate_right_uint32(
    CliAuthUInt8 bits
 ) {
    return CLIAUTH_BITWISE_ROTATE_RIGHT(
-      sizeof(CliAuthUInt32) * 8,
+      sizeof(CliAuthUInt32) * 8u,
       value,
       bits
    );
@@ -104,7 +104,7 @@ cliauth_bitwise_rotate_right_uint64(
    CliAuthUInt8 bits
 ) {
    return CLIAUTH_BITWISE_ROTATE_RIGHT(
-      sizeof(CliAuthUInt64) * 8,
+      sizeof(CliAuthUInt64) * 8u,
       value,
       bits
    );
@@ -120,7 +120,7 @@ cliauth_bitwise_magnitude_deposit_negative_sint64_sign_magnitude(
    output.uint = magnitude;
    
    /* set sign bit */
-   output.uint |= (((CliAuthUInt64)(1u)) << ((sizeof(CliAuthUInt64) * 8) - 1));
+   output.uint |= (CLIAUTH_LITERAL_UINT64(0u, 1u) << ((sizeof(CliAuthUInt64) * 8u) - 1u));
 
    return output.sint;
 }
@@ -150,7 +150,7 @@ cliauth_bitwise_magnitude_deposit_negative_sint64_twos_complement(
    output.uint = magnitude;
 
    /* decrement for two's complement */
-   output.uint -= 1;
+   output.uint -= CLIAUTH_LITERAL_UINT64(0u, 1u);
 
    /* flip the bits of the decremented result */
    output.uint = ~output.uint;
@@ -168,7 +168,7 @@ cliauth_bitwise_magnitude_extract_negative_sint64_sign_magnitude(
    output.sint = value;
 
    /* unset the sign bit */
-   output.uint &= ~(((CliAuthUInt64)(1u)) << ((sizeof(CliAuthUInt64) * 8) - 1));
+   output.uint &= ~(CLIAUTH_LITERAL_UINT64(0u, 1u) << ((sizeof(CliAuthUInt64) * 8u) - 1u));
 
    return output.uint;
 }
@@ -201,7 +201,7 @@ cliauth_bitwise_magnitude_extract_negative_sint64_twos_complement(
    output.uint = ~output.uint;
 
    /* increment to get the positive equivalent */
-   output.uint += 1;
+   output.uint += CLIAUTH_LITERAL_UINT64(0u, 1u);
 
    return output.uint;
 }
