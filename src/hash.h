@@ -234,8 +234,8 @@ union _CliAuthHashContextAlgorithmSha232Digest {
    CliAuthUInt32 words [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
 };
 union _CliAuthHashContextAlgorithmSha232Schedule {
-   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt32)];
-   CliAuthUInt32 words [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT];
+   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_32_MESSAGE_SCHEDULE_LENGTH * sizeof(CliAuthUInt32)];
+   CliAuthUInt32 words [_CLIAUTH_HASH_SHA2_32_MESSAGE_SCHEDULE_LENGTH];
 };
 
 struct _CliAuthHashContextAlgorithmSha232 {
@@ -306,8 +306,8 @@ union _CliAuthHashContextAlgorithmSha264Digest {
    CliAuthUInt64 words [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
 };
 union _CliAuthHashContextAlgorithmSha264Schedule {
-   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT * sizeof(CliAuthUInt64)];
-   CliAuthUInt64 words [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT];
+   CliAuthUInt8 bytes [_CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH * sizeof(CliAuthUInt64)];
+   CliAuthUInt64 words [_CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH];
 };
 
 struct _CliAuthHashContextAlgorithmSha264 {
