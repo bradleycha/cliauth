@@ -59,6 +59,9 @@ cliauth_account_generate_passcode(
             account->algorithm.parameters.totp.period
          );
          break;
+
+      default:
+         CLIAUTH_UNREACHABLE;
    }
 
    /* check to make sure the given passcode index offset exists */

@@ -267,6 +267,9 @@ cliauth_parse_string_integer_state_digest_prefix_character_sign(
       case CLIAUTH_PARSE_STRING_INTEGER_PREFIX_CHARACTER_SIGN_NEGATIVE:
          sign = CLIAUTH_PARSE_STRING_INTEGER_SIGN_NEGATIVE;
          break;
+
+      default:
+         CLIAUTH_UNREACHABLE;
    }
 
    state->value.sign = sign;
@@ -333,6 +336,9 @@ cliauth_parse_string_integer_state_digest_prefix_character_base(
       case CLIAUTH_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_16:
          base = CLIAUTH_PARSE_STRING_INTEGER_BASE_16;
          break;
+
+      default:
+         CLIAUTH_UNREACHABLE;
    }
 
    /* mark the base character as encountered and set the new base */
