@@ -25,6 +25,34 @@
 #define TEST_NAME_BYTES\
    (((sizeof(TEST_NAME) / sizeof(char)) - 1u) * sizeof(char))
 
+static const struct CliAuthHashFunction *
+cliauth_args_parse_hash_function(
+   const char identifier [],
+   CliAuthUInt32 identifier_characters
+) {
+   const struct CliAuthHashFunction * hash_iterator;
+   CliAuthUInt8 i;
+
+   hash_iterator = cliauth_hash;
+   i = CLIAUTH_HASH_ENABLED_COUNT;
+   while (i != 0) {
+      if (hash_iterator->identifier_characters == identifier_characters) {
+         if (cliauth_memory_compare(
+            hash_iterator->identifier,
+            identifier,
+            identifier_characters * sizeof(char)
+         ) == CLIAUTH_BOOLEAN_TRUE) {
+            return hash_iterator;
+         }
+      }
+
+      hash_iterator++;
+      i--;
+   }
+
+   return CLIAUTH_NULLPTR;
+}
+
 enum CliAuthArgsParseResult
 cliauth_args_parse(
    struct CliAuthArgsPayload * payload,
@@ -32,8 +60,10 @@ cliauth_args_parse(
    CliAuthUInt16 args_count
 ) {
    const char * key_uri;
+   CliAuthUInt32 key_uri_characters;
    char key_uri_terminator;
    struct CliAuthMemoryFindResult key_uri_terminator_find_result;
+   const struct CliAuthHashFunction * hash_function;
 
    if (args_count < CLIAUTH_LITERAL_UINT16(2u)) {
       cliauth_log(CLIAUTH_LOG_ERROR("no key URI was given as an argument"));
@@ -51,16 +81,27 @@ cliauth_args_parse(
       CLIAUTH_LITERAL_UINT32(CLIAUTH_UINT32_MAX / sizeof(char)),
       CLIAUTH_LITERAL_UINT32(sizeof(char))
    );
+   key_uri_characters = key_uri_terminator_find_result.position;
 
-   /* TODO: re-implement key URI parsing */
-   cliauth_log(CLIAUTH_LOG_WARNING("key URI parsing is temporarily regressed, arguments parsing will use hard-coded values"));
-   (void)key_uri;
-   (void)key_uri_terminator_find_result;
+   /* TODO: re-implement key URI parsing, right now we're treating the key */
+   /* URI as a hash function identifier and nothing else */
+   cliauth_log(CLIAUTH_LOG_WARNING("key URI parsing is temporarily regressed, arguments parsing will use hard-coded values, except for the hash algorithm"));
 
    payload->account.algorithm.type = CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP;
    payload->account.algorithm.parameters.totp.period = CLIAUTH_LITERAL_UINT64(0u, 30u);
 
-   payload->account.hash_function = &cliauth_hash[CLIAUTH_HASH_INDEX_SHA1];
+   hash_function = cliauth_args_parse_hash_function(key_uri, key_uri_characters);
+   if (hash_function == CLIAUTH_NULLPTR) {
+      cliauth_log(
+         CLIAUTH_LOG_ERROR("unknown hash algorithm \'%.*s\'"),
+         key_uri_characters,
+         key_uri
+      );
+
+      return CLIAUTH_ARGS_PARSE_RESULT_INVALID;
+   }
+
+   payload->account.hash_function = hash_function;
 
    cliauth_memory_copy(
       payload->account.secrets,
