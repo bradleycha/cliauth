@@ -58,12 +58,14 @@ cliauth_memory_fill(
 /* Compares an arbitrary number of bytes for equality.                        */
 /*----------------------------------------------------------------------------*/
 /* data_lhs - The left-hand side of the comparision.  This buffer must be     */
-/*            'bytes' number of bytes.                                        */
+/*            'bytes_lhs' number of bytes.                                    */
 /*                                                                            */
 /* data_rhs - The right-hand side of the comparision.  This buffer must be    */
-/*            'bytes' number of bytes.                                        */
+/*            'bytes_rhs' number of bytes.                                    */
 /*                                                                            */
-/* bytes - The number of bytes to compare.                                    */
+/* bytes_lhs - The number of bytes to compare from 'data_lhs'.                */
+/*                                                                            */
+/* bytes_rhs - The number of bytes to compare from 'data_rhs'.                */
 /*----------------------------------------------------------------------------*/
 /* Return value - Whether the memory buffers are equal or not.                */
 /*----------------------------------------------------------------------------*/
@@ -71,7 +73,8 @@ CliAuthBoolean
 cliauth_memory_compare(
    const void * data_lhs,
    const void * data_rhs,
-   CliAuthUInt32 bytes
+   CliAuthUInt32 bytes_lhs,
+   CliAuthUInt32 bytes_rhs
 );
 
 /*----------------------------------------------------------------------------*/

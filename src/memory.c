@@ -273,16 +273,21 @@ CliAuthBoolean
 cliauth_memory_compare(
    const void * data_lhs,
    const void * data_rhs,
-   CliAuthUInt32 bytes
+   CliAuthUInt32 bytes_lhs,
+   CliAuthUInt32 bytes_rhs
 ) {
    CliAuthBoolean retn;
 
+   if (bytes_lhs != bytes_rhs) {
+      return CLIAUTH_BOOLEAN_FALSE;
+   }
+
 #if CLIAUTH_IMPORTS_USE_C_MEMCMP
    (void)cliauth_memory_compare_fallback;
-   retn = cliauth_memory_compare_libc(data_lhs, data_rhs, bytes);
+   retn = cliauth_memory_compare_libc(data_lhs, data_rhs, bytes_lhs);
 #else /* CLIAUTH_IMPORTS_USE_C_MEMCMP */
    (void)cliauth_memory_compare_libc;
-   retn = cliauth_memory_compare_fallback(data_lhs, data_rhs, bytes);
+   retn = cliauth_memory_compare_fallback(data_lhs, data_rhs, bytes_lhs);
 #endif /* CLIAUTH_IMPORTS_USE_C_MEMCMP */
 
    return retn;
@@ -306,6 +311,7 @@ cliauth_memory_find(
       if (cliauth_memory_compare(
          data_iter,
          sentinel,
+         bytes_per_element,
          bytes_per_element
       ) == CLIAUTH_BOOLEAN_TRUE) {
          result.status = CLIAUTH_MEMORY_FIND_STATUS_FOUND;

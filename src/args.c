@@ -36,14 +36,13 @@ cliauth_args_parse_hash_function(
    hash_iterator = cliauth_hash;
    i = CLIAUTH_HASH_ENABLED_COUNT;
    while (i != 0) {
-      if (hash_iterator->identifier_characters == identifier_characters) {
-         if (cliauth_memory_compare(
-            hash_iterator->identifier,
-            identifier,
-            identifier_characters * sizeof(char)
-         ) == CLIAUTH_BOOLEAN_TRUE) {
-            return hash_iterator;
-         }
+      if (cliauth_memory_compare(
+         hash_iterator->identifier,
+         identifier,
+         hash_iterator->identifier_characters * sizeof(char),
+         identifier_characters * sizeof(char)
+      ) == CLIAUTH_BOOLEAN_TRUE) {
+         return hash_iterator;
       }
 
       hash_iterator++;
