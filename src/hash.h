@@ -150,6 +150,46 @@ struct CliAuthHashFunction {
    CliAuthUInt8                  digest_length;
 };
 
+/*----------------------------------------------------------------------------*/
+/* The index of a particular hash function in cliauth_hash.                   */
+/*----------------------------------------------------------------------------*/
+#define CLIAUTH_HASH_INDEX_FIELD_COUNT CLIAUTH_HASH_ENABLED_COUNT
+enum CliAuthHashIndex {
+   _CLIAUTH_HASH_INDEX_START_OFFSET = -1,
+
+#if CLIAUTH_CONFIG_HASH_SHA1
+   CLIAUTH_HASH_INDEX_SHA1,
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
+#if CLIAUTH_CONFIG_HASH_SHA2_224
+   CLIAUTH_HASH_INDEX_SHA2_224,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_224 */
+#if CLIAUTH_CONFIG_HASH_SHA2_256
+   CLIAUTH_HASH_INDEX_SHA2_256,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_256 */
+#if CLIAUTH_CONFIG_HASH_SHA2_384
+   CLIAUTH_HASH_INDEX_SHA2_384,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_384 */
+#if CLIAUTH_CONFIG_HASH_SHA2_512
+   CLIAUTH_HASH_INDEX_SHA2_512,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_512 */
+#if CLIAUTH_CONFIG_HASH_SHA2_512_224
+   CLIAUTH_HASH_INDEX_SHA2_512_224,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_224 */
+#if CLIAUTH_CONFIG_HASH_SHA2_512_256
+   CLIAUTH_HASH_INDEX_SHA2_512_256,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_256 */
+
+   /* required due to stupidness with trailing commas */
+   _CLIAUTH_HASH_INDEX_TERMINATOR
+};
+
+/*----------------------------------------------------------------------------*/
+/* Array of all available hash functions.  The index of a particular hash     */
+/* function can be found from CliAuthHashIndex.                               */
+/*----------------------------------------------------------------------------*/
+extern const struct CliAuthHashFunction
+cliauth_hash [CLIAUTH_HASH_ENABLED_COUNT];
+
 #if _CLIAUTH_HASH_SHA1_2
 /*----------------------------------------------------------------------------*/
 
@@ -208,8 +248,6 @@ struct _CliAuthHashContextAlgorithmSha1 {
    20u
 #define CLIAUTH_HASH_SHA1_IDENTIFIER\
    "sha1"
-extern const struct CliAuthHashFunction
-cliauth_hash_sha1;
 
 /*----------------------------------------------------------------------------*/
 #endif /* CLIAUTH_CONFIG_HASH_SHA1 */
@@ -270,8 +308,6 @@ struct _CliAuthHashContextAlgorithmSha232 {
    28u
 #define CLIAUTH_HASH_SHA2_224_IDENTIFIER\
    "sha224"
-extern const struct CliAuthHashFunction
-cliauth_hash_sha2_224;
 #endif /* CLIAUTH_CONFIG_HASH_SHA2_224 */
 
 #if CLIAUTH_CONFIG_HASH_SHA2_256
@@ -281,8 +317,6 @@ cliauth_hash_sha2_224;
    32u
 #define CLIAUTH_HASH_SHA2_256_IDENTIFIER\
    "sha256"
-extern const struct CliAuthHashFunction
-cliauth_hash_sha2_256;
 #endif /* CLIAUTH_CONFIG_HASH_SHA2_256 */
 
 /*----------------------------------------------------------------------------*/
@@ -335,8 +369,6 @@ struct _CliAuthHashContextAlgorithmSha264 {
    48u
 #define CLIAUTH_HASH_SHA2_384_IDENTIFIER\
    "sha384"
-extern const struct CliAuthHashFunction
-cliauth_hash_sha2_384;
 #endif /* CLIAUTH_CONFIG_HASH_SHA2_384 */
 
 #if CLIAUTH_CONFIG_HASH_SHA2_512
@@ -346,8 +378,6 @@ cliauth_hash_sha2_384;
    64u
 #define CLIAUTH_HASH_SHA2_512_IDENTIFIER\
    "sha512"
-extern const struct CliAuthHashFunction
-cliauth_hash_sha2_512;
 #endif /* CLIAUTH_CONFIG_HASH_SHA2_512 */
 
 #if CLIAUTH_CONFIG_HASH_SHA2_512_224
@@ -357,8 +387,6 @@ cliauth_hash_sha2_512;
    28u
 #define CLIAUTH_HASH_SHA2_512_224_IDENTIFIER\
    "sha512/224"
-extern const struct CliAuthHashFunction
-cliauth_hash_sha2_512_224;
 #endif /* CLIAUTH_CONFIG_HASH_SHA2_512_224 */
 
 #if CLIAUTH_CONFIG_HASH_SHA2_512_256
@@ -368,8 +396,6 @@ cliauth_hash_sha2_512_224;
    32u
 #define CLIAUTH_HASH_SHA2_512_256_IDENTIFIER\
    "sha512/256"
-extern const struct CliAuthHashFunction
-cliauth_hash_sha2_512_256;
 #endif /* CLIAUTH_CONFIG_HASH_SHA2_512_256 */
 
 /*----------------------------------------------------------------------------*/

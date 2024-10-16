@@ -60,7 +60,7 @@ cliauth_args_parse(
    payload->account.algorithm.type = CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP;
    payload->account.algorithm.parameters.totp.period = CLIAUTH_LITERAL_UINT64(0u, 30u);
 
-   payload->account.hash_function = &cliauth_hash_sha1;
+   payload->account.hash_function = &cliauth_hash[CLIAUTH_HASH_INDEX_SHA1];
 
    cliauth_memory_copy(
       payload->account.secrets,

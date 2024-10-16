@@ -630,7 +630,7 @@ cliauth_hash_sha1_finalize(struct CliAuthHashContext * context) {
    return context_sha->digest.bytes;
 }
 
-const struct CliAuthHashFunction
+static const struct CliAuthHashFunction
 cliauth_hash_sha1 = {
    cliauth_hash_sha1_initialize,
    cliauth_hash_sha1_digest,
@@ -1359,7 +1359,7 @@ cliauth_hash_sha2_224_initialize(struct CliAuthHashContext * context) {
    return;
 }
 
-const struct CliAuthHashFunction
+static const struct CliAuthHashFunction
 cliauth_hash_sha2_224 = {
    cliauth_hash_sha2_224_initialize,
    cliauth_hash_sha2_32_digest,
@@ -1394,7 +1394,7 @@ cliauth_hash_sha2_256_initialize(struct CliAuthHashContext * context) {
    return;
 }
 
-const struct CliAuthHashFunction
+static const struct CliAuthHashFunction
 cliauth_hash_sha2_256 = {
    cliauth_hash_sha2_256_initialize,
    cliauth_hash_sha2_32_digest,
@@ -1429,7 +1429,7 @@ cliauth_hash_sha2_384_initialize(struct CliAuthHashContext * context) {
    return;
 }
 
-const struct CliAuthHashFunction
+static const struct CliAuthHashFunction
 cliauth_hash_sha2_384 = {
    cliauth_hash_sha2_384_initialize,
    cliauth_hash_sha2_64_digest,
@@ -1464,7 +1464,7 @@ cliauth_hash_sha2_512_initialize(struct CliAuthHashContext * context) {
    return;
 }
 
-const struct CliAuthHashFunction
+static const struct CliAuthHashFunction
 cliauth_hash_sha2_512 = {
    cliauth_hash_sha2_512_initialize,
    cliauth_hash_sha2_64_digest,
@@ -1499,7 +1499,7 @@ cliauth_hash_sha2_512_224_initialize(struct CliAuthHashContext * context) {
    return;
 }
 
-const struct CliAuthHashFunction
+static const struct CliAuthHashFunction
 cliauth_hash_sha2_512_224 = {
    cliauth_hash_sha2_512_224_initialize,
    cliauth_hash_sha2_64_digest,
@@ -1534,7 +1534,7 @@ cliauth_hash_sha2_512_256_initialize(struct CliAuthHashContext * context) {
    return;
 }
 
-const struct CliAuthHashFunction
+static const struct CliAuthHashFunction
 cliauth_hash_sha2_512_256 = {
    cliauth_hash_sha2_512_256_initialize,
    cliauth_hash_sha2_64_digest,
@@ -1547,4 +1547,29 @@ cliauth_hash_sha2_512_256 = {
 
 /*----------------------------------------------------------------------------*/
 #endif /* CLIAUTH_CONFIG_HASH_SHA2_512_256 */
+
+const struct CliAuthHashFunction
+cliauth_hash [CLIAUTH_HASH_ENABLED_COUNT] = {
+#if CLIAUTH_CONFIG_HASH_SHA1
+   cliauth_hash_sha1,
+#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
+#if CLIAUTH_CONFIG_HASH_SHA2_224
+   cliauth_hash_sha2_224,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_224 */
+#if CLIAUTH_CONFIG_HASH_SHA2_256
+   cliauth_hash_sha2_256,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_256 */
+#if CLIAUTH_CONFIG_HASH_SHA2_384
+   cliauth_hash_sha2_384,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_384 */
+#if CLIAUTH_CONFIG_HASH_SHA2_512
+   cliauth_hash_sha2_512,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_512 */
+#if CLIAUTH_CONFIG_HASH_SHA2_512_224
+   cliauth_hash_sha2_512_224,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_224 */
+#if CLIAUTH_CONFIG_HASH_SHA2_512_256
+   cliauth_hash_sha2_512_256,
+#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_256 */
+};
 
