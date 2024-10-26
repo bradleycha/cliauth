@@ -194,8 +194,26 @@ cliauth_memory_fill(
    return;
 }
 
+CliAuthBoolean
+cliauth_memory_compare(
+   const void * data_lhs,
+   const void * data_rhs,
+   CliAuthUInt32 bytes_lhs,
+   CliAuthUInt32 bytes_rhs
+) {
+   if (bytes_lhs != bytes_rhs) {
+      return CLIAUTH_BOOLEAN_FALSE;
+   }
+
+   return cliauth_memory_compare_with_equal_lengths(
+      data_lhs,
+      data_rhs,
+      bytes_lhs
+   );
+}
+
 static CliAuthBoolean
-cliauth_memory_compare_fallback(
+cliauth_memory_compare_with_equal_lengths_fallback(
    const void * data_lhs,
    const void * data_rhs,
    CliAuthUInt32 bytes
@@ -220,7 +238,7 @@ cliauth_memory_compare_fallback(
 }
 
 static CliAuthBoolean
-cliauth_memory_compare_libc(
+cliauth_memory_compare_with_equal_lengths_libc(
    const void * data_lhs,
    const void * data_rhs,
    CliAuthUInt32 bytes
@@ -270,24 +288,27 @@ cliauth_memory_compare_libc(
 }
 
 CliAuthBoolean
-cliauth_memory_compare(
+cliauth_memory_compare_with_equal_lengths(
    const void * data_lhs,
    const void * data_rhs,
-   CliAuthUInt32 bytes_lhs,
-   CliAuthUInt32 bytes_rhs
+   CliAuthUInt32 bytes
 ) {
    CliAuthBoolean retn;
 
-   if (bytes_lhs != bytes_rhs) {
-      return CLIAUTH_BOOLEAN_FALSE;
-   }
-
 #if CLIAUTH_IMPORTS_USE_C_MEMCMP
-   (void)cliauth_memory_compare_fallback;
-   retn = cliauth_memory_compare_libc(data_lhs, data_rhs, bytes_lhs);
+   (void)cliauth_memory_compare_with_equal_lengths_fallback;
+   retn = cliauth_memory_compare_with_equal_lengths_libc(
+      data_lhs,
+      data_rhs,
+      bytes
+   );
 #else /* CLIAUTH_IMPORTS_USE_C_MEMCMP */
-   (void)cliauth_memory_compare_libc;
-   retn = cliauth_memory_compare_fallback(data_lhs, data_rhs, bytes_lhs);
+   (void)cliauth_memory_compare_with_equal_lengths_libc;
+   retn = cliauth_memory_compare_with_equal_lengths_fallback(
+      data_lhs,
+      data_rhs,
+      bytes
+   );
 #endif /* CLIAUTH_IMPORTS_USE_C_MEMCMP */
 
    return retn;

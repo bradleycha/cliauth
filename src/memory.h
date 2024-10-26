@@ -55,7 +55,8 @@ cliauth_memory_fill(
 );
 
 /*----------------------------------------------------------------------------*/
-/* Compares an arbitrary number of bytes for equality.                        */
+/* Compares an arbitrary number of bytes for equality, allowing for buffers   */
+/* of differing lengths.                                                      */
 /*----------------------------------------------------------------------------*/
 /* data_lhs - The left-hand side of the comparision.  This buffer must be     */
 /*            'bytes_lhs' number of bytes.                                    */
@@ -67,7 +68,9 @@ cliauth_memory_fill(
 /*                                                                            */
 /* bytes_rhs - The number of bytes to compare from 'data_rhs'.                */
 /*----------------------------------------------------------------------------*/
-/* Return value - Whether the memory buffers are equal or not.                */
+/* Return value - Whether the memory buffers are equal or not.  If the buffer */
+/*                lenghts are not equal, this will always return              */
+/*                CLIAUTH_BOOLEAN_FALSE.                                      */
 /*----------------------------------------------------------------------------*/
 CliAuthBoolean
 cliauth_memory_compare(
@@ -75,6 +78,27 @@ cliauth_memory_compare(
    const void * data_rhs,
    CliAuthUInt32 bytes_lhs,
    CliAuthUInt32 bytes_rhs
+);
+
+/*----------------------------------------------------------------------------*/
+/* Compares an arbitrary number of bytes for equality, given that the amount  */
+/* of data to be compared is equal.                                           */
+/*----------------------------------------------------------------------------*/
+/* data_lhs - The left-hand side of the comparision.  This buffer must be     */
+/*            'bytes' number of bytes.                                        */
+/*                                                                            */
+/* data_rhs - The right-hand side of the comparision.  This buffer must be    */
+/*            'bytes' number of bytes.                                        */
+/*                                                                            */
+/* bytes - The number of bytes to compare from 'data_lhs' and 'data_rhs'.     */
+/*----------------------------------------------------------------------------*/
+/* Return value - Whether the memory buffers are equal or not.                */
+/*----------------------------------------------------------------------------*/
+CliAuthBoolean
+cliauth_memory_compare_with_equal_lengths(
+   const void * data_lhs,
+   const void * data_rhs,
+   CliAuthUInt32 bytes
 );
 
 /*----------------------------------------------------------------------------*/
