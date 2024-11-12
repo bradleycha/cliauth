@@ -85,7 +85,7 @@ typedef void (*CliAuthHashFunctionInitialize)(
 /* context - The hash function context to digest the message into.  The       */
 /*           context must first be initialized.                               */
 /*                                                                            */
-/* message_reader - The reader for the data to digest.                        */
+/* message_reader - The stream reader for the data to digest.                 */
 /*                                                                            */
 /* message_bytes - The number of bytes to read from 'message_reader'.         */
 /*----------------------------------------------------------------------------*/
@@ -97,7 +97,7 @@ typedef void (*CliAuthHashFunctionInitialize)(
 /*----------------------------------------------------------------------------*/
 typedef struct CliAuthIoReadResult (*CliAuthHashFunctionDigest)(
    struct CliAuthHashContext * context,
-   const struct CliAuthIoReader * message_reader,
+   const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
 );
 

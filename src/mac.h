@@ -59,7 +59,7 @@ cliauth_mac_hmac_initialize(
 /*           must not have been finalized by                                  */
 /*           'cliauth_mac_hmac_key_finalize()'.                               */
 /*                                                                            */
-/* key_reader - The reader to source the key bytes from.                      */
+/* key_reader - The stream reader to source the key bytes from.               */
 /*                                                                            */
 /* key_bytes - The number of bytes to read from 'key_reader'.                 */
 /*----------------------------------------------------------------------------*/
@@ -72,7 +72,7 @@ cliauth_mac_hmac_initialize(
 struct CliAuthIoReadResult
 cliauth_mac_hmac_key_digest(
    struct CliAuthMacHmacContext * context,
-   const struct CliAuthIoReader * key_reader,
+   const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 );
 
@@ -96,6 +96,10 @@ cliauth_mac_hmac_key_finalize(
 /*           have had its secret key digested and finalized with              */
 /*           'cliauth_mac_hmac_key_finalize()' and must not have been         */
 /*           finalized with 'cliauth_mac_hmac_finalize()'.                    */
+/*                                                                            */
+/* message_reader - The stream reader to source the message bytes from.       */
+/*                                                                            */
+/* message_bytes - The number of bytes to read from 'message_reader'.         */
 /*----------------------------------------------------------------------------*/
 /* Return value - The result of reading the key from 'message_reader'.  If    */
 /*                the returned read result status is not                      */
@@ -106,7 +110,7 @@ cliauth_mac_hmac_key_finalize(
 struct CliAuthIoReadResult
 cliauth_mac_hmac_message_digest(
    struct CliAuthMacHmacContext * context,
-   const struct CliAuthIoReader * message_reader,
+   const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
 );
 

@@ -82,7 +82,7 @@ cliauth_otp_hotp_initialize(
 struct CliAuthIoReadResult
 cliauth_otp_hotp_key_digest(
    struct CliAuthOtpHotpContext * context,
-   const struct CliAuthIoReader * key_reader,
+   const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
    return cliauth_mac_hmac_key_digest(
@@ -97,7 +97,7 @@ cliauth_otp_hotp_finalize(
    struct CliAuthOtpHotpContext * context
 ) {
    struct CliAuthIoByteStreamReader counter_byte_stream_reader;
-   struct CliAuthIoReader counter_reader;
+   struct CliAuthIoStreamReader counter_reader;
    union CliAuthInt64 counter_big_endian;
    CliAuthUInt8 * hmac_digest;
    CliAuthUInt32 passcode_untrimmed;

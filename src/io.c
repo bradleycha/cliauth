@@ -9,11 +9,10 @@
 #include "io.h"
 
 #include "memory.h"
-#include "endian.h"
 
 struct CliAuthIoReadResult
-cliauth_io_reader_read(
-   const struct CliAuthIoReader * reader,
+cliauth_io_stream_reader_read(
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 ) {
@@ -25,8 +24,8 @@ cliauth_io_reader_read(
 }
 
 struct CliAuthIoReadResult
-cliauth_io_reader_read_all(
-   const struct CliAuthIoReader * reader,
+cliauth_io_stream_reader_read_all(
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 ) {
@@ -38,7 +37,7 @@ cliauth_io_reader_read_all(
    read_bytes = CLIAUTH_LITERAL_UINT32(0u);
 
    while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
-      read_result = cliauth_io_reader_read(
+      read_result = cliauth_io_stream_reader_read(
          reader,
          buffer_iter,
          bytes
@@ -60,8 +59,8 @@ cliauth_io_reader_read_all(
 }
 
 struct CliAuthIoWriteResult
-cliauth_io_writer_write(
-   const struct CliAuthIoWriter * writer,
+cliauth_io_stream_writer_write(
+   const struct CliAuthIoStreamWriter * writer,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
@@ -73,8 +72,8 @@ cliauth_io_writer_write(
 }
 
 struct CliAuthIoWriteResult
-cliauth_io_writer_write_all(
-   const struct CliAuthIoWriter * writer,
+cliauth_io_stream_writer_write_all(
+   const struct CliAuthIoStreamWriter * writer,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
@@ -86,7 +85,7 @@ cliauth_io_writer_write_all(
    write_bytes = CLIAUTH_LITERAL_UINT32(0u);
 
    while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
-      write_result = cliauth_io_writer_write(
+      write_result = cliauth_io_stream_writer_write(
          writer,
          data_iter,
          bytes
@@ -217,11 +216,11 @@ cliauth_io_byte_stream_writer_initialize(
    return;
 }
 
-struct CliAuthIoReader
+struct CliAuthIoStreamReader
 cliauth_io_byte_stream_reader_interface(
    struct CliAuthIoByteStreamReader * context
 ) {
-   struct CliAuthIoReader retn;
+   struct CliAuthIoStreamReader retn;
 
    retn.reader = cliauth_io_byte_stream_reader_read;
    retn.context = context;
@@ -229,11 +228,11 @@ cliauth_io_byte_stream_reader_interface(
    return retn;
 }
 
-struct CliAuthIoWriter
+struct CliAuthIoStreamWriter
 cliauth_io_byte_stream_writer_interface(
    struct CliAuthIoByteStreamWriter * context
 ) {
-   struct CliAuthIoWriter retn;
+   struct CliAuthIoStreamWriter retn;
 
    retn.writer = cliauth_io_byte_stream_writer_write;
    retn.context = context;
@@ -245,20 +244,20 @@ cliauth_io_byte_stream_writer_interface(
 /*----------------------------------------------------------------------------*/
 
 static struct CliAuthIoReadResult
-cliauth_io_buffered_reader_read(
+cliauth_io_buffered_stream_reader_read(
    void * context,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 ) {
    struct CliAuthIoReadResult read_result;
-   struct CliAuthIoBufferedReader * context_reader;
+   struct CliAuthIoBufferedStreamReader * context_reader;
    CliAuthUInt8 * read_buffer_start;
    CliAuthUInt32 read_total;
    CliAuthUInt8 * buffer_iter;
    CliAuthUInt32 buffer_bytes;
    CliAuthUInt32 residual_bytes;
 
-   context_reader = (struct CliAuthIoBufferedReader *)context;
+   context_reader = (struct CliAuthIoBufferedStreamReader *)context;
 
    /* calculate the start of the read buffer */
    read_buffer_start = &context_reader->buffer[context_reader->start];
@@ -306,7 +305,7 @@ cliauth_io_buffered_reader_read(
    buffer_iter += buffer_bytes;
 
    /* read the rest of the remaining bytes */
-   read_result = cliauth_io_reader_read_all(
+   read_result = cliauth_io_stream_reader_read_all(
       context_reader->backing_reader,
       buffer_iter,
       residual_bytes
@@ -320,7 +319,7 @@ cliauth_io_buffered_reader_read(
 
    /* buffer in a new block into the read buffer, ignoring errors and simply */
    /* accepting whatever number of bytes we were given */
-   read_result = cliauth_io_reader_read_all(
+   read_result = cliauth_io_stream_reader_read_all(
       context_reader->backing_reader,
       context_reader->buffer,
       context_reader->length
@@ -335,13 +334,13 @@ cliauth_io_buffered_reader_read(
 }
 
 static struct CliAuthIoWriteResult
-cliauth_io_buffered_writer_write(
+cliauth_io_buffered_stream_writer_write(
    void * context,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
    struct CliAuthIoWriteResult write_result;
-   struct CliAuthIoBufferedWriter * context_writer;
+   struct CliAuthIoBufferedStreamWriter * context_writer;
    CliAuthUInt8 * buffer_free;
    CliAuthUInt32 write_total;
    const CliAuthUInt8 * data_iter;
@@ -349,7 +348,7 @@ cliauth_io_buffered_writer_write(
    CliAuthUInt32 residual_bytes;
    CliAuthUInt32 block_bytes;
 
-   context_writer = (struct CliAuthIoBufferedWriter *)context;
+   context_writer = (struct CliAuthIoBufferedStreamWriter *)context;
 
    /* calculate the pointer to the start of the write buffer free space */
    buffer_free = &context_writer->buffer[
@@ -395,7 +394,7 @@ cliauth_io_buffered_writer_write(
    context_writer->capacity = CLIAUTH_LITERAL_UINT32(0u);
 
    /* attempt to flush the write buffer */
-   write_result = cliauth_io_buffered_writer_flush(context_writer);
+   write_result = cliauth_io_buffered_stream_writer_flush(context_writer);
    write_total += write_result.bytes;
    data_iter += write_result.bytes;
 
@@ -405,7 +404,7 @@ cliauth_io_buffered_writer_write(
    }
 
    /* attempt to write out all the full-sized blocks at once */
-   write_result = cliauth_io_writer_write_all(
+   write_result = cliauth_io_stream_writer_write_all(
       context_writer->backing_writer,
       data_iter,
       block_bytes
@@ -434,9 +433,9 @@ cliauth_io_buffered_writer_write(
 }
 
 void
-cliauth_io_buffered_reader_initialize(
+cliauth_io_buffered_stream_reader_initialize(
    struct CliAuthIoBufferedReader * context,
-   const struct CliAuthIoReader * backing_reader,
+   const struct CliAuthIoStreamReader * backing_reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 length
 ) {
@@ -450,9 +449,9 @@ cliauth_io_buffered_reader_initialize(
 }
 
 void
-cliauth_io_buffered_writer_initialize(
-   struct CliAuthIoBufferedWriter * context,
-   const struct CliAuthIoWriter * backing_writer,
+cliauth_io_buffered_stream_writer_initialize(
+   struct CliAuthIoBufferedStreamWriter * context,
+   const struct CliAuthIoStreamWriter * backing_writer,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 length
 ) {
@@ -466,32 +465,32 @@ cliauth_io_buffered_writer_initialize(
 }
 
 struct CliAuthIoReader
-cliauth_io_buffered_reader_interface(
-   struct CliAuthIoBufferedReader * context
+cliauth_io_buffered_stream_reader_interface(
+   struct CliAuthIoBufferedStreamReader * context
 ) {
-   struct CliAuthIoReader retn;
+   struct CliAuthIoStreamReader retn;
 
-   retn.reader = cliauth_io_buffered_reader_read;
+   retn.reader = cliauth_io_buffered_stream_reader_read;
    retn.context = context;
 
    return retn;
 }
 
 struct CliAuthIoWriter
-cliauth_io_buffered_writer_interface(
-   struct CliAuthIoBufferedWriter * context
+cliauth_io_buffered_stream_writer_interface(
+   struct CliAuthIoBufferedStreamWriter * context
 ) {
-   struct CliAuthIoWriter retn;
+   struct CliAuthIoStreamWriter retn;
 
-   retn.writer = cliauth_io_buffered_writer_write;
+   retn.writer = cliauth_io_buffered_stream_writer_write;
    retn.context = context;
 
    return retn;
 }
 
 static struct CliAuthIoWriteResult
-cliauth_io_buffered_writer_flush_unified(
-   struct CliAuthIoBufferedWriter * context
+cliauth_io_buffered_stream_writer_flush_unified(
+   struct CliAuthIoBufferedStreamWriter * context
 ) {
    struct CliAuthIoWriteResult result;
    CliAuthUInt8 * data_ptr;
@@ -502,7 +501,7 @@ cliauth_io_buffered_writer_flush_unified(
    data_bytes  = context->length - context->capacity;
 
    /* attempt to write the buffer slice */
-   result = cliauth_io_writer_write_all(
+   result = cliauth_io_stream_writer_write_all(
       context->backing_writer,
       data_ptr,
       data_bytes
@@ -517,8 +516,8 @@ cliauth_io_buffered_writer_flush_unified(
 }
 
 static struct CliAuthIoWriteResult
-cliauth_io_buffered_writer_flush_fragmented(
-   struct CliAuthIoBufferedWriter * context
+cliauth_io_buffered_stream_writer_flush_fragmented(
+   struct CliAuthIoBufferedStreamWriter * context
 ) {
    struct CliAuthIoWriteResult result;
    CliAuthUInt8 * fill_ptr;
@@ -533,7 +532,7 @@ cliauth_io_buffered_writer_flush_fragmented(
    remainder_bytes = context->start - context->capacity;
 
    /* attempt to write the 'fill' buffer slice */
-   result = cliauth_io_writer_write_all(
+   result = cliauth_io_stream_writer_write_all(
       context->backing_writer,
       fill_ptr,
       fill_bytes
@@ -549,7 +548,7 @@ cliauth_io_buffered_writer_flush_fragmented(
    }
 
    /* attempt to write the 'remainder' buffer slice */
-   result = cliauth_io_writer_write_all(
+   result = cliauth_io_stream_writer_write_all(
       context->backing_writer,
       remainder_ptr,
       remainder_bytes
@@ -567,17 +566,17 @@ cliauth_io_buffered_writer_flush_fragmented(
 }
 
 struct CliAuthIoWriteResult
-cliauth_io_buffered_writer_flush(
-   struct CliAuthIoBufferedWriter * context
+cliauth_io_buffered_stream_writer_flush(
+   struct CliAuthIoBufferedStreamWriter * context
 ) {
    struct CliAuthIoWriteResult result;
 
    /* if the buffer is not fragmented, simply flush the entire buffer */
    /* otherwise we will need to flush each portion seperately */
    if (context->start > context->capacity) {
-      result = cliauth_io_buffered_writer_flush_fragmented(context);
+      result = cliauth_io_buffered_stream_writer_flush_fragmented(context);
    } else {
-      result = cliauth_io_buffered_writer_flush_unified(context);
+      result = cliauth_io_buffered_stream_writer_flush_unified(context);
    }
 
    return result;

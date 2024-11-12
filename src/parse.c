@@ -428,7 +428,7 @@ cliauth_parse_string_integer_state_digest_prefix_character(
 static struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_state_digest_prefix(
    struct CliAuthParseStringIntegerState * state,
-   const struct CliAuthIoReader * reader
+   const struct CliAuthIoStreamReader * reader
 ) {
    struct CliAuthParseStringIntegerResult result;
    CliAuthUInt8 prefix_buffer [CLIAUTH_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS];
@@ -445,7 +445,7 @@ cliauth_parse_string_integer_state_digest_prefix(
    }
 
    /* attempt to read in the prefix string */
-   result.read_result = cliauth_io_reader_read_all(
+   result.read_result = cliauth_io_stream_reader_read_all(
       reader,
       prefix_buffer,
       prefix_characters * CLIAUTH_LITERAL_UINT32(sizeof(char))
@@ -479,7 +479,7 @@ cliauth_parse_string_integer_state_digest_prefix(
 static struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_state_digest_magnitude(
    struct CliAuthParseStringIntegerState * state,
-   const struct CliAuthIoReader * reader
+   const struct CliAuthIoStreamReader * reader
 ) {
    struct CliAuthParseStringIntegerResult result;
    CliAuthUInt32 bytes_read;
@@ -487,7 +487,7 @@ cliauth_parse_string_integer_state_digest_magnitude(
 
    bytes_read = CLIAUTH_LITERAL_UINT32(0u);
    while (state->characters_remaining != CLIAUTH_LITERAL_UINT32(0u)) {
-      result.read_result = cliauth_io_reader_read_all(
+      result.read_result = cliauth_io_stream_reader_read_all(
          reader,
          &digit,
          CLIAUTH_LITERAL_UINT32(sizeof(digit))
@@ -520,7 +520,7 @@ cliauth_parse_string_integer_state_digest_magnitude(
 static struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_sign_magnitude(
    struct CliAuthParseStringIntegerSignMagnitude * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base
@@ -576,7 +576,7 @@ cliauth_parse_string_integer_sign_magnitude(
 static struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_uint(
    CliAuthUInt64 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base,
@@ -665,7 +665,7 @@ cliauth_parse_string_integer_sint_negative(
 static struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_sint(
    CliAuthSInt64 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base,
@@ -720,7 +720,7 @@ cliauth_parse_string_integer_sint(
 struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_uint8(
    CliAuthUInt8 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base
@@ -745,7 +745,7 @@ cliauth_parse_string_integer_uint8(
 struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_uint16(
    CliAuthUInt16 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base
@@ -770,7 +770,7 @@ cliauth_parse_string_integer_uint16(
 struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_uint32(
    CliAuthUInt32 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base
@@ -795,7 +795,7 @@ cliauth_parse_string_integer_uint32(
 struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_uint64(
    CliAuthUInt64 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base
@@ -814,7 +814,7 @@ cliauth_parse_string_integer_uint64(
 struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_sint8(
    CliAuthSInt8 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base
@@ -842,7 +842,7 @@ cliauth_parse_string_integer_sint8(
 struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_sint16(
    CliAuthSInt16 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base
@@ -870,7 +870,7 @@ cliauth_parse_string_integer_sint16(
 struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_sint32(
    CliAuthSInt32 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base
@@ -898,7 +898,7 @@ cliauth_parse_string_integer_sint32(
 struct CliAuthParseStringIntegerResult
 cliauth_parse_string_integer_sint64(
    CliAuthSInt64 * output,
-   const struct CliAuthIoReader * reader,
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt32 characters,
    enum CliAuthParseStringIntegerSign sign,
    enum CliAuthParseStringIntegerBase base

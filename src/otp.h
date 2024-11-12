@@ -59,7 +59,7 @@ cliauth_otp_hotp_initialize(
 /*           been initialized with 'cliauth_otp_hotp_initialize()' and must   */
 /*           not have been finalized with 'cliauth_otp_hotp_finalize()'.      */
 /*                                                                            */
-/* key_reader - The reader to source the key bytes from.                      */
+/* key_reader - The stream reader to source the key bytes from.               */
 /*                                                                            */
 /* key_bytes - The number of bytes to read from 'key_reader'.                 */
 /*----------------------------------------------------------------------------*/
@@ -72,7 +72,7 @@ cliauth_otp_hotp_initialize(
 struct CliAuthIoReadResult
 cliauth_otp_hotp_key_digest(
    struct CliAuthOtpHotpContext * context,
-   const struct CliAuthIoReader * key_reader,
+   const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 );
 

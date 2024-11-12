@@ -43,7 +43,7 @@ cliauth_account_generate_passcode(
    CliAuthSInt64 index
 ) {
    struct CliAuthIoByteStreamReader secrets_byte_stream_reader;
-   struct CliAuthIoReader secrets_reader;
+   struct CliAuthIoStreamReader secrets_reader;
    CliAuthUInt64 counter;
 
    /* get the current HOTP counter value */

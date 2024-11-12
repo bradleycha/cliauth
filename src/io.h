@@ -75,41 +75,43 @@ struct CliAuthIoWriteResult {
 };
 
 /*----------------------------------------------------------------------------*/
-/* A function which implements the reader interface.  For more information,   */
-/* see the documentation for cliauth_io_reader_read().                        */
+/* A function which implements the reader interface for a uni-directional.    */
+/* stream.  For more information, see the documentation for                   */
+/* cliauth_io_stream_reader_read().                                           */
 /*----------------------------------------------------------------------------*/
-typedef struct CliAuthIoReadResult (*CliAuthIoReaderFunction)(
+typedef struct CliAuthIoReadResult (*CliAuthIoStreamReaderFunction)(
    void * context,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 );
 
 /*----------------------------------------------------------------------------*/
-/* A function which implements the writer interface.  For more information,   */
-/* see the documentation for cliauth_io_writer_write().                        */
+/* A function which implements the writer interface for a uni-directional.    */
+/* stream.  For more information, see the documentation for                   */
+/* cliauth_io_stream_writer_write().                                          */
 /*----------------------------------------------------------------------------*/
-typedef struct CliAuthIoWriteResult (*CliAuthIoWriterFunction)(
+typedef struct CliAuthIoWriteResult (*CliAuthIoStreamWriterFunction)(
    void * context,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 );
 
 /*----------------------------------------------------------------------------*/
-/* A generic reader interface.                                                */
+/* A generic uni-directional stream reader interface.                         */
 /*----------------------------------------------------------------------------*/
 /* reader - The reader function for the instance's implementation.            */
 /*                                                                            */
 /* context - A pointer to an implementation-specific context struct.          */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoReader {
-   CliAuthIoReaderFunction reader;
+struct CliAuthIoStreamReader {
+   CliAuthIoStreamReaderFunction reader;
    void * context;
 };
 
 /*----------------------------------------------------------------------------*/
-/* Attempts to read bytes into a buffer from a reader.                        */
+/* Attempts to read bytes into a buffer from a stream reader.                 */
 /*----------------------------------------------------------------------------*/
-/* reader - The reader interface to read from.                                */
+/* reader - The stream reader interface to read from.                         */
 /*                                                                            */
 /* buffer - A byte buffer to store the read contents to.  The buffer will     */
 /*          only be valid up to the number of bytes successfully read in the  */
@@ -121,16 +123,16 @@ struct CliAuthIoReader {
 /* Return value - A struct representing the result of reading.                */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoReadResult
-cliauth_io_reader_read(
-   const struct CliAuthIoReader * reader,
+cliauth_io_stream_reader_read(
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 );
 
 /*----------------------------------------------------------------------------*/
-/* Attempts to read and completely fill a buffer from a reader.               */
+/* Attempts to read and completely fill a buffer from a stream reader.        */
 /*----------------------------------------------------------------------------*/
-/* reader - The reader interface to read from.                                */
+/* reader - The stream reader interface to read from.                         */
 /*                                                                            */
 /* buffer - A byte buffer to store the read contents to.  The buffer will     */
 /*          only be valid up to the number of bytes successfully read in the  */
@@ -141,28 +143,28 @@ cliauth_io_reader_read(
 /* Return value - A struct representing the result of reading.                */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoReadResult
-cliauth_io_reader_read_all(
-   const struct CliAuthIoReader * reader,
+cliauth_io_stream_reader_read_all(
+   const struct CliAuthIoStreamReader * reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 );
 
 /*----------------------------------------------------------------------------*/
-/* A generic writer interface.                                                */
+/* A generic uni-directional stream writer interface.                         */
 /*----------------------------------------------------------------------------*/
 /* writer - The writer function for the instance's implementation.            */
 /*                                                                            */
 /* context - A pointer to the implementation-specific context struct.         */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoWriter {
-   CliAuthIoWriterFunction writer;
+struct CliAuthIoStreamWriter {
+   CliAuthIoStreamWriterFunction writer;
    void * context;
 };
 
 /*----------------------------------------------------------------------------*/
-/* Attempts to write bytes into a buffer info a writer.                       */
+/* Attempts to write bytes into a buffer info a stream writer.                */
 /*----------------------------------------------------------------------------*/
-/* writer - The writer interface to write bytes into.                         */
+/* writer - The stream writer interface to write bytes into.                  */
 /*                                                                            */
 /* data - The bytes to write.  The number of bytes which are successfully     */
 /*        written will be contained in the returned write result.             */
@@ -173,16 +175,16 @@ struct CliAuthIoWriter {
 /* Return value - A struct representing the result of writing.                */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoWriteResult
-cliauth_io_writer_write(
-   const struct CliAuthIoWriter * writer,
+cliauth_io_stream_writer_write(
+   const struct CliAuthIoStreamWriter * writer,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 );
 
 /*----------------------------------------------------------------------------*/
-/* Attempts to completely write a buffer into a writer.                       */
+/* Attempts to completely write a buffer into a stream writer.                */
 /*----------------------------------------------------------------------------*/
-/* writer - The writer interface to write bytes into.                         */
+/* writer - The stream writer interface to write bytes into.                  */
 /*                                                                            */
 /* data - The bytes to write.  The number of bytes which are successfully     */
 /*        written will be contained in the returned write result.             */
@@ -192,14 +194,14 @@ cliauth_io_writer_write(
 /* Return value - A struct representing the result of writing.                */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoWriteResult
-cliauth_io_writer_write_all(
-   const struct CliAuthIoWriter * writer,
+cliauth_io_stream_writer_write_all(
+   const struct CliAuthIoStreamWriter * writer,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 );
 
 /*----------------------------------------------------------------------------*/
-/* A reader implementation over a constant byte buffer.                       */
+/* A stream reader implementation over a constant byte buffer.                */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoByteStreamReader {
    /* the backing byte array */
@@ -213,7 +215,7 @@ struct CliAuthIoByteStreamReader {
 };
 
 /*----------------------------------------------------------------------------*/
-/* A writer implementation over a mutable byte buffer.                        */
+/* A stream writer implementation over a mutable byte buffer.                 */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoByteStreamWriter {
    /* the backing byte array */
@@ -259,27 +261,29 @@ cliauth_io_byte_stream_writer_initialize(
 );
 
 /*----------------------------------------------------------------------------*/
-/* Creates a generic reader interface from the byte stream reader.            */
+/* Creates a generic stream reader interface from the byte stream reader.     */
 /*----------------------------------------------------------------------------*/
-/* context - The byte stream reader to create a reader from.  The lifetime    */
-/*           of the reader interface is the same as the byte stream reader.   */
+/* context - The byte stream reader to create a stream reader from.  The      */
+/*           lifetime of the reader interface is the same as the byte stream  */
+/*           reader.                                                          */
 /*----------------------------------------------------------------------------*/
-/* Return value - A generic reader interface.                                 */
+/* Return value - A generic stream reader interface.                          */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoReader
+struct CliAuthIoStreamReader
 cliauth_io_byte_stream_reader_interface(
    struct CliAuthIoByteStreamReader * context
 );
 
 /*----------------------------------------------------------------------------*/
-/* Creates a generic writer interface from the byte stream writer.            */
+/* Creates a generic stream writer interface from the byte stream writer.     */
 /*----------------------------------------------------------------------------*/
-/* context - The byte stream writer to create a writer from.  The lifetime    */
-/*           of the writer interface is the same as the byte stream writer.   */
+/* context - The byte stream writer to create a stream writer from.  The      */
+/*           lifetime of the writer interface is the same as the byte stream  */
+/*           writer.                                                          */
 /*----------------------------------------------------------------------------*/
-/* Return value - A generic writer interface.                                 */
+/* Return value - A generic stream writer interface.                          */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoWriter
+struct CliAuthIoStreamWriter
 cliauth_io_byte_stream_writer_interface(
    struct CliAuthIoByteStreamWriter * context
 );
@@ -288,11 +292,11 @@ cliauth_io_byte_stream_writer_interface(
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
-/* A generic buffered reader implementation.                                  */
+/* A generic buffered stream reader implementation.                           */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoBufferedReader {
+struct CliAuthIoBufferedStreamReader {
    /* the backing reader interface */
-   const struct CliAuthIoReader * backing_reader;
+   const struct CliAuthIoStreamReader * backing_reader;
 
    /* the buffer to read input blocks into */
    CliAuthUInt8 * buffer;
@@ -308,11 +312,11 @@ struct CliAuthIoBufferedReader {
 };
 
 /*----------------------------------------------------------------------------*/
-/* A generic buffered writer implementation.                                  */
+/* A generic buffered stream writer implementation.                           */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoBufferedWriter {
+struct CliAuthIoBufferedStreamWriter {
    /* the backing writer interface */
-   const struct CliAuthIoWriter * backing_writer;
+   const struct CliAuthIoStreamWriter * backing_writer;
 
    /* the buffer to write input blocks into */
    CliAuthUInt8 * buffer;
@@ -328,11 +332,11 @@ struct CliAuthIoBufferedWriter {
 };
 
 /*----------------------------------------------------------------------------*/
-/* Initializes the buffered reader.                                           */
+/* Initializes the buffered stream reader.                                    */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered reader to initialize.                               */
+/* context - The buffered stream reader to initialize.                        */
 /*                                                                            */
-/* backing_reader - The backing reader interface to buffer.                   */
+/* backing_reader - The backing stream reader interface to buffer.            */
 /*                                                                            */
 /* buffer - A byte array which will store the buffered reads.                 */
 /*                                                                            */
@@ -340,18 +344,18 @@ struct CliAuthIoBufferedWriter {
 /*----------------------------------------------------------------------------*/
 void
 cliauth_io_buffered_reader_initialize(
-   struct CliAuthIoBufferedReader * context,
-   const struct CliAuthIoReader * backing_reader,
+   struct CliAuthIoBufferedStreamReader * context,
+   const struct CliAuthIoStreamReader * backing_reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 length
 );
 
 /*----------------------------------------------------------------------------*/
-/* Initializes the buffered writer.                                           */
+/* Initializes the buffered stream writer.                                    */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered writer to initialize.                               */
+/* context - The buffered stream writer to initialize.                        */
 /*                                                                            */
-/* backing_writer - The backing writer interface to buffer.                   */
+/* backing_writer - The backing stream writer interface to buffer.            */
 /*                                                                            */
 /* buffer - A byte array which will store the buffered writes.                */
 /*                                                                            */
@@ -359,48 +363,51 @@ cliauth_io_buffered_reader_initialize(
 /*----------------------------------------------------------------------------*/
 void
 cliauth_io_buffered_writer_initialize(
-   struct CliAuthIoBufferedWriter * context,
-   const struct CliAuthIoWriter * backing_writer,
+   struct CliAuthIoBufferedStreamWriter * context,
+   const struct CliAuthIoStreamWriter * backing_writer,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 length
 );
 
 /*----------------------------------------------------------------------------*/
-/* Creates a generic reader interface from the buffered reader.               */
+/* Creates a generic stream reader interface from the buffered stream reader. */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered reader to create a reader from.  The lifetime of    */
-/*           the reader interface is the same as the buffered reader.         */
+/* context - The buffered stream reader to create a stream reader from.  The  */
+/*           lifetime of the reader interface is the same as the buffered     */
+/*           stream reader.                                                   */
 /*----------------------------------------------------------------------------*/
-/* Return value - A generic reader interface.                                 */
+/* Return value - A generic stream reader interface.                          */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoReader
-cliauth_io_buffered_reader_interface(
-   struct CliAuthIoBufferedReader * context
+struct CliAuthIoStreamReader
+cliauth_io_buffered_stream_reader_interface(
+   struct CliAuthIoBufferedStreamReader * context
 );
 
 /*----------------------------------------------------------------------------*/
-/* Creates a generic writer interface from the buffered writer.               */
+/* Creates a generic stream writer interface from the buffered stream writer. */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered writer to create a writer from.  The lifetime of    */
-/*           the writer interface is the same as the buffered writer.         */
+/* context - The buffered stream writer to create a stream writer from.  The  */
+/*           lifetime of the stream lwriter interface is the same as the      */
+/*           buffered stream writer.                                          */
 /*----------------------------------------------------------------------------*/
-/* Return value - A generic writer interface.                                 */
+/* Return value - A generic stream writer interface.                          */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoWriter
-cliauth_io_buffered_writer_interface(
-   struct CliAuthIoBufferedWriter * context
+struct CliAuthIoStreamWriter
+cliauth_io_buffered_stream_writer_interface(
+   struct CliAuthIoBufferedStreamWriter * context
 );
 
 /*----------------------------------------------------------------------------*/
-/* Flushes any buffered bytes to the writer, emptying the write buffer.       */
+/* Flushes any buffered bytes to the stream writer, emptying the write        */
+/* buffer.                                                                    */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered writer to flush.                                    */
+/* context - The buffered stream writer to flush.                             */
 /*----------------------------------------------------------------------------*/
-/* Return value - The result of flushing the write buffer.                    */
+/* Return value - The result of flushing the stream write buffer.             */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoWriteResult
-cliauth_io_buffered_writer_flush(
-   struct CliAuthIoBufferedWriter * context
+cliauth_io_buffered_stream_writer_flush(
+   struct CliAuthIoBufferedStreamWriter * context
 );
 
 /*----------------------------------------------------------------------------*/

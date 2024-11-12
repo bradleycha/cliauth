@@ -30,7 +30,7 @@ cliauth_mac_hmac_initialize(
 static struct CliAuthIoReadResult
 cliauth_mac_hmac_key_digest_hash(
    struct CliAuthMacHmacContext * context,
-   const struct CliAuthIoReader * key_reader,
+   const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
    struct CliAuthIoReadResult read_result;
@@ -47,14 +47,14 @@ cliauth_mac_hmac_key_digest_hash(
 static struct CliAuthIoReadResult
 cliauth_mac_hmac_key_digest_rollover(
    struct CliAuthMacHmacContext * context,
-   const struct CliAuthIoReader * key_reader,
+   const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
    struct CliAuthIoReadResult read_result;
    CliAuthUInt8 * buffer_free;
    CliAuthUInt8 key_bytes_residual;
    struct CliAuthIoByteStreamReader buffer_byte_stream_reader;
-   struct CliAuthIoReader buffer_reader;
+   struct CliAuthIoStreamReader buffer_reader;
    CliAuthUInt8 input_block_length;
 
    input_block_length = context->hash_function->input_block_length;
@@ -67,7 +67,7 @@ cliauth_mac_hmac_key_digest_rollover(
 
    /* attempt to read enough bytes to fill the k0 buffer.  this is done */
    /* seperately in the case of an IO error */
-   read_result = cliauth_io_reader_read_all(
+   read_result = cliauth_io_stream_reader_read_all(
       key_reader,
       buffer_free,
       context->k0_capacity
@@ -122,7 +122,7 @@ cliauth_mac_hmac_key_digest_rollover(
 static struct CliAuthIoReadResult
 cliauth_mac_hmac_key_digest_append(
    struct CliAuthMacHmacContext * context,
-   const struct CliAuthIoReader * key_reader,
+   const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
    struct CliAuthIoReadResult read_result;
@@ -133,7 +133,7 @@ cliauth_mac_hmac_key_digest_append(
 
    buffer_free = &context->k0_buffer[input_block_length - context->k0_capacity];
 
-   read_result = cliauth_io_reader_read_all(
+   read_result = cliauth_io_stream_reader_read_all(
       key_reader,
       buffer_free,
       key_bytes
@@ -147,7 +147,7 @@ cliauth_mac_hmac_key_digest_append(
 struct CliAuthIoReadResult
 cliauth_mac_hmac_key_digest(
    struct CliAuthMacHmacContext * context,
-   const struct CliAuthIoReader * key_reader,
+   const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
    /* case 1: the key length already exceeded the maximum capacity of the  */
@@ -189,7 +189,7 @@ cliauth_mac_hmac_key_finalize(
    CliAuthUInt8 * pad_ptr;
    CliAuthUInt8 pad_bytes;
    struct CliAuthIoByteStreamReader k0_byte_stream_reader;
-   struct CliAuthIoReader k0_reader;
+   struct CliAuthIoStreamReader k0_reader;
    CliAuthUInt8 ipad_constant;
    CliAuthUInt8 input_block_length;
    CliAuthUInt8 digest_length;
@@ -257,7 +257,7 @@ cliauth_mac_hmac_key_finalize(
 struct CliAuthIoReadResult
 cliauth_mac_hmac_message_digest(
    struct CliAuthMacHmacContext * context,
-   const struct CliAuthIoReader * message_reader,
+   const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
    return context->hash_function->digest(
@@ -275,7 +275,7 @@ cliauth_mac_hmac_finalize(
    CliAuthUInt8 * k0_opad_iter;
    CliAuthUInt8 k0_opad_bytes;
    struct CliAuthIoByteStreamReader byte_stream_reader;
-   struct CliAuthIoReader reader;
+   struct CliAuthIoStreamReader reader;
    CliAuthUInt8 input_block_length;
    CliAuthUInt8 digest_length;
 
