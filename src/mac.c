@@ -53,8 +53,10 @@ cliauth_mac_hmac_key_digest_rollover(
    struct CliAuthIoReadResult read_result;
    CliAuthUInt8 * buffer_free;
    CliAuthUInt8 key_bytes_residual;
-   struct CliAuthIoByteStreamReader buffer_byte_stream_reader;
-   struct CliAuthIoStreamReader buffer_reader;
+   struct CliAuthIoByteArrayMapperReader buffer_byte_array_mapper_reader;
+   struct CliAuthIoMapperReader buffer_mapper_reader;
+   struct CliAuthIoMapperStreamReader buffer_mapper_stream_reader;
+   struct CliAuthIoStreamReader buffer_stream_reader;
    CliAuthUInt8 input_block_length;
 
    input_block_length = context->hash_function->input_block_length;
@@ -80,20 +82,29 @@ cliauth_mac_hmac_key_digest_rollover(
 
    /* initialize the hash context */
    context->hash_function->initialize(&context->hash_context);
-   buffer_reader = cliauth_io_byte_stream_reader_interface(
-      &buffer_byte_stream_reader
-   );
 
    /* digest the k0 buffer into the hash function */
-   cliauth_io_byte_stream_reader_initialize(
-      &buffer_byte_stream_reader,
-      context->k0_buffer,
-      input_block_length
+   buffer_mapper_reader = cliauth_io_byte_array_mapper_reader_interface(
+      &buffer_byte_array_mapper_reader
+   );
+   buffer_stream_reader = cliauth_io_mapper_stream_reader_interface(
+      &buffer_mapper_stream_reader
+   );
+
+   cliauth_io_byte_array_mapper_reader_initialize(
+      &buffer_byte_array_mapper_reader,
+      context->k0_buffer
+   );
+   cliauth_io_mapper_stream_reader_initialize(
+      &buffer_mapper_stream_reader,
+      &buffer_mapper_reader,
+      input_block_length,
+      CLIAUTH_LITERAL_UINT32(0u)
    );
 
    (void)context->hash_function->digest(
       &context->hash_context,
-      &buffer_reader,
+      &buffer_stream_reader,
       input_block_length
    );
 
@@ -188,8 +199,10 @@ cliauth_mac_hmac_key_finalize(
    CliAuthUInt8 message_bytes;
    CliAuthUInt8 * pad_ptr;
    CliAuthUInt8 pad_bytes;
-   struct CliAuthIoByteStreamReader k0_byte_stream_reader;
-   struct CliAuthIoStreamReader k0_reader;
+   struct CliAuthIoByteArrayMapperReader k0_byte_array_mapper_reader;
+   struct CliAuthIoMapperReader k0_mapper_reader;
+   struct CliAuthIoMapperStreamReader k0_mapper_stream_reader;
+   struct CliAuthIoStreamReader k0_stream_reader;
    CliAuthUInt8 ipad_constant;
    CliAuthUInt8 input_block_length;
    CliAuthUInt8 digest_length;
@@ -235,19 +248,28 @@ cliauth_mac_hmac_key_finalize(
    /* re-initialize the hash context and digest k0 ^ ipad to prepare for */
    /* digestion and appending of the message */
    context->hash_function->initialize(&context->hash_context);
-   k0_reader = cliauth_io_byte_stream_reader_interface(
-      &k0_byte_stream_reader
+
+   k0_mapper_reader = cliauth_io_byte_array_mapper_reader_interface(
+      &k0_byte_array_mapper_reader
+   );
+   k0_stream_reader = cliauth_io_mapper_stream_reader_interface(
+      &k0_mapper_stream_reader
    );
 
-   cliauth_io_byte_stream_reader_initialize(
-      &k0_byte_stream_reader,
-      context->k0_buffer,
-      input_block_length
+   cliauth_io_byte_array_mapper_reader_initialize(
+      &k0_byte_array_mapper_reader,
+      context->k0_buffer
+   );
+   cliauth_io_mapper_stream_reader_initialize(
+      &k0_mapper_stream_reader,
+      &k0_mapper_reader,
+      input_block_length,
+      CLIAUTH_LITERAL_UINT32(0u)
    );
 
    (void)context->hash_function->digest(
       &context->hash_context,
-      &k0_reader,
+      &k0_stream_reader,
       input_block_length
    );
 
@@ -274,8 +296,10 @@ cliauth_mac_hmac_finalize(
    CliAuthUInt8 * digest;
    CliAuthUInt8 * k0_opad_iter;
    CliAuthUInt8 k0_opad_bytes;
-   struct CliAuthIoByteStreamReader byte_stream_reader;
-   struct CliAuthIoStreamReader reader;
+   struct CliAuthIoByteArrayMapperReader byte_array_mapper_reader;
+   struct CliAuthIoMapperReader mapper_reader;
+   struct CliAuthIoMapperStreamReader mapper_stream_reader;
+   struct CliAuthIoStreamReader stream_reader;
    CliAuthUInt8 input_block_length;
    CliAuthUInt8 digest_length;
 
@@ -304,31 +328,45 @@ cliauth_mac_hmac_finalize(
 
    /* calculate H((k0 ^ opad) || H((k0 ^ ipad) || message)) */
    context->hash_function->initialize(&context->hash_context);
-   reader = cliauth_io_byte_stream_reader_interface(
-      &byte_stream_reader
+
+   mapper_reader = cliauth_io_byte_array_mapper_reader_interface(
+      &byte_array_mapper_reader
+   );
+   stream_reader = cliauth_io_mapper_stream_reader_interface(
+      &mapper_stream_reader
    );
 
-   cliauth_io_byte_stream_reader_initialize(
-      &byte_stream_reader,
-      context->k0_buffer,
-      input_block_length
+   cliauth_io_byte_array_mapper_reader_initialize(
+      &byte_array_mapper_reader,
+      context->k0_buffer
    );
-
-   (void)context->hash_function->digest(
-      &context->hash_context,
-      &reader,
-      input_block_length
-   );
-
-   cliauth_io_byte_stream_reader_initialize(
-      &byte_stream_reader,
-      context->digest_buffer,
-      digest_length
+   cliauth_io_mapper_stream_reader_initialize(
+      &mapper_stream_reader,
+      &mapper_reader,
+      input_block_length,
+      CLIAUTH_LITERAL_UINT32(0u)
    );
 
    (void)context->hash_function->digest(
       &context->hash_context,
-      &reader,
+      &stream_reader,
+      input_block_length
+   );
+
+   cliauth_io_byte_array_mapper_reader_initialize(
+      &byte_array_mapper_reader,
+      context->digest_buffer
+   );
+   cliauth_io_mapper_stream_reader_initialize(
+      &mapper_stream_reader,
+      &mapper_reader,
+      digest_length,
+      CLIAUTH_LITERAL_UINT32(0u)
+   );
+
+   (void)context->hash_function->digest(
+      &context->hash_context,
+      &stream_reader,
       digest_length
    );
 

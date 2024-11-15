@@ -96,8 +96,10 @@ CliAuthUInt32
 cliauth_otp_hotp_finalize(
    struct CliAuthOtpHotpContext * context
 ) {
-   struct CliAuthIoByteStreamReader counter_byte_stream_reader;
-   struct CliAuthIoStreamReader counter_reader;
+   struct CliAuthIoByteArrayMapperReader counter_byte_array_mapper_reader;
+   struct CliAuthIoMapperReader counter_mapper_reader;
+   struct CliAuthIoMapperStreamReader counter_mapper_stream_reader;
+   struct CliAuthIoStreamReader counter_stream_reader;
    union CliAuthInt64 counter_big_endian;
    CliAuthUInt8 * hmac_digest;
    CliAuthUInt32 passcode_untrimmed;
@@ -113,19 +115,27 @@ cliauth_otp_hotp_finalize(
       CLIAUTH_ENDIAN_TARGET_BIG
    );
 
-   cliauth_io_byte_stream_reader_initialize(
-      &counter_byte_stream_reader,
-      counter_big_endian.bytes,
-      CLIAUTH_LITERAL_UINT32(sizeof(counter_big_endian))
+   counter_mapper_reader = cliauth_io_byte_array_mapper_reader_interface(
+      &counter_byte_array_mapper_reader
+   );
+   counter_stream_reader = cliauth_io_mapper_stream_reader_interface(
+      &counter_mapper_stream_reader
    );
 
-   counter_reader = cliauth_io_byte_stream_reader_interface(
-      &counter_byte_stream_reader
+   cliauth_io_byte_array_mapper_reader_initialize(
+      &counter_byte_array_mapper_reader,
+      counter_big_endian.bytes
+   );
+   cliauth_io_mapper_stream_reader_initialize(
+      &counter_mapper_stream_reader,
+      &counter_mapper_reader,
+      CLIAUTH_LITERAL_UINT32(sizeof(counter_big_endian)),
+      CLIAUTH_LITERAL_UINT32(0u)
    );
 
    (void)cliauth_mac_hmac_message_digest(
       &context->hmac_context,
-      &counter_reader,
+      &counter_stream_reader,
       CLIAUTH_LITERAL_UINT32(sizeof(counter_big_endian))
    );
 

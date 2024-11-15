@@ -42,8 +42,10 @@ cliauth_account_generate_passcode(
    const struct CliAuthAccountGeneratePasscodeTotpParameters * totp_parameters,
    CliAuthSInt64 index
 ) {
-   struct CliAuthIoByteStreamReader secrets_byte_stream_reader;
-   struct CliAuthIoStreamReader secrets_reader;
+   struct CliAuthIoByteArrayMapperReader secrets_byte_array_mapper_reader;
+   struct CliAuthIoMapperReader secrets_mapper_reader;
+   struct CliAuthIoMapperStreamReader secrets_mapper_stream_reader;
+   struct CliAuthIoStreamReader secrets_stream_reader;
    CliAuthUInt64 counter;
 
    /* get the current HOTP counter value */
@@ -83,20 +85,28 @@ cliauth_account_generate_passcode(
       account->digits
    );
 
-   cliauth_io_byte_stream_reader_initialize(
-      &secrets_byte_stream_reader,
-      account->secrets,
-      account->secrets_bytes
+   secrets_mapper_reader = cliauth_io_byte_array_mapper_reader_interface(
+      &secrets_byte_array_mapper_reader
+   );
+   secrets_stream_reader = cliauth_io_mapper_stream_reader_interface(
+      &secrets_mapper_stream_reader
    );
 
-   secrets_reader = cliauth_io_byte_stream_reader_interface(
-      &secrets_byte_stream_reader
+   cliauth_io_byte_array_mapper_reader_initialize(
+      &secrets_byte_array_mapper_reader,
+      account->secrets
+   );
+   cliauth_io_mapper_stream_reader_initialize(
+      &secrets_mapper_stream_reader,
+      &secrets_mapper_reader,
+      account->secrets_bytes,
+      CLIAUTH_LITERAL_UINT32(0u)
    );
 
    (void)cliauth_otp_hotp_key_digest(
       hotp_context,
-      &secrets_reader,
-      secrets_byte_stream_reader.length
+      &secrets_stream_reader,
+      account->secrets_bytes
    );
 
    *output = cliauth_otp_hotp_finalize(hotp_context);

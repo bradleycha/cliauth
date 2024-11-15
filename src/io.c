@@ -16,7 +16,7 @@ cliauth_io_stream_reader_read(
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 ) {
-   return reader->reader(
+   return reader->read(
       reader->context,
       buffer,
       bytes
@@ -64,7 +64,7 @@ cliauth_io_stream_writer_write(
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
-   return writer->writer(
+   return writer->write(
       writer->context,
       data,
       bytes
@@ -106,19 +106,214 @@ cliauth_io_stream_writer_write_all(
    return write_result;
 }
 
+struct CliAuthIoReadResult
+cliauth_io_mapper_reader_read(
+   const struct CliAuthIoMapperReader * reader,
+   CliAuthUInt8 buffer [],
+   CliAuthUInt32 bytes,
+   CliAuthUInt32 offset
+) {
+   return reader->read(
+      reader->context,
+      buffer,
+      bytes,
+      offset
+   );
+}
+
+struct CliAuthIoReadResult
+cliauth_io_mapper_reader_read_all(
+   const struct CliAuthIoMapperReader * reader,
+   CliAuthUInt8 buffer [],
+   CliAuthUInt32 bytes,
+   CliAuthUInt32 offset
+) {
+   struct CliAuthIoReadResult read_result;
+   CliAuthUInt8 * buffer_iter;
+   CliAuthUInt32 read_bytes;
+
+   buffer_iter = buffer;
+   read_bytes = CLIAUTH_LITERAL_UINT32(0u);
+
+   while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
+      read_result = cliauth_io_mapper_reader_read(
+         reader,
+         buffer_iter,
+         bytes,
+         offset
+      );
+      read_bytes += read_result.bytes;
+
+      if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+         read_result.bytes = read_bytes;
+         return read_result;
+      }
+
+      buffer_iter += read_result.bytes;
+      bytes -= read_result.bytes;
+      offset += read_result.bytes;
+   }
+
+   read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
+   read_result.bytes = read_bytes;
+   return read_result;
+}
+
+struct CliAuthIoWriteResult
+cliauth_io_mapper_writer_write(
+   const struct CliAuthIoMapperWriter * writer,
+   const CliAuthUInt8 data [],
+   CliAuthUInt32 bytes,
+   CliAuthUInt32 offset
+) {
+   return writer->write(
+      writer->context,
+      data,
+      bytes,
+      offset
+   );
+}
+
+struct CliAuthIoWriteResult
+cliauth_io_mapper_writer_write_all(
+   const struct CliAuthIoMapperWriter * writer,
+   const CliAuthUInt8 data [],
+   CliAuthUInt32 bytes,
+   CliAuthUInt32 offset
+) {
+   struct CliAuthIoWriteResult write_result;
+   const CliAuthUInt8 * data_iter;
+   CliAuthUInt32 write_bytes;
+
+   data_iter = data;
+   write_bytes = CLIAUTH_LITERAL_UINT32(0u);
+
+   while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
+      write_result = cliauth_io_mapper_writer_write(
+         writer,
+         data_iter,
+         bytes,
+         offset
+      );
+      write_bytes += write_result.bytes;
+
+      if (write_result.status != CLIAUTH_IO_WRITE_STATUS_SUCCESS) {
+         write_result.bytes = write_bytes;
+         return write_result;
+      }
+
+      data_iter += write_result.bytes;
+      bytes -= write_result.bytes;
+      offset += write_result.bytes;
+   }
+   
+   write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
+   write_result.bytes = write_bytes;
+   return write_result;
+}
+
 static struct CliAuthIoReadResult
-cliauth_io_byte_stream_reader_read(
+cliauth_io_byte_array_mapper_reader_read(
+   void * context,
+   CliAuthUInt8 buffer [],
+   CliAuthUInt32 bytes,
+   CliAuthUInt32 offset
+) {
+   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoByteArrayMapperReader * reader;
+
+   reader = (struct CliAuthIoByteArrayMapperReader *)context;
+
+   cliauth_memory_copy(
+      buffer,
+      &reader->data[offset],
+      bytes
+   );
+
+   read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
+   read_result.bytes = bytes;
+   return read_result;
+}
+
+static struct CliAuthIoWriteResult
+cliauth_io_byte_array_mapper_writer_write(
+   void * context,
+   const CliAuthUInt8 data [],
+   CliAuthUInt32 bytes,
+   CliAuthUInt32 offset
+) {
+   struct CliAuthIoWriteResult write_result;
+   struct CliAuthIoByteArrayMapperWriter * writer;
+
+   writer = (struct CliAuthIoByteArrayMapperWriter *)context;
+
+   cliauth_memory_copy(
+      &writer->data[offset],
+      data,
+      bytes
+   );
+
+   write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
+   write_result.bytes = bytes;
+   return write_result;
+}
+
+void
+cliauth_io_byte_array_mapper_reader_initialize(
+   struct CliAuthIoByteArrayMapperReader * context,
+   const CliAuthUInt8 bytes []
+) {
+   context->data = bytes;
+
+   return;
+}
+
+void
+cliauth_io_byte_array_mapper_writer_initialize(
+   struct CliAuthIoByteArrayMapperWriter * context,
+   CliAuthUInt8 bytes []
+) {
+   context->data = bytes;
+
+   return;
+}
+
+struct CliAuthIoMapperReader
+cliauth_io_byte_array_mapper_reader_interface(
+   struct CliAuthIoByteArrayMapperReader * context
+) {
+   struct CliAuthIoMapperReader retn;
+
+   retn.read = cliauth_io_byte_array_mapper_reader_read;
+   retn.context = context;
+
+   return retn;
+}
+
+struct CliAuthIoMapperWriter
+cliauth_io_byte_array_mapper_writer_interface(
+   struct CliAuthIoByteArrayMapperWriter * context
+) {
+   struct CliAuthIoMapperWriter retn;
+
+   retn.write = cliauth_io_byte_array_mapper_writer_write;
+   retn.context = context;
+
+   return retn;
+}
+
+static struct CliAuthIoReadResult
+cliauth_io_mapper_stream_reader_read(
    void * context,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 ) {
    struct CliAuthIoReadResult read_result;
-   struct CliAuthIoByteStreamReader * reader;
+   struct CliAuthIoMapperStreamReader * reader;
    CliAuthUInt32 bytes_remaining;
    CliAuthUInt32 bytes_read_count;
-   const CliAuthUInt8 * bytes_read_ptr;
 
-   reader = (struct CliAuthIoByteStreamReader *)context;
+   reader = (struct CliAuthIoMapperStreamReader *)context;
 
    bytes_remaining = reader->length - reader->position;
 
@@ -134,33 +329,29 @@ cliauth_io_byte_stream_reader_read(
       bytes_read_count = bytes;
    }
 
-   bytes_read_ptr = &reader->bytes[reader->position];
-
-   cliauth_memory_copy(
+   read_result = cliauth_io_mapper_reader_read(
+      reader->backing_mapper_reader,
       buffer,
-      bytes_read_ptr,
-      bytes_read_count
+      bytes_read_count,
+      reader->position
    );
-   reader->position += bytes_read_count;
+   reader->position += read_result.bytes;
 
-   read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
-   read_result.bytes = bytes_read_count;
    return read_result;
 }
 
 static struct CliAuthIoWriteResult
-cliauth_io_byte_stream_writer_write(
+cliauth_io_mapper_stream_writer_write(
    void * context,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
    struct CliAuthIoWriteResult write_result;
-   struct CliAuthIoByteStreamWriter * writer;
+   struct CliAuthIoMapperStreamWriter * writer;
    CliAuthUInt32 bytes_remaining;
    CliAuthUInt32 bytes_write_count;
-   CliAuthUInt8 * bytes_write_ptr;
 
-   writer = (struct CliAuthIoByteStreamWriter *)context;
+   writer = (struct CliAuthIoMapperStreamWriter *)context;
 
    bytes_remaining = writer->length - writer->position;
 
@@ -176,67 +367,66 @@ cliauth_io_byte_stream_writer_write(
       bytes_write_count = bytes;
    }
 
-   bytes_write_ptr = &writer->bytes[writer->position];
-
-   cliauth_memory_copy(
-      bytes_write_ptr,
+   write_result = cliauth_io_mapper_writer_write(
+      writer->backing_mapper_writer,
       data,
-      bytes_write_count
+      bytes_write_count,
+      writer->position
    );
-   writer->position += bytes_write_count;
-   
-   write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
-   write_result.bytes = bytes_write_count;
+   writer->position += write_result.bytes;
+
    return write_result;
 }
 
 void
-cliauth_io_byte_stream_reader_initialize(
-   struct CliAuthIoByteStreamReader * context,
-   const CliAuthUInt8 bytes [],
-   CliAuthUInt32 length
+cliauth_io_mapper_stream_reader_initialize(
+   struct CliAuthIoMapperStreamReader * context,
+   const struct CliAuthIoMapperReader * backing_mapper_reader,
+   CliAuthUInt32 length,
+   CliAuthUInt32 offset
 ) {
-   context->bytes = bytes;
+   context->backing_mapper_reader = backing_mapper_reader;
    context->length = length;
-   context->position = CLIAUTH_LITERAL_UINT32(0u);
+   context->position = offset;
 
    return;
 }
 
 void
-cliauth_io_byte_stream_writer_initialize(
-   struct CliAuthIoByteStreamWriter * context,
-   CliAuthUInt8 bytes [],
-   CliAuthUInt32 length
+cliauth_io_mapper_stream_writer_initialize(
+   struct CliAuthIoMapperStreamWriter * context,
+   const struct CliAuthIoMapperWriter * backing_mapper_writer,
+   CliAuthUInt32 length,
+   CliAuthUInt32 offset
 ) {
-   context->bytes = bytes;
+   context->backing_mapper_writer = backing_mapper_writer;
    context->length = length;
-   context->position = CLIAUTH_LITERAL_UINT32(0u);
+   context->position = offset;
 
    return;
 }
 
 struct CliAuthIoStreamReader
-cliauth_io_byte_stream_reader_interface(
-   struct CliAuthIoByteStreamReader * context
+cliauth_io_mapper_stream_reader_interface(
+   struct CliAuthIoMapperStreamReader * context
 ) {
    struct CliAuthIoStreamReader retn;
 
-   retn.reader = cliauth_io_byte_stream_reader_read;
+   retn.read = cliauth_io_mapper_stream_reader_read;
    retn.context = context;
-
+   
    return retn;
 }
 
 struct CliAuthIoStreamWriter
-cliauth_io_byte_stream_writer_interface(
-   struct CliAuthIoByteStreamWriter * context
+cliauth_io_mapper_stream_writer_interface(
+   struct CliAuthIoMapperStreamWriter * context
 ) {
    struct CliAuthIoStreamWriter retn;
 
-   retn.writer = cliauth_io_byte_stream_writer_write;
+   retn.write = cliauth_io_mapper_stream_writer_write;
    retn.context = context;
-
+   
    return retn;
 }
 
@@ -470,7 +660,7 @@ cliauth_io_buffered_stream_reader_interface(
 ) {
    struct CliAuthIoStreamReader retn;
 
-   retn.reader = cliauth_io_buffered_stream_reader_read;
+   retn.read = cliauth_io_buffered_stream_reader_read;
    retn.context = context;
 
    return retn;
@@ -482,7 +672,7 @@ cliauth_io_buffered_stream_writer_interface(
 ) {
    struct CliAuthIoStreamWriter retn;
 
-   retn.writer = cliauth_io_buffered_stream_writer_write;
+   retn.write = cliauth_io_buffered_stream_writer_write;
    retn.context = context;
 
    return retn;
