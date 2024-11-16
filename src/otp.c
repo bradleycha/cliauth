@@ -79,7 +79,7 @@ cliauth_otp_hotp_initialize(
    return;
 }
 
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_otp_hotp_key_digest(
    struct CliAuthOtpHotpContext * context,
    const struct CliAuthIoStreamReader * key_reader,

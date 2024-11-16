@@ -48,12 +48,12 @@ enum CliAuthParseStringIntegerStatus {
 /*----------------------------------------------------------------------------*/
 /* status - The status of the integer parsing.                                */
 /*                                                                            */
-/* read_result - The read result.  This will contain further details about    */
-/*               potential IO read errors.                                    */
+/* read_result - The I/O read result.  This will contain further details      */
+/*               about potential I/O read errors.                             */
 /*----------------------------------------------------------------------------*/
 struct CliAuthParseStringIntegerResult {
    enum CliAuthParseStringIntegerStatus status;
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult read_result;
 };
 
 /*----------------------------------------------------------------------------*/

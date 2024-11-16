@@ -44,7 +44,7 @@ cliauth_hash_sha1_2_ring_buffer_initialize(
 }
 
 /* loads a message into the ring buffer, digesting if the ring buffer fills */
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_hash_sha1_2_ring_buffer_digest(
    const struct CliAuthHashSha12RingBufferImplementation * implementation,
    struct _CliAuthHashSha12RingBufferContext * context,
@@ -53,7 +53,7 @@ cliauth_hash_sha1_2_ring_buffer_digest(
    const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult read_result;
    CliAuthUInt8 * ring_buffer_free;
    CliAuthUInt32 digest_blocks;
    CliAuthUInt32 digest_bytes;
@@ -96,7 +96,7 @@ cliauth_hash_sha1_2_ring_buffer_digest(
    digest_bytes += read_result.bytes;
    context->total += read_result.bytes;
 
-   if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+   if (read_result.status != CLIAUTH_IO_STATUS_SUCCESS) {
       context->capacity = implementation->bytes - read_result.bytes;
       read_result.bytes = digest_bytes;
       return read_result;
@@ -114,7 +114,7 @@ cliauth_hash_sha1_2_ring_buffer_digest(
       digest_bytes += read_result.bytes;
       context->total += read_result.bytes;
 
-      if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+      if (read_result.status != CLIAUTH_IO_STATUS_SUCCESS) {
          context->capacity = implementation->bytes - read_result.bytes;
          read_result.bytes = digest_bytes;
          return read_result;
@@ -588,7 +588,7 @@ cliauth_hash_sha1_initialize(struct CliAuthHashContext * context) {
    return;
 }
 
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_hash_sha1_digest(
    struct CliAuthHashContext * context,
    const struct CliAuthIoStreamReader * message_reader,
@@ -919,7 +919,7 @@ cliauth_hash_sha2_32_initialize(
    return;
 }
 
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_hash_sha2_32_digest(
    struct CliAuthHashContext * context,
    const struct CliAuthIoStreamReader * message_reader,
@@ -1291,7 +1291,7 @@ cliauth_hash_sha2_64_initialize(
    return;
 }
 
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_hash_sha2_64_digest(
    struct CliAuthHashContext * context,
    const struct CliAuthIoStreamReader * message_reader,

@@ -13,64 +13,30 @@
 #include "endian.h"
 
 /*----------------------------------------------------------------------------*/
-/* A generic I/O read result status.                                          */
+/* A generic I/O result status.                                               */
 /*----------------------------------------------------------------------------*/
-/* CLIAUTH_IO_READ_STATUS_SUCCESS - The reader function executed              */
-/*                                  successfully.                             */
+/* CLIAUTH_IO_STATUS_SUCCESS - The I/O function executed successfully.        */
 /*                                                                            */
-/* CLIAUTH_IO_READ_STATUS_END_OF_STREAM - The end of the reader stream was    */
-/*                                        reached.                            */
+/* CLIAUTH_IO_STATUS_END_OF_STREAM - The end of the I/O stream was reached.   */
 /*                                                                            */
-/* CLIAUTH_IO_READ_STATUS_ERROR_UNKNOWN - An uncategorized, usually platform  */
-/*                                        or implementation specific error.   */
+/* CLIAUTH_IO_STATUS_ERROR_UNKNOWN - An unknown I/O error occurred.           */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_IO_READ_STATUS_FIELD_COUNT 3u
-enum CliAuthIoReadStatus {
-   CLIAUTH_IO_READ_STATUS_SUCCESS,
-   CLIAUTH_IO_READ_STATUS_END_OF_STREAM,
-   CLIAUTH_IO_READ_STATUS_ERROR_UNKNOWN
+#define CLIAUTH_IO_STATUS_FIELD_COUNT 3u
+enum CliAuthIoStatus {
+   CLIAUTH_IO_STATUS_SUCCESS,
+   CLIAUTH_IO_STATUS_END_OF_STREAM,
+   CLIAUTH_IO_STATUS_ERROR_UNKNOWN
 };
 
 /*----------------------------------------------------------------------------*/
-/* The result of a generic I/O read operation.                                */
+/* The result of a generic I/O operation.                                     */
 /*----------------------------------------------------------------------------*/
-/* status - The status of the read operation.                                 */
+/* status - The status of the I/O operation.                                  */
 /*                                                                            */
 /* bytes - The number of bytes which were successfully read.                  */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoReadResult {
-   enum CliAuthIoReadStatus status;
-   CliAuthUInt32 bytes;
-};
-
-/*----------------------------------------------------------------------------*/
-/* A generic I/O write result status.                                         */
-/*----------------------------------------------------------------------------*/
-/* CLIAUTH_IO_WRITE_STATUS_SUCCESS - The writer function executed             */
-/*                                   successfully.                            */
-/*                                                                            */
-/* CLIAUTH_IO_WRITE_STATUS_END_OF_STREAM - The end of the writer stream was   */
-/*                                         reached.                           */
-/*                                                                            */
-/* CLIAUTH_IO_WRITE_STATUS_ERROR_UNKNOWN - An uncategorized, usually platform */
-/*                                         or implementation specific error.  */
-/*----------------------------------------------------------------------------*/
-#define CLIAUTH_IO_WRITE_STATUS_FIELD_COUNT 3u
-enum CliAuthIoWriteStatus {
-   CLIAUTH_IO_WRITE_STATUS_SUCCESS,
-   CLIAUTH_IO_WRITE_STATUS_END_OF_STREAM,
-   CLIAUTH_IO_WRITE_STATUS_ERROR_UNKNOWN
-};
-
-/*----------------------------------------------------------------------------*/
-/* The result of a generic I/O write operation.                               */
-/*----------------------------------------------------------------------------*/
-/* status - The status of the write operation.                                */
-/*                                                                            */
-/* bytes - The number of bytes which were successfully written.               */
-/*----------------------------------------------------------------------------*/
-struct CliAuthIoWriteResult {
-   enum CliAuthIoWriteStatus status;
+struct CliAuthIoResult {
+   enum CliAuthIoStatus status;
    CliAuthUInt32 bytes;
 };
 
@@ -79,7 +45,7 @@ struct CliAuthIoWriteResult {
 /* stream.  For more information, see the documentation for                   */
 /* cliauth_io_stream_reader_read().                                           */
 /*----------------------------------------------------------------------------*/
-typedef struct CliAuthIoReadResult (*CliAuthIoStreamFunctionRead)(
+typedef struct CliAuthIoResult (*CliAuthIoStreamFunctionRead)(
    void * context,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
@@ -90,7 +56,7 @@ typedef struct CliAuthIoReadResult (*CliAuthIoStreamFunctionRead)(
 /* stream.  For more information, see the documentation for                   */
 /* cliauth_io_stream_writer_write().                                          */
 /*----------------------------------------------------------------------------*/
-typedef struct CliAuthIoWriteResult (*CliAuthIoStreamFunctionWrite)(
+typedef struct CliAuthIoResult (*CliAuthIoStreamFunctionWrite)(
    void * context,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
@@ -118,7 +84,7 @@ struct CliAuthIoStreamReader {
 /*----------------------------------------------------------------------------*/
 /* Return value - A struct representing the result of reading.                */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_io_stream_reader_read(
    const struct CliAuthIoStreamReader * reader,
    CliAuthUInt8 buffer [],
@@ -138,7 +104,7 @@ cliauth_io_stream_reader_read(
 /*----------------------------------------------------------------------------*/
 /* Return value - A struct representing the result of reading.                */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_io_stream_reader_read_all(
    const struct CliAuthIoStreamReader * reader,
    CliAuthUInt8 buffer [],
@@ -166,7 +132,7 @@ struct CliAuthIoStreamWriter {
 /*----------------------------------------------------------------------------*/
 /* Return value - A struct representing the result of writing.                */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_stream_writer_write(
    const struct CliAuthIoStreamWriter * writer,
    const CliAuthUInt8 data [],
@@ -185,7 +151,7 @@ cliauth_io_stream_writer_write(
 /*----------------------------------------------------------------------------*/
 /* Return value - A struct representing the result of writing.                */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_stream_writer_write_all(
    const struct CliAuthIoStreamWriter * writer,
    const CliAuthUInt8 data [],
@@ -197,7 +163,7 @@ cliauth_io_stream_writer_write_all(
 /* mapper.  For more information, see the documentation for                   */
 /* cliauth_io_mapper_reader_read().                                           */
 /*----------------------------------------------------------------------------*/
-typedef struct CliAuthIoReadResult (*CliAuthIoMapperFunctionRead)(
+typedef struct CliAuthIoResult (*CliAuthIoMapperFunctionRead)(
    void * context,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes,
@@ -209,7 +175,7 @@ typedef struct CliAuthIoReadResult (*CliAuthIoMapperFunctionRead)(
 /* mapper.  For more information, see the documentation for                   */
 /* cliauth_io_mapper_writer_write().                                          */
 /*----------------------------------------------------------------------------*/
-typedef struct CliAuthIoWriteResult (*CliAuthIoMapperFunctionWrite)(
+typedef struct CliAuthIoResult (*CliAuthIoMapperFunctionWrite)(
    void * context,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes,
@@ -244,7 +210,7 @@ struct CliAuthIoMapperReader {
 /*----------------------------------------------------------------------------*/
 /* Return value - A struct representing the result of reading.                */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_io_mapper_reader_read(
    const struct CliAuthIoMapperReader * reader,
    CliAuthUInt8 buffer [],
@@ -272,7 +238,7 @@ cliauth_io_mapper_reader_read(
 /*----------------------------------------------------------------------------*/
 /* Return value - A struct representing the result of reading.                */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_io_mapper_reader_read_all(
    const struct CliAuthIoMapperReader * reader,
    CliAuthUInt8 buffer [],
@@ -311,7 +277,7 @@ struct CliAuthIoMapperWriter {
 /*----------------------------------------------------------------------------*/
 /* Return value - A struct representing the result of writing.                */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_mapper_writer_write(
    const struct CliAuthIoMapperWriter * writer,
    const CliAuthUInt8 data [],
@@ -338,7 +304,7 @@ cliauth_io_mapper_writer_write(
 /*----------------------------------------------------------------------------*/
 /* Return value - A struct representing the result of writing.                */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_mapper_writer_write_all(
    const struct CliAuthIoMapperWriter * writer,
    const CliAuthUInt8 data [],
@@ -639,7 +605,7 @@ cliauth_io_buffered_stream_writer_interface(
 /*----------------------------------------------------------------------------*/
 /* Return value - The result of flushing the stream write buffer.             */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_buffered_stream_writer_flush(
    struct CliAuthIoBufferedStreamWriter * context
 );

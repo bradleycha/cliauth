@@ -27,13 +27,13 @@ cliauth_mac_hmac_initialize(
    return;
 }
 
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_mac_hmac_key_digest_hash(
    struct CliAuthMacHmacContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult read_result;
 
    read_result = context->hash_function->digest(
       &context->hash_context,
@@ -44,13 +44,13 @@ cliauth_mac_hmac_key_digest_hash(
    return read_result;
 }
 
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_mac_hmac_key_digest_rollover(
    struct CliAuthMacHmacContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult read_result;
    CliAuthUInt8 * buffer_free;
    CliAuthUInt8 key_bytes_residual;
    struct CliAuthIoByteArrayMapperReader buffer_byte_array_mapper_reader;
@@ -76,7 +76,7 @@ cliauth_mac_hmac_key_digest_rollover(
    );
    context->k0_capacity -= read_result.bytes;
    
-   if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+   if (read_result.status != CLIAUTH_IO_STATUS_SUCCESS) {
       return read_result;
    }
 
@@ -130,13 +130,13 @@ cliauth_mac_hmac_key_digest_rollover(
    return read_result;
 }
 
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_mac_hmac_key_digest_append(
    struct CliAuthMacHmacContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult read_result;
    CliAuthUInt8 * buffer_free;
    CliAuthUInt8 input_block_length;
 
@@ -155,7 +155,7 @@ cliauth_mac_hmac_key_digest_append(
    return read_result;
 }
 
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_mac_hmac_key_digest(
    struct CliAuthMacHmacContext * context,
    const struct CliAuthIoStreamReader * key_reader,
@@ -276,7 +276,7 @@ cliauth_mac_hmac_key_finalize(
    return;
 }
 
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_mac_hmac_message_digest(
    struct CliAuthMacHmacContext * context,
    const struct CliAuthIoStreamReader * message_reader,

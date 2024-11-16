@@ -10,7 +10,7 @@
 
 #include "memory.h"
 
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_io_stream_reader_read(
    const struct CliAuthIoStreamReader * reader,
    CliAuthUInt8 buffer [],
@@ -23,13 +23,13 @@ cliauth_io_stream_reader_read(
    );
 }
 
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_io_stream_reader_read_all(
    const struct CliAuthIoStreamReader * reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 ) {
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult result;
    CliAuthUInt8 * buffer_iter;
    CliAuthUInt32 read_bytes;
 
@@ -37,28 +37,28 @@ cliauth_io_stream_reader_read_all(
    read_bytes = CLIAUTH_LITERAL_UINT32(0u);
 
    while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
-      read_result = cliauth_io_stream_reader_read(
+      result = cliauth_io_stream_reader_read(
          reader,
          buffer_iter,
          bytes
       );
-      read_bytes += read_result.bytes;
+      read_bytes += result.bytes;
 
-      if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-         read_result.bytes = read_bytes;
-         return read_result;
+      if (result.status != CLIAUTH_IO_STATUS_SUCCESS) {
+         result.bytes = read_bytes;
+         return result;
       }
 
-      buffer_iter += read_result.bytes;
-      bytes -= read_result.bytes;
+      buffer_iter += result.bytes;
+      bytes -= result.bytes;
    }
 
-   read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
-   read_result.bytes = read_bytes;
-   return read_result;
+   result.status = CLIAUTH_IO_STATUS_SUCCESS;
+   result.bytes = read_bytes;
+   return result;
 }
 
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_stream_writer_write(
    const struct CliAuthIoStreamWriter * writer,
    const CliAuthUInt8 data [],
@@ -71,13 +71,13 @@ cliauth_io_stream_writer_write(
    );
 }
 
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_stream_writer_write_all(
    const struct CliAuthIoStreamWriter * writer,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
-   struct CliAuthIoWriteResult write_result;
+   struct CliAuthIoResult result;
    const CliAuthUInt8 * data_iter;
    CliAuthUInt32 write_bytes;
 
@@ -85,28 +85,28 @@ cliauth_io_stream_writer_write_all(
    write_bytes = CLIAUTH_LITERAL_UINT32(0u);
 
    while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
-      write_result = cliauth_io_stream_writer_write(
+      result = cliauth_io_stream_writer_write(
          writer,
          data_iter,
          bytes
       );
-      write_bytes += write_result.bytes;
+      write_bytes += result.bytes;
 
-      if (write_result.status != CLIAUTH_IO_WRITE_STATUS_SUCCESS) {
-         write_result.bytes = write_bytes;
-         return write_result;
+      if (result.status != CLIAUTH_IO_STATUS_SUCCESS) {
+         result.bytes = write_bytes;
+         return result;
       }
 
-      data_iter += write_result.bytes;
-      bytes -= write_result.bytes;
+      data_iter += result.bytes;
+      bytes -= result.bytes;
    }
    
-   write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
-   write_result.bytes = write_bytes;
-   return write_result;
+   result.status = CLIAUTH_IO_STATUS_SUCCESS;
+   result.bytes = write_bytes;
+   return result;
 }
 
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_io_mapper_reader_read(
    const struct CliAuthIoMapperReader * reader,
    CliAuthUInt8 buffer [],
@@ -121,14 +121,14 @@ cliauth_io_mapper_reader_read(
    );
 }
 
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_io_mapper_reader_read_all(
    const struct CliAuthIoMapperReader * reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes,
    CliAuthUInt32 offset
 ) {
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult result;
    CliAuthUInt8 * buffer_iter;
    CliAuthUInt32 read_bytes;
 
@@ -136,30 +136,30 @@ cliauth_io_mapper_reader_read_all(
    read_bytes = CLIAUTH_LITERAL_UINT32(0u);
 
    while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
-      read_result = cliauth_io_mapper_reader_read(
+      result = cliauth_io_mapper_reader_read(
          reader,
          buffer_iter,
          bytes,
          offset
       );
-      read_bytes += read_result.bytes;
+      read_bytes += result.bytes;
 
-      if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-         read_result.bytes = read_bytes;
-         return read_result;
+      if (result.status != CLIAUTH_IO_STATUS_SUCCESS) {
+         result.bytes = read_bytes;
+         return result;
       }
 
-      buffer_iter += read_result.bytes;
-      bytes -= read_result.bytes;
-      offset += read_result.bytes;
+      buffer_iter += result.bytes;
+      bytes -= result.bytes;
+      offset += result.bytes;
    }
 
-   read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
-   read_result.bytes = read_bytes;
-   return read_result;
+   result.status = CLIAUTH_IO_STATUS_SUCCESS;
+   result.bytes = read_bytes;
+   return result;
 }
 
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_mapper_writer_write(
    const struct CliAuthIoMapperWriter * writer,
    const CliAuthUInt8 data [],
@@ -174,14 +174,14 @@ cliauth_io_mapper_writer_write(
    );
 }
 
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_mapper_writer_write_all(
    const struct CliAuthIoMapperWriter * writer,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes,
    CliAuthUInt32 offset
 ) {
-   struct CliAuthIoWriteResult write_result;
+   struct CliAuthIoResult result;
    const CliAuthUInt8 * data_iter;
    CliAuthUInt32 write_bytes;
 
@@ -189,37 +189,37 @@ cliauth_io_mapper_writer_write_all(
    write_bytes = CLIAUTH_LITERAL_UINT32(0u);
 
    while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
-      write_result = cliauth_io_mapper_writer_write(
+      result = cliauth_io_mapper_writer_write(
          writer,
          data_iter,
          bytes,
          offset
       );
-      write_bytes += write_result.bytes;
+      write_bytes += result.bytes;
 
-      if (write_result.status != CLIAUTH_IO_WRITE_STATUS_SUCCESS) {
-         write_result.bytes = write_bytes;
-         return write_result;
+      if (result.status != CLIAUTH_IO_STATUS_SUCCESS) {
+         result.bytes = write_bytes;
+         return result;
       }
 
-      data_iter += write_result.bytes;
-      bytes -= write_result.bytes;
-      offset += write_result.bytes;
+      data_iter += result.bytes;
+      bytes -= result.bytes;
+      offset += result.bytes;
    }
    
-   write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
-   write_result.bytes = write_bytes;
-   return write_result;
+   result.status = CLIAUTH_IO_STATUS_SUCCESS;
+   result.bytes = write_bytes;
+   return result;
 }
 
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_io_byte_array_mapper_reader_read(
    void * context,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes,
    CliAuthUInt32 offset
 ) {
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult result;
    struct CliAuthIoByteArrayMapperReader * reader;
 
    reader = (struct CliAuthIoByteArrayMapperReader *)context;
@@ -230,19 +230,19 @@ cliauth_io_byte_array_mapper_reader_read(
       bytes
    );
 
-   read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
-   read_result.bytes = bytes;
-   return read_result;
+   result.status = CLIAUTH_IO_STATUS_SUCCESS;
+   result.bytes = bytes;
+   return result;
 }
 
-static struct CliAuthIoWriteResult
+static struct CliAuthIoResult
 cliauth_io_byte_array_mapper_writer_write(
    void * context,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes,
    CliAuthUInt32 offset
 ) {
-   struct CliAuthIoWriteResult write_result;
+   struct CliAuthIoResult result;
    struct CliAuthIoByteArrayMapperWriter * writer;
 
    writer = (struct CliAuthIoByteArrayMapperWriter *)context;
@@ -253,9 +253,9 @@ cliauth_io_byte_array_mapper_writer_write(
       bytes
    );
 
-   write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
-   write_result.bytes = bytes;
-   return write_result;
+   result.status = CLIAUTH_IO_STATUS_SUCCESS;
+   result.bytes = bytes;
+   return result;
 }
 
 void
@@ -302,13 +302,13 @@ cliauth_io_byte_array_mapper_writer_interface(
    return retn;
 }
 
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_io_mapper_stream_reader_read(
    void * context,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 ) {
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult result;
    struct CliAuthIoMapperStreamReader * reader;
    CliAuthUInt32 bytes_remaining;
    CliAuthUInt32 bytes_read_count;
@@ -318,9 +318,9 @@ cliauth_io_mapper_stream_reader_read(
    bytes_remaining = reader->length - reader->position;
 
    if (bytes_remaining == CLIAUTH_LITERAL_UINT32(0u)) {
-      read_result.status = CLIAUTH_IO_READ_STATUS_END_OF_STREAM;
-      read_result.bytes = CLIAUTH_LITERAL_UINT32(0u);
-      return read_result;
+      result.status = CLIAUTH_IO_STATUS_END_OF_STREAM;
+      result.bytes = CLIAUTH_LITERAL_UINT32(0u);
+      return result;
    }
 
    if (bytes > bytes_remaining) {
@@ -329,24 +329,24 @@ cliauth_io_mapper_stream_reader_read(
       bytes_read_count = bytes;
    }
 
-   read_result = cliauth_io_mapper_reader_read(
+   result = cliauth_io_mapper_reader_read(
       reader->backing_mapper_reader,
       buffer,
       bytes_read_count,
       reader->position
    );
-   reader->position += read_result.bytes;
+   reader->position += result.bytes;
 
-   return read_result;
+   return result;
 }
 
-static struct CliAuthIoWriteResult
+static struct CliAuthIoResult
 cliauth_io_mapper_stream_writer_write(
    void * context,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
-   struct CliAuthIoWriteResult write_result;
+   struct CliAuthIoResult result;
    struct CliAuthIoMapperStreamWriter * writer;
    CliAuthUInt32 bytes_remaining;
    CliAuthUInt32 bytes_write_count;
@@ -356,9 +356,9 @@ cliauth_io_mapper_stream_writer_write(
    bytes_remaining = writer->length - writer->position;
 
    if (bytes_remaining == CLIAUTH_LITERAL_UINT32(0u)) {
-      write_result.status = CLIAUTH_IO_WRITE_STATUS_END_OF_STREAM;
-      write_result.bytes = CLIAUTH_LITERAL_UINT32(0u);
-      return write_result;
+      result.status = CLIAUTH_IO_STATUS_END_OF_STREAM;
+      result.bytes = CLIAUTH_LITERAL_UINT32(0u);
+      return result;
    }
 
    if (bytes > bytes_remaining) {
@@ -367,15 +367,15 @@ cliauth_io_mapper_stream_writer_write(
       bytes_write_count = bytes;
    }
 
-   write_result = cliauth_io_mapper_writer_write(
+   result = cliauth_io_mapper_writer_write(
       writer->backing_mapper_writer,
       data,
       bytes_write_count,
       writer->position
    );
-   writer->position += write_result.bytes;
+   writer->position += result.bytes;
 
-   return write_result;
+   return result;
 }
 
 void
@@ -433,13 +433,13 @@ cliauth_io_mapper_stream_writer_interface(
 #if CLIAUTH_CONFIG_IO_BUFFERING
 /*----------------------------------------------------------------------------*/
 
-static struct CliAuthIoReadResult
+static struct CliAuthIoResult
 cliauth_io_buffered_stream_reader_read(
    void * context,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
 ) {
-   struct CliAuthIoReadResult read_result;
+   struct CliAuthIoResult result;
    struct CliAuthIoBufferedStreamReader * context_reader;
    CliAuthUInt8 * read_buffer_start;
    CliAuthUInt32 read_total;
@@ -464,10 +464,9 @@ cliauth_io_buffered_stream_reader_read(
       context_reader->start += bytes;
       context_reader->capacity += bytes;
 
-      read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
-      read_result.bytes = bytes;
-
-      return read_result;
+      result.status = CLIAUTH_IO_STATUS_SUCCESS;
+      result.bytes = bytes;
+      return result;
    }
 
    /* initialize the total number of read bytes */
@@ -495,16 +494,16 @@ cliauth_io_buffered_stream_reader_read(
    buffer_iter += buffer_bytes;
 
    /* read the rest of the remaining bytes */
-   read_result = cliauth_io_stream_reader_read_all(
+   result = cliauth_io_stream_reader_read_all(
       context_reader->backing_reader,
       buffer_iter,
       residual_bytes
    );
-   read_total += read_result.bytes;
+   read_total += result.bytes;
 
-   if (read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
-      read_result.bytes = read_total;
-      return read_result;
+   if (result.status != CLIAUTH_IO_STATUS_SUCCESS) {
+      result.bytes = read_total;
+      return result;
    }
 
    /* buffer in a new block into the read buffer, ignoring errors and simply */
@@ -514,22 +513,22 @@ cliauth_io_buffered_stream_reader_read(
       context_reader->buffer,
       context_reader->length
    );
-   context_reader->capacity -= read_result.bytes;
+   context_reader->capacity -= result.bytes;
    
    /* lastly update to return the total bytes read, not including the new */
    /* read buffer block */
-   read_result.status = CLIAUTH_IO_READ_STATUS_SUCCESS;
-   read_result.bytes = read_total;
-   return read_result;
+   result.status = CLIAUTH_IO_STATUS_SUCCESS;
+   result.bytes = read_total;
+   return result;
 }
 
-static struct CliAuthIoWriteResult
+static struct CliAuthIoResult
 cliauth_io_buffered_stream_writer_write(
    void * context,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
-   struct CliAuthIoWriteResult write_result;
+   struct CliAuthIoResult result;
    struct CliAuthIoBufferedStreamWriter * context_writer;
    CliAuthUInt8 * buffer_free;
    CliAuthUInt32 write_total;
@@ -558,10 +557,9 @@ cliauth_io_buffered_stream_writer_write(
 
       context_writer->capacity -= bytes;
 
-      write_result.status = CLIAUTH_IO_WRITE_STATUS_SUCCESS;
-      write_result.bytes = bytes;
-
-      return write_result;
+      result.status = CLIAUTH_IO_STATUS_SUCCESS;
+      result.bytes = bytes;
+      return result;
    }
 
    /* initialize the total number of written bytes */
@@ -584,27 +582,27 @@ cliauth_io_buffered_stream_writer_write(
    context_writer->capacity = CLIAUTH_LITERAL_UINT32(0u);
 
    /* attempt to flush the write buffer */
-   write_result = cliauth_io_buffered_stream_writer_flush(context_writer);
+   result = cliauth_io_buffered_stream_writer_flush(context_writer);
    write_total += write_result.bytes;
    data_iter += write_result.bytes;
 
-   if (write_result.status != CLIAUTH_IO_WRITE_STATUS_SUCCESS) {
-      write_result.bytes = write_total;
-      return write_result;
+   if (result.status != CLIAUTH_IO_STATUS_SUCCESS) {
+      result.bytes = write_total;
+      return result;
    }
 
    /* attempt to write out all the full-sized blocks at once */
-   write_result = cliauth_io_stream_writer_write_all(
+   result = cliauth_io_stream_writer_write_all(
       context_writer->backing_writer,
       data_iter,
       block_bytes
    );
-   write_total += write_result.bytes;
-   data_iter += write_result.bytes;
+   write_total += result.bytes;
+   data_iter += result.bytes;
 
-   if (write_result.status != CLIAUTH_IO_WRITE_STATUS_SUCCESS) {
-      write_result.bytes = write_total;
-      return write_result;
+   if (result.status != CLIAUTH_IO_STATUS_SUCCESS) {
+      result.bytes = write_total;
+      return result;
    }
 
    /* copy the remaining bytes into the write buffer */
@@ -618,8 +616,8 @@ cliauth_io_buffered_stream_writer_write(
    write_total += residual_bytes;
 
    /* lastly update to return the total bytes written */
-   write_result.bytes = write_total;
-   return write_result;
+   result.bytes = write_total;
+   return result;
 }
 
 void
@@ -678,11 +676,11 @@ cliauth_io_buffered_stream_writer_interface(
    return retn;
 }
 
-static struct CliAuthIoWriteResult
+static struct CliAuthIoResult
 cliauth_io_buffered_stream_writer_flush_unified(
    struct CliAuthIoBufferedStreamWriter * context
 ) {
-   struct CliAuthIoWriteResult result;
+   struct CliAuthIoResult result;
    CliAuthUInt8 * data_ptr;
    CliAuthUInt32 data_bytes;
 
@@ -705,11 +703,11 @@ cliauth_io_buffered_stream_writer_flush_unified(
    return result;
 }
 
-static struct CliAuthIoWriteResult
+static struct CliAuthIoResult
 cliauth_io_buffered_stream_writer_flush_fragmented(
    struct CliAuthIoBufferedStreamWriter * context
 ) {
-   struct CliAuthIoWriteResult result;
+   struct CliAuthIoResult result;
    CliAuthUInt8 * fill_ptr;
    CliAuthUInt32 fill_bytes;
    CliAuthUInt8 * remainder_ptr;
@@ -733,7 +731,7 @@ cliauth_io_buffered_stream_writer_flush_fragmented(
    context->capacity = context->capacity + result.bytes;
 
    /* if the write resulted in an error, pass the result to the caller */
-   if (result.status != CLIAUTH_IO_WRITE_STATUS_SUCCESS) {
+   if (result.status != CLIAUTH_IO_STATUS_SUCCESS) {
       return result;
    }
 
@@ -755,11 +753,11 @@ cliauth_io_buffered_stream_writer_flush_fragmented(
    return result;
 }
 
-struct CliAuthIoWriteResult
+struct CliAuthIoResult
 cliauth_io_buffered_stream_writer_flush(
    struct CliAuthIoBufferedStreamWriter * context
 ) {
-   struct CliAuthIoWriteResult result;
+   struct CliAuthIoResult result;
 
    /* if the buffer is not fragmented, simply flush the entire buffer */
    /* otherwise we will need to flush each portion seperately */

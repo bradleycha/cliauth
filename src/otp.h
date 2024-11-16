@@ -65,11 +65,11 @@ cliauth_otp_hotp_initialize(
 /*----------------------------------------------------------------------------*/
 /* Return value - The result of reading the key from 'key_reader'.  If the    */
 /*                returned read result statis is not                          */
-/*                'CLIAUTH_IO_READ_STATUS_SUCCESS', the number of digested    */
-/*                bytes can be obtained from the 'bytes' field in the         */
-/*                returned read result.                                       */
+/*                'CLIAUTH_IO_STATUS_SUCCESS', the number of digested bytes   */
+/*                can be obtained from the 'bytes' field in the returned read */
+/*                result.                                                     */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoReadResult
+struct CliAuthIoResult
 cliauth_otp_hotp_key_digest(
    struct CliAuthOtpHotpContext * context,
    const struct CliAuthIoStreamReader * key_reader,

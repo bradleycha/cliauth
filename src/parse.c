@@ -452,7 +452,7 @@ cliauth_parse_string_integer_state_digest_prefix(
    );
    state->characters_remaining -= result.read_result.bytes / CLIAUTH_LITERAL_UINT32(sizeof(char));
 
-   if (result.read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+   if (result.read_result.status != CLIAUTH_IO_STATUS_SUCCESS) {
       result.status = CLIAUTH_PARSE_STRING_INTEGER_STATUS_IO_ERROR;
       return result;
    }
@@ -494,7 +494,7 @@ cliauth_parse_string_integer_state_digest_magnitude(
       );
       bytes_read += result.read_result.bytes;
 
-      if (result.read_result.status != CLIAUTH_IO_READ_STATUS_SUCCESS) {
+      if (result.read_result.status != CLIAUTH_IO_STATUS_SUCCESS) {
          result.status = CLIAUTH_PARSE_STRING_INTEGER_STATUS_IO_ERROR;
          return result;
       }
