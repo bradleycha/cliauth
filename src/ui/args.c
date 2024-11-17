@@ -2,18 +2,18 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/args/args.c - Command-line arguments parsing implementation.           */
+/* src/ui/args.c - Command-line arguments parsing implementation.             */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
 #include "ui/args.h"
 
-#include <time.h>
-
 #include "memory/memory.h"
 #include "crypto/hash/hash.h"
 #include "database/account.h"
 #include "io/log.h"
+
+#include <time.h>
 
 #define TEST_SECRETS "\xde\xad\xbe\xef"
 #define TEST_ISSUER  "Account Authority Inc."

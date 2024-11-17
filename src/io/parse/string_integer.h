@@ -2,18 +2,18 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/parse/parse.h - Generic I/O data parsers.                           */
+/* src/io/parse/string_integer.h - String integer parser.                  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _CLIAUTH_IO_PARSE_H
-#define _CLIAUTH_IO_PARSE_H
+#ifndef _CLIAUTH_IO_PARSE_STRING_INTEGER_H
+#define _CLIAUTH_IO_PARSE_STRING_INTEGER_H
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
 #include "io/io.h"
 
 /*----------------------------------------------------------------------------*/
-/* The result status of parsing an integer from a string.                     */
+/* The result status of parsing a string integer.                             */
 /*----------------------------------------------------------------------------*/
 /* CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS - The integer was parsed    */
 /*                                                  successfully.             */
@@ -279,5 +279,5 @@ cliauth_io_parse_string_integer_sint64(
 );
 
 /*----------------------------------------------------------------------------*/
-#endif /* _CLIAUTH_IO_PARSE_H */
+#endif /* _CLIAUTH_IO_PARSE_STRING_INTEGER_H */
 

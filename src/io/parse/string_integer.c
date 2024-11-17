@@ -2,12 +2,11 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/parse/parse.c - Generic data serializer and deserializer            */
-/*                        implementations.                                    */
+/* src/io/parse/string_integer.c - String integer parser implementation.      */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "io/parse/parse.h"
+#include "io/parse/string_integer.h"
 
 #include "io/io.h"
 #include "math/bitwise.h"

@@ -33,8 +33,8 @@ cliauth_SOURCES = \
 	src/io/io.h \
 	src/io/log.c \
 	src/io/log.h \
-	src/io/parse/parse.c \
-	src/io/parse/parse.h \
+	src/io/parse/string_integer.c \
+	src/io/parse/string_integer.h \
 	src/math/bitwise.c \
 	src/math/bitwise.h \
 	src/math/endian.c \

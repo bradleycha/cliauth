@@ -10,6 +10,7 @@
 #include "crypto/otp.h"
 #include "database/account.h"
 #include "io/log.h"
+
 #include <inttypes.h>
 
 #define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION
