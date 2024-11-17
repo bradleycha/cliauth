@@ -15,11 +15,14 @@
 /*----------------------------------------------------------------------------*/
 /* A generic I/O result status.                                               */
 /*----------------------------------------------------------------------------*/
-/* CLIAUTH_IO_STATUS_SUCCESS - The I/O function executed successfully.        */
+/* CLIAUTH_IO_STATUS_SUCCESS -                                                */
+/*    The I/O function executed successfully.                                 */
 /*                                                                            */
-/* CLIAUTH_IO_STATUS_END_OF_STREAM - The end of the I/O stream was reached.   */
+/* CLIAUTH_IO_STATUS_END_OF_STREAM -                                          */
+/*    The end of the I/O stream was reached.                                  */
 /*                                                                            */
-/* CLIAUTH_IO_STATUS_ERROR_UNKNOWN - An unknown I/O error occurred.           */
+/* CLIAUTH_IO_STATUS_ERROR_UNKNOWN -                                          */
+/*    An unknown I/O error occurred.                                          */
 /*----------------------------------------------------------------------------*/
 #define CLIAUTH_IO_STATUS_FIELD_COUNT 3u
 enum CliAuthIoStatus {
@@ -31,9 +34,11 @@ enum CliAuthIoStatus {
 /*----------------------------------------------------------------------------*/
 /* The result of a generic I/O operation.                                     */
 /*----------------------------------------------------------------------------*/
-/* status - The status of the I/O operation.                                  */
+/* status -                                                                   */
+/*    The status of the I/O operation.                                        */
 /*                                                                            */
-/* bytes - The number of bytes which were successfully read.                  */
+/* bytes -                                                                    */
+/*    The number of bytes which were successfully read.                       */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult {
    enum CliAuthIoStatus status;
@@ -73,16 +78,20 @@ struct CliAuthIoStreamReader {
 /*----------------------------------------------------------------------------*/
 /* Attempts to read bytes into a buffer from a stream reader.                 */
 /*----------------------------------------------------------------------------*/
-/* reader - The stream reader interface to read from.                         */
+/* reader -                                                                   */
+/*    The stream reader interface to read from.                               */
 /*                                                                            */
-/* buffer - A byte buffer to store the read contents to.  The buffer will     */
-/*          only be valid up to the number of bytes successfully read in the  */
-/*          returned read result.                                             */
+/* buffer -                                                                   */
+/*    A byte buffer to store the read contents to.  The buffer will only be   */
+/*    valid up to the number of bytes successfully read in the returned read  */
+/*    result.                                                                 */
 /*                                                                            */
-/* bytes - The number of bytes to attempt to read.  The actual number of      */
-/*         bytes read is output in the 'bytes' result field.                  */
+/* bytes -                                                                    */
+/*    The number of bytes to attempt to read.  The actual number of bytes     */
+/*    read is output in the 'bytes' result field.                             */
 /*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of reading.                */
+/* Return value -                                                             */
+/*    A struct representing the result of reading.                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_stream_reader_read(
@@ -94,15 +103,19 @@ cliauth_io_stream_reader_read(
 /*----------------------------------------------------------------------------*/
 /* Attempts to read and completely fill a buffer from a stream reader.        */
 /*----------------------------------------------------------------------------*/
-/* reader - The stream reader interface to read from.                         */
+/* reader -                                                                   */
+/*    The stream reader interface to read from.                               */
 /*                                                                            */
-/* buffer - A byte buffer to store the read contents to.  The buffer will     */
-/*          only be valid up to the number of bytes successfully read in the  */
-/*          returned read result.                                             */
+/* buffer -                                                                   */
+/*    A byte buffer to store the read contents to.  The buffer will only be   */
+/*    valid up to the number of bytes successfully read in the returned read  */
+/*    result.                                                                 */
 /*                                                                            */
-/* bytes - The length of 'buffer' in bytes.                                   */
+/* bytes -                                                                    */
+/*    The length of 'buffer' in bytes.                                        */
 /*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of reading.                */
+/* Return value -                                                             */
+/*    A struct representing the result of reading.                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_stream_reader_read_all(
@@ -122,15 +135,19 @@ struct CliAuthIoStreamWriter {
 /*----------------------------------------------------------------------------*/
 /* Attempts to write bytes into a buffer info a stream writer.                */
 /*----------------------------------------------------------------------------*/
-/* writer - The stream writer interface to write bytes into.                  */
+/* writer -                                                                   */
+/*    The stream writer interface to write bytes into.                        */
 /*                                                                            */
-/* data - The bytes to write.  The number of bytes which are successfully     */
-/*        written will be contained in the returned write result.             */
+/* data -                                                                     */
+/*    The bytes to write.  The number of bytes which are successfully written */
+/*    will be contained in the returned write result.                         */
 /*                                                                            */
-/* bytes - The number of bytes to attempt to write.  The actual number of     */
-/*         bytes written is output in the 'bytes' result field.               */
+/* bytes -                                                                    */
+/*    The number of bytes to attempt to write.  The actual number of bytes    */
+/*    written is output in the 'bytes' result field.                          */
 /*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of writing.                */
+/* Return value -                                                             */
+/*    A struct representing the result of writing.                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_stream_writer_write(
@@ -142,14 +159,18 @@ cliauth_io_stream_writer_write(
 /*----------------------------------------------------------------------------*/
 /* Attempts to completely write a buffer into a stream writer.                */
 /*----------------------------------------------------------------------------*/
-/* writer - The stream writer interface to write bytes into.                  */
+/* writer -                                                                   */
+/*    The stream writer interface to write bytes into.                        */
 /*                                                                            */
-/* data - The bytes to write.  The number of bytes which are successfully     */
-/*        written will be contained in the returned write result.             */
+/* data -                                                                     */
+/*    The bytes to write.  The number of bytes which are successfully written */
+/*    will be contained in the returned write result.                         */
 /*                                                                            */
-/* bytes - The length of 'data' in bytes.                                     */
+/* bytes -                                                                    */
+/*    The length of 'data' in bytes.                                          */
 /*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of writing.                */
+/* Return value -                                                             */
+/*    A struct representing the result of writing.                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_stream_writer_write_all(
@@ -193,22 +214,27 @@ struct CliAuthIoMapperReader {
 /*----------------------------------------------------------------------------*/
 /* Attempts to read bytes into a buffer from a mapper reader.                 */
 /*----------------------------------------------------------------------------*/
-/* reader - The mapper reader interface to read from.                         */
+/* reader -                                                                   */
+/*    The mapper reader interface to read from.                               */
 /*                                                                            */
-/* buffer - A byte buffer to store the read contents to.  The buffer will     */
-/*          only be valid up to the number of bytes successfully read in the  */
-/*          returned read result.                                             */
+/* buffer -                                                                   */
+/*    A byte buffer to store the read contents to.  The buffer will only be   */
+/*    valid up to the number of bytes successfully read in the returned read  */
+/*    result.                                                                 */
 /*                                                                            */
-/* bytes - The number of bytes to attempt to read.  The actual number of      */
-/*         bytes read is output in the 'bytes' result field.  It is undefined */
-/*         behavior to have a byte read count such that reading will take     */
-/*         place past the allocated region for the mapper.                    */
+/* bytes -                                                                    */
+/*    The number of bytes to attempt to read.  The actual number of bytes     */
+/*    read is output in the 'bytes' result field.  It is undefined behavior   */
+/*    to have a byte read count such that reading will take place past the    */
+/*    allocated region for the mapper.                                        */
 /*                                                                            */
-/* offset - The position in the mapper to attempt to read bytes into.         */
-/*          It is undefined behavior to have an offset such that reading will */
-/*          take place past the allocated region for the mapper.              */
+/* offset -                                                                   */
+/*    The position in the mapper to attempt to read bytes into.  It is        */
+/*    undefined behavior to have an offset such that reading will take place  */
+/*    past the allocated region for the mapper.                               */
 /*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of reading.                */
+/* Return value -                                                             */
+/*    A struct representing the result of reading.                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_mapper_reader_read(
@@ -221,22 +247,27 @@ cliauth_io_mapper_reader_read(
 /*----------------------------------------------------------------------------*/
 /* Attempts to read and completely fill a buffer from a mapper reader.        */
 /*----------------------------------------------------------------------------*/
-/* reader - The mapper reader interface to read from.                         */
+/* reader -                                                                   */
+/*    The mapper reader interface to read from.                               */
 /*                                                                            */
-/* buffer - A byte buffer to store the read contents to.  The buffer will     */
-/*          only be valid up to the number of bytes successfully read in the  */
-/*          returned read result.                                             */
+/* buffer -                                                                   */
+/*    A byte buffer to store the read contents to.  The buffer will only be   */
+/*    valid up to the number of bytes successfully read in the returned read  */
+/*    result.                                                                 */
 /*                                                                            */
-/* bytes - The number of bytes to attempt to read.  The actual number of      */
-/*         bytes read is output in the 'bytes' result field.  It is undefined */
-/*         behavior to have a byte read count such that reading will take     */
-/*         place past the allocated region for the mapper.                    */
+/* bytes -                                                                    */
+/*    The number of bytes to attempt to read.  The actual number of bytes     */
+/*    read is output in the 'bytes' result field.  It is undefined behavior   */
+/*    to have a byte read count such that reading will take place past the    */
+/*    allocated region for the mapper.                                        */
 /*                                                                            */
-/* offset - The position in the mapper to attempt to read bytes into.         */
-/*          It is undefined behavior to have an offset such that reading will */
-/*          take place past the allocated region for the mapper.              */
+/* offset -                                                                   */
+/*    The position in the mapper to attempt to read bytes into.  It is        */
+/*    undefined behavior to have an offset such that reading will take place  */
+/*    past the allocated region for the mapper.                               */
 /*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of reading.                */
+/* Return value -                                                             */
+/*    A struct representing the result of reading.                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_mapper_reader_read_all(
@@ -249,10 +280,6 @@ cliauth_io_mapper_reader_read_all(
 /*----------------------------------------------------------------------------*/
 /* A generic random-access mapper writer interface.                           */
 /*----------------------------------------------------------------------------*/
-/* writer - The writer function for the instance's implementation.            */
-/*                                                                            */
-/* context - A pointer to the implementation-specific context struct.         */
-/*----------------------------------------------------------------------------*/
 struct CliAuthIoMapperWriter {
    CliAuthIoMapperFunctionWrite write;
    void * context;
@@ -261,21 +288,26 @@ struct CliAuthIoMapperWriter {
 /*----------------------------------------------------------------------------*/
 /* Attempts to write bytes into a buffer info a mapper writer.                */
 /*----------------------------------------------------------------------------*/
-/* writer - The mapper writer interface to write bytes into.                  */
+/* writer -                                                                   */
+/*    The mapper writer interface to write bytes into.                        */
 /*                                                                            */
-/* data - The bytes to write.  The number of bytes which are successfully     */
-/*        written will be contained in the returned write result.             */
+/* data -                                                                     */
+/*    The bytes to write.  The number of bytes which are successfully written */
+/*    will be contained in the returned write result.                         */
 /*                                                                            */
-/* bytes - The number of bytes to attempt to write.  The actual number of     */
-/*         bytes written is output in the 'bytes' result field.  It is        */
-/*         undefined behavior to have a byte write count such that writing    */
-/*         will take place past the allocated region for the mapper.          */
+/* bytes -                                                                    */
+/*    The number of bytes to attempt to write.  The actual number of bytes    */
+/*    written is output in the 'bytes' result field.  It is undefined         */
+/*    behavior to have a byte write count such that writing will take place   */
+/*    past the allocated region for the mapper.                               */
 /*                                                                            */
-/* offset - The position in the mapper to attempt to write bytes into.        */
-/*          It is undefined behavior to have an offset such that writing will */
-/*          take place past the allocated region for the mapper.              */
+/* offset -                                                                   */
+/*    The position in the mapper to attempt to write bytes into.  It is       */
+/*    undefined behavior to have an offset such that writing will take place  */
+/*    past the allocated region for the mapper.                               */
 /*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of writing.                */
+/* Return value -                                                             */
+/*    A struct representing the result of writing.                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_mapper_writer_write(
@@ -288,21 +320,26 @@ cliauth_io_mapper_writer_write(
 /*----------------------------------------------------------------------------*/
 /* Attempts to completely write a buffer into a mapper writer.                */
 /*----------------------------------------------------------------------------*/
-/* writer - The mapper writer interface to write bytes into.                  */
+/* writer -                                                                   */
+/*    The mapper writer interface to write bytes into.                        */
 /*                                                                            */
-/* data - The bytes to write.  The number of bytes which are successfully     */
-/*        written will be contained in the returned write result.             */
+/* data -                                                                     */
+/*    The bytes to write.  The number of bytes which are successfully written */
+/*    will be contained in the returned write result.                         */
 /*                                                                            */
-/* bytes - The number of bytes to attempt to write.  The actual number of     */
-/*         bytes written is output in the 'bytes' result field.  It is        */
-/*         undefined behavior to have a byte write count such that writing    */
-/*         will take place past the allocated region for the mapper.          */
+/* bytes -                                                                    */
+/*    The number of bytes to attempt to write.  The actual number of bytes    */
+/*    written is output in the 'bytes' result field.  It is undefined         */
+/*    behavior to have a byte write count such that writing will take place   */
+/*    past the allocated region for the mapper.                               */
 /*                                                                            */
-/* offset - The position in the mapper to attempt to write bytes into.        */
-/*          It is undefined behavior to have an offset such that writing will */
-/*          take place past the allocated region for the mapper.              */
+/* offset -                                                                   */
+/*    The position in the mapper to attempt to write bytes into.  It is       */
+/*    undefined behavior to have an offset such that writing will take place  */
+/*    past the allocated region for the mapper.                               */
 /*----------------------------------------------------------------------------*/
-/* Return value - A struct representing the result of writing.                */
+/* Return value -                                                             */
+/*    A struct representing the result of writing.                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_mapper_writer_write_all(
@@ -329,11 +366,12 @@ struct CliAuthIoByteArrayMapperWriter {
 /*----------------------------------------------------------------------------*/
 /* Initializes the byte array mapper reader.                                  */
 /*----------------------------------------------------------------------------*/
-/* context - The byte array mapper reader to initialize.                      */
+/* context -                                                                  */
+/*    The byte array mapper reader to initialize.                             */
 /*                                                                            */
-/* bytes - The backing byte array for the reader.  The length of the          */
-/*         allocated region for the reader will be the length of the backing  */
-/*         byte array.                                                        */
+/* bytes -                                                                    */
+/*    The backing byte array for the reader.  The length of the allocated     */
+/*    region for the reader will be the length of the backing byte array.     */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_io_byte_array_mapper_reader_initialize(
@@ -344,11 +382,12 @@ cliauth_io_byte_array_mapper_reader_initialize(
 /*----------------------------------------------------------------------------*/
 /* Initializes the byte array mapper writer.                                  */
 /*----------------------------------------------------------------------------*/
-/* context - The byte array mapper writer to initialize.                      */
+/* context -                                                                  */
+/*    The byte array mapper writer to initialize.                             */
 /*                                                                            */
-/* bytes - The backing byte array for the writer.  The length of the          */
-/*         allocated region for the writer will be the length of the backing  */
-/*         byte array.                                                        */
+/* bytes -                                                                    */
+/*    The backing byte array for the writer.  The length of the allocated     */
+/*    region for the writer will be the length of the backing byte array.     */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_io_byte_array_mapper_writer_initialize(
@@ -360,9 +399,10 @@ cliauth_io_byte_array_mapper_writer_initialize(
 /* Creates a generic mapper reader interface from the byte array mapper       */
 /* reader.                                                                    */
 /*----------------------------------------------------------------------------*/
-/* context - The byte array mapper reader to create a mapper reader from.     */
-/*           The lifetime of the reader interface is the same as the byte     */
-/*           array mapper reader.                                             */
+/* context -                                                                  */
+/*    The byte array mapper reader to create a mapper reader from.  The       */
+/*    lifetime of the reader interface is the same as the byte array mapper   */
+/*    reader.                                                                 */
 /*----------------------------------------------------------------------------*/
 /* Return value - A generic mapper reader interface.                          */
 /*----------------------------------------------------------------------------*/
@@ -375,11 +415,13 @@ cliauth_io_byte_array_mapper_reader_interface(
 /* Creates a generic mapper writer interface from the byte array mapper       */
 /* writer.                                                                    */
 /*----------------------------------------------------------------------------*/
-/* context - The byte array mapper writer to create a mapper writer from.     */
-/*           The lifetime of the writer interface is the same as the byte     */
-/*           array mapper writer.                                             */
+/* context -                                                                  */
+/*    The byte array mapper writer to create a mapper writer from.  The       */
+/*    lifetime of the writer interface is the same as the byte array mapper   */
+/*    writer.                                                                 */
 /*----------------------------------------------------------------------------*/
-/* Return value - A generic mapper writer interface.                          */
+/* Return value -                                                             */
+/*    A generic mapper writer interface.                                      */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoMapperWriter
 cliauth_io_byte_array_mapper_writer_interface(
@@ -419,16 +461,19 @@ struct CliAuthIoMapperStreamWriter {
 /*----------------------------------------------------------------------------*/
 /* Initializes the mapper stream reader.                                      */
 /*----------------------------------------------------------------------------*/
-/* context - The mapper stream reader to initialize.                          */
+/* context -                                                                  */
+/*    The mapper stream reader to initialize.                                 */
 /*                                                                            */
-/* backing_mapper_reader - The backing mapper reader to create a stream from. */
+/* backing_mapper_reader -                                                    */
+/*    The backing mapper reader to create a stream from.                      */
 /*                                                                            */
-/* length - The length of the backing mapper reader's allocated region in     */
-/*          bytes.                                                            */
+/* length -                                                                   */
+/*    The length of the backing mapper reader's allocated region in bytes.    */
 /*                                                                            */
-/* offset - The offset within the backing mapper reader to position the start */
-/*          of the stream at.  It is undefined behavior to specify a starting */
-/*          offset past the allocated region for the backing mapper reader.   */
+/* offset -                                                                   */
+/*    The offset within the backing mapper reader to position the start of    */
+/*    the stream at.  It is undefined behavior to specify a starting offset   */
+/*    past the allocated region for the backing mapper reader.                */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_io_mapper_stream_reader_initialize(
@@ -441,16 +486,19 @@ cliauth_io_mapper_stream_reader_initialize(
 /*----------------------------------------------------------------------------*/
 /* Initializes the mapper stream writer.                                      */
 /*----------------------------------------------------------------------------*/
-/* context - The mapper stream writer to initialize.                          */
+/* context -                                                                  */
+/*    The mapper stream writer to initialize.                                 */
 /*                                                                            */
-/* backing_mapper_writer - The backing writer reader to create a stream from. */
+/* backing_mapper_writer -                                                    */
+/*    The backing writer reader to create a stream from.                      */
 /*                                                                            */
-/* length - The length of the backing mapper writer's allocated region in     */
-/*          bytes.                                                            */
+/* length -                                                                   */
+/*    The length of the backing mapper writer's allocated region in bytes.    */
 /*                                                                            */
-/* offset - The offset within the backing mapper writer to position the start */
-/*          of the stream at.  It is undefined behavior to specify a starting */
-/*          offset past the allocated region for the backing mapper writer.   */
+/* offset -                                                                   */
+/*    The offset within the backing mapper writer to position the start of    */
+/*    the stream at.  It is undefined behavior to specify a starting offset   */
+/*    past the allocated region for the backing mapper writer.                */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_io_mapper_stream_writer_initialize(
@@ -463,11 +511,12 @@ cliauth_io_mapper_stream_writer_initialize(
 /*----------------------------------------------------------------------------*/
 /* Creates a generic stream reader interface from the mapper stream reader.   */
 /*----------------------------------------------------------------------------*/
-/* context - The mapper stream reader to create a stream reader from.  The    */
-/*           lifetime of the stream reader interface is the same as the       */
-/*           mapper stream reader.                                            */
+/* context -                                                                  */
+/*    The mapper stream reader to create a stream reader from.  The lifetime  */
+/*    of the stream reader interface is the same as the mapper stream reader. */
 /*----------------------------------------------------------------------------*/
-/* Return value - A generic stream reader interface.                          */
+/* Return value -                                                             */
+/*    A generic stream reader interface.                                      */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoStreamReader
 cliauth_io_mapper_stream_reader_interface(
@@ -477,11 +526,12 @@ cliauth_io_mapper_stream_reader_interface(
 /*----------------------------------------------------------------------------*/
 /* Creates a generic stream writer interface from the mapper stream writer.   */
 /*----------------------------------------------------------------------------*/
-/* context - The mapper stream writer to create a stream writer from.  The    */
-/*           lifetime of the stream writer interface is the same as the       */
-/*           mapper stream writer.                                            */
+/* context -                                                                  */
+/*    The mapper stream writer to create a stream writer from.  The lifetime  */
+/*    of the stream writer interface is the same as the mapper stream writer. */
 /*----------------------------------------------------------------------------*/
-/* Return value - A generic stream writer interface.                          */
+/* Return value -                                                             */
+/*    A generic stream writer interface.                                      */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoStreamWriter
 cliauth_io_mapper_stream_writer_interface(
@@ -534,13 +584,17 @@ struct CliAuthIoBufferedStreamWriter {
 /*----------------------------------------------------------------------------*/
 /* Initializes the buffered stream reader.                                    */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered stream reader to initialize.                        */
+/* context -                                                                  */
+/*    The buffered stream reader to initialize.                               */
 /*                                                                            */
-/* backing_reader - The backing stream reader interface to buffer.            */
+/* backing_reader -                                                           */
+/*    The backing stream reader interface to buffer.                          */
 /*                                                                            */
-/* buffer - A byte array which will store the buffered reads.                 */
+/* buffer -                                                                   */
+/*    A byte array which will store the buffered reads.                       */
 /*                                                                            */
-/* length - The length of 'buffer' in bytes.                                  */
+/* length -                                                                   */
+/*    The length of 'buffer' in bytes.                                        */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_io_buffered_reader_initialize(
@@ -553,13 +607,17 @@ cliauth_io_buffered_reader_initialize(
 /*----------------------------------------------------------------------------*/
 /* Initializes the buffered stream writer.                                    */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered stream writer to initialize.                        */
+/* context -                                                                  */
+/*    The buffered stream writer to initialize.                               */
 /*                                                                            */
-/* backing_writer - The backing stream writer interface to buffer.            */
+/* backing_writer -                                                           */
+/*    The backing stream writer interface to buffer.                          */
 /*                                                                            */
-/* buffer - A byte array which will store the buffered writes.                */
+/* buffer -                                                                   */
+/*    A byte array which will store the buffered writes.                      */
 /*                                                                            */
-/* length - The length of 'buffer' in bytes.                                  */
+/* length -                                                                   */
+/*    The length of 'buffer' in bytes.                                        */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_io_buffered_writer_initialize(
@@ -572,11 +630,13 @@ cliauth_io_buffered_writer_initialize(
 /*----------------------------------------------------------------------------*/
 /* Creates a generic stream reader interface from the buffered stream reader. */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered stream reader to create a stream reader from.  The  */
-/*           lifetime of the reader interface is the same as the buffered     */
-/*           stream reader.                                                   */
+/* context -                                                                  */
+/*    The buffered stream reader to create a stream reader from.  The         */
+/*    lifetime of the stream reader interface is the same as the buffered     */
+/*    stream reader.                                                          */
 /*----------------------------------------------------------------------------*/
-/* Return value - A generic stream reader interface.                          */
+/* Return value -                                                             */
+/*    A generic stream reader interface.                                      */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoStreamReader
 cliauth_io_buffered_stream_reader_interface(
@@ -586,11 +646,13 @@ cliauth_io_buffered_stream_reader_interface(
 /*----------------------------------------------------------------------------*/
 /* Creates a generic stream writer interface from the buffered stream writer. */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered stream writer to create a stream writer from.  The  */
-/*           lifetime of the stream writer interface is the same as the       */
-/*           buffered stream writer.                                          */
+/* context -                                                                  */
+/*    The buffered stream writer to create a stream writer from.  The         */
+/*    lifetime of the stream writer interface is the same as the buffered     */
+/*    stream writer.                                                          */
 /*----------------------------------------------------------------------------*/
-/* Return value - A generic stream writer interface.                          */
+/* Return value -                                                             */
+/*    A generic stream writer interface.                                      */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoStreamWriter
 cliauth_io_buffered_stream_writer_interface(
@@ -601,9 +663,11 @@ cliauth_io_buffered_stream_writer_interface(
 /* Flushes any buffered bytes to the stream writer, emptying the write        */
 /* buffer.                                                                    */
 /*----------------------------------------------------------------------------*/
-/* context - The buffered stream writer to flush.                             */
+/* context -                                                                  */
+/*    The buffered stream writer to flush.                                    */
 /*----------------------------------------------------------------------------*/
-/* Return value - The result of flushing the stream write buffer.             */
+/* Return value -                                                             */
+/*    The result of flushing the stream write buffer.                         */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_buffered_stream_writer_flush(

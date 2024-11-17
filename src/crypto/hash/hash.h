@@ -82,18 +82,21 @@ typedef void (*CliAuthCryptoHashFunctionInitialize)(
 /*----------------------------------------------------------------------------*/
 /* Digest an arbitrary amount of data.                                        */
 /*----------------------------------------------------------------------------*/
-/* context - The hash function context to digest the message into.  The       */
-/*           context must first be initialized.                               */
+/* context -                                                                  */
+/*    The hash function context to digest the message into.  The context must */
+/*    first be initialized.                                                   */
 /*                                                                            */
-/* message_reader - The stream reader for the data to digest.                 */
+/* message_reader -                                                           */
+/*    The stream reader for the data to digest.                               */
 /*                                                                            */
-/* message_bytes - The number of bytes to read from 'message_reader'.         */
+/* message_bytes -                                                            */
+/*    The number of bytes to read from 'message_reader'.                      */
 /*----------------------------------------------------------------------------*/
-/* Return value - The result of reading the message from 'message_reader'.    */
-/*                If the returned read result status is not                   */
-/*                'CLIAUTH_IO_STATUS_SUCCESS', the number of digested bytes   */
-/*                can be obtained from the 'bytes' field in the returned      */
-/*                read result.                                                */
+/* Return value -                                                             */
+/*    The result of reading the message from 'message_reader'.  If the        */
+/*    returned read result status is not 'CLIAUTH_IO_STATUS_SUCCESS', the     */
+/*    number of digested bytes can be obtained from the 'bytes' field in the  */
+/*    returned read result.                                                   */
 /*----------------------------------------------------------------------------*/
 typedef struct CliAuthIoResult (*CliAuthCryptoHashFunctionDigest)(
    struct CliAuthCryptoHashContext * context,
@@ -104,17 +107,18 @@ typedef struct CliAuthIoResult (*CliAuthCryptoHashFunctionDigest)(
 /*----------------------------------------------------------------------------*/
 /* Finalizes a hash function and generates a digest value.                    */
 /*----------------------------------------------------------------------------*/
-/* context - The hash function context to finalize.  The context must first   */
-/*           be initialized and optionally contain digested byte data.        */
-/*           Calling this function requires the context to be re-initialized  */
-/*           before digesting again.                                          */
+/* context -                                                                  */
+/*    The hash function context to finalize.  The context must first be       */
+/*    initialized and optionally contain digested byte data.  Calling this    */
+/*    function requires the context to be re-initialized before digesting     */
+/*    again.                                                                  */
 /*----------------------------------------------------------------------------*/
-/* Return value - A pointer to the final digest value.  This value will only  */
-/*                be valid for the lifetime of the hash context and will be   */
-/*                invalidated by re-initialization.  The length of the        */
-/*                returned buffer containing the digest depends on the hash   */
-/*                algorithm.  The byte length of the output digest value can  */
-/*                be found from 'CLIAUTH_CRYPTO_HASH_*_DIGEST_LENGTH'.        */
+/* Return value -                                                             */
+/*    A pointer to the final digest value.  This value will only be valid for */
+/*    the lifetime of the hash context and will be invalidated by             */
+/*    re-initialization.  The length of the returned buffer containing the    */
+/*    digest depends on the hash algorithm.  The byte length of the output    */
+/*    digest value can be found from 'CLIAUTH_CRYPTO_HASH_*_DIGEST_LENGTH'.   */
 /*----------------------------------------------------------------------------*/
 typedef CliAuthUInt8 * (*CliAuthCryptoHashFunctionFinalize)(
    struct CliAuthCryptoHashContext * context
@@ -123,22 +127,29 @@ typedef CliAuthUInt8 * (*CliAuthCryptoHashFunctionFinalize)(
 /*----------------------------------------------------------------------------*/
 /* A generic hash function represented by its function pointers.              */
 /*----------------------------------------------------------------------------*/
-/* initialize - Initializes the hash function's context, and makes it valid   */
-/*              to call 'digest' using the context.                           */
+/* initialize -                                                               */
+/*    Initializes the hash function's context, and makes it valid to call     */
+/*    'digest' using the context.                                             */
 /*                                                                            */
-/* digest - Digests a given array of arbitrary data.                          */
+/* digest -                                                                   */
+/*    Digests a given array of arbitrary data.                                */
 /*                                                                            */
-/* finalize - Finalizes the hash function and writes the digest, invalidating */
-/*            the internal state.  To start a new hash, 'initialize' must be  */
-/*            called again.                                                   */
+/* finalize -                                                                 */
+/*    Finalizes the hash function and writes the digest, invalidating the     */
+/*    internal state.  To start a new hash, 'initialize' must be called       */
+/*    again.                                                                  */
 /*                                                                            */
-/* identifier - The string identifier for the hash algorithm.                 */
+/* identifier -                                                               */
+/*    The string identifier for the hash algorithm.                           */
 /*                                                                            */
-/* identifier_characters - The length of 'identifier' in characters.          */
+/* identifier_characters -                                                    */
+/*    The length of 'identifier' in characters.                               */
 /*                                                                            */
-/* input_block_length - The length of a single input block, in bytes.         */
+/* input_block_length -                                                       */
+/*    The length of a single input block, in bytes.                           */
 /*                                                                            */
-/* digest_length - The length of the output digest value, in bytes.           */
+/* digest_length -                                                            */
+/*    The length of the output digest value, in bytes.                        */
 /*----------------------------------------------------------------------------*/
 struct CliAuthCryptoHashFunction {
    CliAuthCryptoHashFunctionInitialize initialize;

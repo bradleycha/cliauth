@@ -14,11 +14,14 @@
 /*----------------------------------------------------------------------------*/
 /* Performs a bitwise rotation.                                               */
 /*----------------------------------------------------------------------------*/
-/* value - The number to perform the rotation on.                             */
+/* value -                                                                    */
+/*    The number to perform the rotation on.                                  */
 /*                                                                            */
-/* bits - The amount of bits to rotate by.                                    */
+/* bits -                                                                     */
+/*    The amount of bits to rotate by.                                        */
 /*----------------------------------------------------------------------------*/
-/* Return value - The value after bitwise rotation.                           */
+/* Return value -                                                             */
+/*    The value after bitwise rotation.                                       */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt8
 cliauth_math_bitwise_rotate_left_uint8(
@@ -64,10 +67,12 @@ cliauth_math_bitwise_rotate_right_uint64(
 /*----------------------------------------------------------------------------*/
 /* Converts a magnitude to its negative signed integer representation.        */
 /*----------------------------------------------------------------------------*/
-/* magnitude - The magnitude of the number to convert.  The magnitude must be */
-/*             within the range of representable values for the given type.   */
+/* magnitude -                                                                */
+/*    The magnitude of the number to convert.  The magnitude must be within   */
+/*    the range of representable values for the given type.                   */
 /*----------------------------------------------------------------------------*/
-/* Return value - The signed integer representation of the magnitude.         */
+/* Return value -                                                             */
+/*    The signed integer representation of the magnitude.                     */
 /*----------------------------------------------------------------------------*/
 CliAuthSInt8
 cliauth_math_bitwise_magnitude_deposit_negative_sint8(
@@ -89,9 +94,11 @@ cliauth_math_bitwise_magnitude_deposit_negative_sint64(
 /*----------------------------------------------------------------------------*/
 /* Extract the magnitude of a negative signed integer.                        */
 /*----------------------------------------------------------------------------*/
-/* value - The number to extract the magnitude from.                          */
+/* value -                                                                    */
+/*    The number to extract the magnitude from.                               */
 /*----------------------------------------------------------------------------*/
-/* Return value - The magnitude of the value.                                 */
+/* Return value -                                                             */
+/*    The magnitude of the value.                                             */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt8
 cliauth_math_bitwise_magnitude_extract_negative_sint8(

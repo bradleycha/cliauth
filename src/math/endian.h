@@ -14,11 +14,11 @@
 /*----------------------------------------------------------------------------*/
 /* An endianess format.                                                       */
 /*----------------------------------------------------------------------------*/
-/* CLIAUTH_MATH_ENDIAN_TARGET_LITTLE - Bytes will be ordered starting with    */
-/*                                     least significant first.               */
+/* CLIAUTH_MATH_ENDIAN_TARGET_LITTLE -                                        */
+/*    Bytes will be ordered starting with least significant first.            */
 /*                                                                            */
-/* CLIAUTH_MATH_ENDIAN_TARGET_BIG - Bytes will be ordered starting with most  */
-/*                                  significant first.                        */
+/* CLIAUTH_MATH_ENDIAN_TARGET_BIG -                                           */
+/*    Bytes will be ordered starting with most significant first.             */
 /*----------------------------------------------------------------------------*/
 #define CLIAUTH_MATH_ENDIAN_TARGET_FIELD_COUNT 2u
 enum CliAuthMathEndianTarget {
@@ -40,11 +40,14 @@ enum CliAuthMathEndianTarget {
 /* platform's endianess and a known endianess, overwriting the result into    */
 /* the source buffer.                                                         */
 /*----------------------------------------------------------------------------*/
-/* data - A pointer to the data to be converted in-place.                     */
+/* data -                                                                     */
+/*    A pointer to the data to be converted in-place.                         */
 /*                                                                            */
-/* bytes - The number of bytes in 'data' which should be swapped.             */
+/* bytes -                                                                    */
+/*    The number of bytes in 'data' which should be swapped.                  */
 /*                                                                            */
-/* target - The target endianess to convert between.                          */
+/* target -                                                                   */
+/*    The target endianess to convert between.                                */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_math_endian_convert_inplace(
@@ -58,14 +61,18 @@ cliauth_math_endian_convert_inplace(
 /* platform's endianess and a known endianess, copying the result into a      */
 /* seperate buffer.                                                           */
 /*----------------------------------------------------------------------------*/
-/* dest - The destination buffer to store the converted endian data to.  This */
-/*        buffer should be the same length or greater length than 'source'.   */
+/* dest -                                                                     */
+/*    The destination buffer to store the converted endian data to.  This     */
+/*    buffer should be the same length or greater length than 'source'.       */
 /*                                                                            */
-/* source - The source data to be copied and swapped.                         */
+/* source -                                                                   */
+/*    The source data to be copied and swapped.                               */
 /*                                                                            */
-/* bytes - The number of bytes in 'source' which should be swapped.           */
+/* bytes -                                                                    */
+/*    The number of bytes in 'source' which should be swapped.                */
 /*                                                                            */
-/* target - The target endianess to convert between.                          */
+/* target -                                                                   */
+/*    The target endianess to convert between.                                */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_math_endian_convert_copy(
@@ -79,11 +86,14 @@ cliauth_math_endian_convert_copy(
 /* Converts the endianess of an integer between the host platform's native    */
 /* endianess and a known endianess.                                           */
 /*----------------------------------------------------------------------------*/
-/* value - The integer value to have its endianess swapped.                   */
+/* value -                                                                    */
+/*    The integer value to have its endianess swapped.                        */
 /*                                                                            */
-/* target - The target endianess to convert between.                          */
+/* target -                                                                   */
+/*    The target endianess to convert between.                                */
 /*----------------------------------------------------------------------------*/
-/* Return value - The integer value with its endianess swapped.               */
+/* Return value -                                                             */
+/*    The integer value with its endianess swapped.                           */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt16
 cliauth_math_endian_convert_uint16(

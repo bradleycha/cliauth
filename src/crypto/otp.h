@@ -32,18 +32,21 @@ struct CliAuthCryptoOtpHotpContext {
 /*----------------------------------------------------------------------------*/
 /* Initializes the HOTP context.                                              */
 /*----------------------------------------------------------------------------*/
-/* context - The HOTP context to initialize.                                  */
+/* context -                                                                  */
+/*    The HOTP context to initialize.                                         */
 /*                                                                            */
 /*                                                                            */
-/* hash_function - The 'hash_function' argument for the HMAC algorithm.  See  */
-/*                 the documentation for                                      */
-/*                 'cliauth_crypto_mac_hmac_initialize()' for more            */
-/*                 information.                                               */
+/* hash_function -                                                            */
+/*    The 'hash_function' argument for the HMAC algorithm.  See the           */
+/*    documentation for 'cliauth_crypto_mac_hmac_initialize()' for more       */
+/*    information.                                                            */
 /*                                                                            */
-/* counter - The counter value for the HOTP algorithm.                        */
+/* counter -                                                                  */
+/*    The counter value for the HOTP algorithm.                               */
 /*                                                                            */
-/* digits - The number of digits, base 10, to include in the final HOTP       */
-/*          output.  This must be at least 1, and may not be greater than 9.  */
+/* digits -                                                                   */
+/*    The number of digits, base 10, to include in the final HOTP             */
+/*    output.  This must be at least 1, and may not be greater than 9.        */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_crypto_otp_hotp_initialize(
@@ -56,20 +59,22 @@ cliauth_crypto_otp_hotp_initialize(
 /*----------------------------------------------------------------------------*/
 /* Digests bytes as the secret key for the HOTP algorithm.                    */
 /*----------------------------------------------------------------------------*/
-/* context - The HOTP context to digest into.  The given context must have    */
-/*           been initialized with 'cliauth_crypto_otp_hotp_initialize()' and */
-/*           must not have been finalized with                                */
-/*           'cliauth_crypto_otp_hotp_finalize()'.                            */
+/* context -                                                                  */
+/*    The HOTP context to digest into.  The given context must have been      */
+/*    initialized with 'cliauth_crypto_otp_hotp_initialize()' and must not    */
+/*    have been finalized with 'cliauth_crypto_otp_hotp_finalize()'.          */
 /*                                                                            */
-/* key_reader - The stream reader to source the key bytes from.               */
+/* key_reader -                                                               */
+/*    The stream reader to source the key bytes from.                         */
 /*                                                                            */
-/* key_bytes - The number of bytes to read from 'key_reader'.                 */
+/* key_bytes -                                                                */
+/*    The number of bytes to read from 'key_reader'.                          */
 /*----------------------------------------------------------------------------*/
-/* Return value - The result of reading the key from 'key_reader'.  If the    */
-/*                returned read result statis is not                          */
-/*                'CLIAUTH_IO_STATUS_SUCCESS', the number of digested bytes   */
-/*                can be obtained from the 'bytes' field in the returned read */
-/*                result.                                                     */
+/* Return value -                                                             */
+/*    The result of reading the key from 'key_reader'.  If the returned read  */
+/*    result statis is not 'CLIAUTH_IO_STATUS_SUCCESS', the number of         */
+/*    digested bytes can be obtained from the 'bytes' field in the returned   */
+/*    read result.                                                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_crypto_otp_hotp_key_digest(
@@ -81,13 +86,14 @@ cliauth_crypto_otp_hotp_key_digest(
 /*----------------------------------------------------------------------------*/
 /* Finalizes the HOTP value, generating a one-time-password.                  */
 /*----------------------------------------------------------------------------*/
-/* context - The HOTP context to finalize.  The context must have been        */
-/*           initialized with 'cliauth_crypto_otp_hotp_initialize()'.  Key    */
-/*           bytes may no longer be digested by                               */
-/*           'cliauth_crypto_otp_hotp_key_digest()' after execution.  To      */
-/*           generate another code, the context must be re-initialized.       */
+/* context -                                                                  */
+/*    The HOTP context to finalize.  The context must have been initialized   */
+/*    with 'cliauth_crypto_otp_hotp_initialize()'.  Key bytes may no longer   */
+/*    be digested by 'cliauth_crypto_otp_hotp_key_digest()' after execution.  */
+/*    To generate another code, the context must be re-initialized.           */
 /*----------------------------------------------------------------------------*/
-/* Return value - The final generated HMAC-based one-time-password.           */
+/* Return value -                                                             */
+/*    The final generated HMAC-based one-time-password.                       */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt32
 cliauth_crypto_otp_hotp_finalize(
@@ -97,19 +103,21 @@ cliauth_crypto_otp_hotp_finalize(
 /*----------------------------------------------------------------------------*/
 /* Calculates the HOTP 'counter' value in accordance with the TOTP algorithm. */
 /*----------------------------------------------------------------------------*/
-/* time_initial - The timestamp to start counting from, in seconds relative   */
-/*                to the Unix epoch.                                          */
+/* time_initial -                                                             */
+/*    The timestamp to start counting from, in seconds relative to the Unix   */
+/*    epoch.                                                                  */
 /*                                                                            */
-/* time_current - The timestamp that represents the current time, in seconds  */
-/*                relative to the Unix epoch.  This must be greater than or   */
-/*                equal to 'time_initial'.                                    */
+/* time_current -                                                             */
+/*    The timestamp that represents the current time, in seconds relative to  */
+/*    the Unix epoch.  This must be greater than or equal to 'time_initial'.  */
 /*                                                                            */
-/* time_interval - The interval at which to generate a new password, in       */
-/*                 seconds.  This must be greater than zero.                  */
+/* time_interval -                                                            */
+/*    The interval at which to generate a new password, in seconds.  This     */
+/*    must be greater than zero.                                              */
 /*----------------------------------------------------------------------------*/
-/* Return value - The HOTP 'counter' value generated by the TOTP algorithm    */
-/*                which can be used by the HOTP algorithm to generate a TOTP  */
-/*                passcode.                                                   */
+/* Return value -                                                             */
+/*    The HOTP 'counter' value generated by the TOTP algorithm which can be   */
+/*    used by the HOTP algorithm to generate a TOTP passcode.                 */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt64
 cliauth_crypto_otp_totp_calculate_counter(

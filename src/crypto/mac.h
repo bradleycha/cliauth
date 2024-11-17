@@ -41,9 +41,11 @@ struct CliAuthCryptoMacHmacContext {
 /*----------------------------------------------------------------------------*/
 /* Initializes the HMAC context.                                              */
 /*----------------------------------------------------------------------------*/
-/* context - The HMAC context to initialize.                                  */
+/* context -                                                                  */
+/*    The HMAC context to initialize.                                         */
 /*                                                                            */
-/* hash_function - The hash function to compute the HMAC digest with.         */
+/* hash_function -                                                            */
+/*    The hash function to compute the HMAC digest with.                      */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_crypto_mac_hmac_initialize(
@@ -54,20 +56,22 @@ cliauth_crypto_mac_hmac_initialize(
 /*----------------------------------------------------------------------------*/
 /* Digests bytes as the secret key value for the HMAC algorithm.              */
 /*----------------------------------------------------------------------------*/
-/* context - The HMAC context to digest into.  The given context must         */
-/*           first be initialized with 'cliauth_crypto_mac_hmac_initialize()' */
-/*           and must not have been finalized by                              */
-/*           'cliauth_crypto_mac_hmac_key_finalize()'.                        */
+/* context -                                                                  */
+/*    The HMAC context to digest into.  The given context must first be       */
+/*    initialized with 'cliauth_crypto_mac_hmac_initialize()' and must not    */
+/*    have been finalized by 'cliauth_crypto_mac_hmac_key_finalize()'.        */
 /*                                                                            */
-/* key_reader - The stream reader to source the key bytes from.               */
+/* key_reader -                                                               */
+/*    The stream reader to source the key bytes from.                         */
 /*                                                                            */
-/* key_bytes - The number of bytes to read from 'key_reader'.                 */
+/* key_bytes -                                                                */
+/*    The number of bytes to read from 'key_reader'.                          */
 /*----------------------------------------------------------------------------*/
-/* Return value - The result of reading the key from 'key_reader'.  If the    */
-/*                returned read result status is not                          */
-/*                'CLIAUTH_IO_STATUS_SUCCESS', the number of digested bytes   */
-/*                can be obtained from the 'bytes' field in the returned read */
-/*                result.                                                     */
+/* Return value -                                                             */
+/*    The result of reading the key from 'key_reader'.  If the returned read  */
+/*    result status is not 'CLIAUTH_IO_STATUS_SUCCESS', the number of         */
+/*    digested bytes can be obtained from the 'bytes' field in the returned   */
+/*    read result.                                                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_crypto_mac_hmac_key_digest(
@@ -79,10 +83,11 @@ cliauth_crypto_mac_hmac_key_digest(
 /*----------------------------------------------------------------------------*/
 /* Finalizes the HMAC secret key value.                                       */
 /*----------------------------------------------------------------------------*/
-/* context - The HMAC context whose key to finalize.  The context must have   */
-/*           been initialized with 'cliauth_crypto_mac_hmac_initialize()'.    */
-/*           Key bytes may no longer be digested by                           */
-/*           'cliauth_crypto_mac_hmac_key_digest()' after execution.          */
+/* context -                                                                  */
+/*    The HMAC context whose key to finalize.  The context must have been     */
+/*    initialized with 'cliauth_crypto_mac_hmac_initialize()'.  Key bytes may */
+/*    no longer be digested by 'cliauth_crypto_mac_hmac_key_digest()' after   */
+/*    execution.                                                              */
 /*----------------------------------------------------------------------------*/
 void
 cliauth_crypto_mac_hmac_key_finalize(
@@ -92,20 +97,23 @@ cliauth_crypto_mac_hmac_key_finalize(
 /*----------------------------------------------------------------------------*/
 /* Digests bytes as the message for the HMAC algorithm.                       */
 /*----------------------------------------------------------------------------*/
-/* context - The HMAC context to digest into.  The given context must first   */
-/*           have had its secret key digested and finalized with              */
-/*           'cliauth_crypto_mac_hmac_key_finalize()' and must not have been  */
-/*           finalized with 'cliauth_crypto_mac_hmac_finalize()'.             */
+/* context -                                                                  */
+/*    The HMAC context to digest into.  The given context must first have had */
+/*    its secret key digested and finalized with                              */
+/*    'cliauth_crypto_mac_hmac_key_finalize()' and must not have been         */
+/*    finalized with 'cliauth_crypto_mac_hmac_finalize()'.                    */
 /*                                                                            */
-/* message_reader - The stream reader to source the message bytes from.       */
+/* message_reader -                                                           */
+/*    The stream reader to source the message bytes from.                     */
 /*                                                                            */
-/* message_bytes - The number of bytes to read from 'message_reader'.         */
+/* message_bytes -                                                            */
+/*    The number of bytes to read from 'message_reader'.                      */
 /*----------------------------------------------------------------------------*/
-/* Return value - The result of reading the key from 'message_reader'.  If    */
-/*                the returned read result status is not                      */
-/*                'CLIAUTH_IO_STATUS_SUCCESS', the number of digested bytes   */
-/*                can be obtained from the 'bytes' field in the returned read */
-/*                result.                                                     */
+/* Return value -                                                             */
+/*    The result of reading the key from 'message_reader'.  If the returned   */
+/*    read result status is not 'CLIAUTH_IO_STATUS_SUCCESS', the number of    */
+/*    digested bytes can be obtained from the 'bytes' field in the returned   */
+/*    read result.                                                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_crypto_mac_hmac_message_digest(
@@ -117,14 +125,16 @@ cliauth_crypto_mac_hmac_message_digest(
 /*----------------------------------------------------------------------------*/
 /* Calculate the final HMAC digest value.                                     */
 /*----------------------------------------------------------------------------*/
-/* context - The context to finalize.  The given context must first have had  */
-/*           its secret key value finalized with                              */
-/*           'cliauth_crypto_mac_hmac_key_finalize()'.  To use the HMAC       */
-/*           context again, it must be re-initialized with                    */
-/*           'cliauth_crypto_mac_hmac_initialize()'.                          */
+/* context -                                                                  */
+/*    The context to finalize.  The given context must first have had its     */
+/*    secret key value finalized with                                         */
+/*    'cliauth_crypto_mac_hmac_key_finalize()'.  To use the HMAC context      */
+/*    again, it must be re-initialized with                                   */
+/*    'cliauth_crypto_mac_hmac_initialize()'.                                 */
 /*----------------------------------------------------------------------------*/
-/* Return value - A pointer to the final digest value.  The pointer will be   */
-/*                valid until the context is re-initialized.                  */
+/* Return value -                                                             */
+/*    A pointer to the final digest value.  The pointer will be valid until   */
+/*    the context is re-initialized.                                          */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt8 *
 cliauth_crypto_mac_hmac_finalize(

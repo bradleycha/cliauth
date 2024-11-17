@@ -16,16 +16,16 @@
 /*----------------------------------------------------------------------------*/
 /* The account's authenticator algorithm type.                                */
 /*----------------------------------------------------------------------------*/
-/* CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP - Use the HOTP authentication */
-/*                                                algorithm.                  */
+/* CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP -                             */
+/*    Use the HOTP authentication algorithm.                                  */
 /*                                                                            */
-/* CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP - Use the TOTP authentication */
-/*                                                algorithm.                  */
+/* CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP -                             */
+/*    Use the TOTP authentication algorithm.                                  */
 /*                                                                            */
 /* Each enum field is given an explicit value to ensure a well-defined        */
 /* in-memory representation.                                                  */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_DTABASE_ACCOUNT_ALGORITHM_TYPE_FIELD_COUNT 2u
+#define CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_FIELD_COUNT 2u
 enum CliAuthDatabaseAccountAlgorithmType {
    CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP = 0,
    CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP = 1
@@ -34,7 +34,8 @@ enum CliAuthDatabaseAccountAlgorithmType {
 /*----------------------------------------------------------------------------*/
 /* Account algorithm parameters for the HOTP authentication algorithm.        */
 /*----------------------------------------------------------------------------*/
-/* counter - The current HOTP counter value.                                  */
+/* counter -                                                                  */
+/*    The current HOTP counter value.                                         */
 /*----------------------------------------------------------------------------*/
 struct CliAuthDatabaseAccountAlgorithmHotp {
    CliAuthUInt64 counter;
@@ -43,8 +44,9 @@ struct CliAuthDatabaseAccountAlgorithmHotp {
 /*----------------------------------------------------------------------------*/
 /* Account algorithm parameters for the TOTP authentication algorithm.        */
 /*----------------------------------------------------------------------------*/
-/* period - The duration, in seconds, to generate a new passcode.  This       */
-/*          should always be greater than zero.                               */
+/* period -                                                                   */
+/*    The duration, in seconds, to generate a new passcode.  This should      */
+/*    always be greater than zero.                                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthDatabaseAccountAlgorithmTotp {
    CliAuthUInt64 period;
@@ -53,9 +55,11 @@ struct CliAuthDatabaseAccountAlgorithmTotp {
 /*----------------------------------------------------------------------------*/
 /* Generic account algorithm parameters.                                      */
 /*----------------------------------------------------------------------------*/
-/* hotp - HOTP-specific parameters.                                           */
+/* hotp -                                                                     */
+/*    HOTP-specific parameters.                                               */
 /*                                                                            */
-/* totp - TOTP-specific parameters.                                           */
+/* totp -                                                                     */
+/*    TOTP-specific parameters.                                               */
 /*----------------------------------------------------------------------------*/
 union CliAuthDatabaseAccountAlgorithmParameters {
    struct CliAuthDatabaseAccountAlgorithmHotp hotp;
@@ -65,13 +69,14 @@ union CliAuthDatabaseAccountAlgorithmParameters {
 /*----------------------------------------------------------------------------*/
 /* An account algorithm type and its relevant parameters.                     */
 /*----------------------------------------------------------------------------*/
-/* type - Which algorithm type is stored in 'parameters'.                     */
+/* type -                                                                     */
+/*    Which algorithm type is stored in 'parameters'.                         */
 /*                                                                            */
-/* parameters - The algorithm-specific parameters. The 'hotp' field is only   */
-/*              valid when 'type' is                                          */
-/*              CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP.                 */
-/*              The 'totp' field is only valid when 'type' is                 */
-/*              CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP.                 */
+/* parameters -                                                               */
+/*    The algorithm-specific parameters. The 'hotp' field is only valid when  */
+/*    'type' is CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP.  The 'totp'     */
+/*    field is only valid when 'type' is                                      */
+/*    CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP.                           */
 /*----------------------------------------------------------------------------*/
 struct CliAuthDatabaseAccountAlgorithm {
    enum CliAuthDatabaseAccountAlgorithmType type;
@@ -114,29 +119,37 @@ struct CliAuthDatabaseAccountAlgorithm {
 /*----------------------------------------------------------------------------*/
 /* The in-memory representation of a single authenticator account.            */
 /*----------------------------------------------------------------------------*/
-/* algorithm - The type of authenticator algorithm to use and its relevant    */
-/*             algorithm-specific parameters.                                 */
+/* algorithm -                                                                */
+/*    The type of authenticator algorithm to use and its relevant             */
+/*    algorithm-specific parameters.                                          */
 /*                                                                            */
-/* hash_function - The hash function to use with the authenticator algorithm. */
+/* hash_function -                                                            */
+/*    The hash function to use with the authenticator algorithm.              */
 /*                                                                            */
-/* secrets - An array of byte data which serves as the 'key' for the          */
-/*           HOTP/TOTP algorithms.                                            */
+/* secrets -                                                                  */
+/*    An array of byte data which serves as the 'key' for the HOTP/TOTP       */
+/*    algorithms.                                                             */
 /*                                                                            */
-/* issuer - A string which represents the organization which created the      */
-/*          account.  This string is not null-terminated.                     */
+/* issuer -                                                                   */
+/*    A string which represents the organization which created the account.   */
+/*    This string is not null-terminated.                                     */
 /*                                                                            */
-/* name - A string which represents the name of the account.  This string is  */
-/*        not null-terminated.                                                */
+/* name -                                                                     */
+/*    A string which represents the name of the account.  This string is not  */
+/*    not null-terminated.                                                    */
 /*                                                                            */
-/* secrets_bytes - The length of 'secrets' in bytes.                          */
+/* secrets_bytes -                                                            */
+/*    The length of 'secrets' in bytes.                                       */
 /*                                                                            */
-/* issuer_characters - The length of 'issuer' in characters.                  */
+/* issuer_characters -                                                        */
+/*    The length of 'issuer' in characters.                                   */
 /*                                                                            */
-/* name_characters - The length of 'name' in characters.                      */
+/* name_characters -                                                          */
+/*    The length of 'name' in characters.                                     */
 /*                                                                            */
-/* digits - The number of digits the passcode should contain.  This should    */
-/*          always be greater than or equal to '1' and less than or equal to  */
-/*          '9'.                                                              */
+/* digits -                                                                   */
+/*    The number of digits the passcode should contain.  This should always   */
+/*    be greater than or equal to '1' and less than or equal to '9'.          */
 /*----------------------------------------------------------------------------*/
 struct CliAuthDatabaseAccount {
    struct CliAuthDatabaseAccountAlgorithm algorithm;
@@ -154,11 +167,11 @@ struct CliAuthDatabaseAccount {
 /* TOTP-specific algorithm parameters used by                                 */
 /* cliauth_database_account_generate_passcode().                              */
 /*----------------------------------------------------------------------------*/
-/* time_initial - The initial timestamp, in seconds, and relative to the unix */
-/*                timestamp.                                                  */
+/* time_initial -                                                             */
+/* The initial timestamp, in seconds, and relative to the unix timestamp.     */
 /*                                                                            */
-/* time_current - The current timestamp, in seconds, and relative to the unix */
-/*                timestamp.                                                  */
+/* time_current -                                                             */
+/*    The current timestamp, in seconds, and relative to the unix timestamp.  */
 /*----------------------------------------------------------------------------*/
 struct CliAuthDatabaseAccountGeneratePasscodeTotpParameters {
    CliAuthUInt64 time_initial;
@@ -168,9 +181,8 @@ struct CliAuthDatabaseAccountGeneratePasscodeTotpParameters {
 /*----------------------------------------------------------------------------*/
 /* Return status enum for cliauth_account_generate_passcode().                */
 /*----------------------------------------------------------------------------*/
-/* CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_SUCCESS - The passcode   */
-/*                                                             was generated  */
-/*                                                             successfully.  */
+/* CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_SUCCESS -                */
+/*    The passcode was generated successfully.                                */
 /*                                                                            */
 /* CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_DOES_NOT_EXIST -         */
 /*    The passcode at the given index offset does not exist.                  */
@@ -183,32 +195,37 @@ enum CliAuthDatabaseAccountGeneratePasscodeResult {
 /*----------------------------------------------------------------------------*/
 /* Generates a one-time passcode from the account.                            */
 /*----------------------------------------------------------------------------*/
-/* account - The account to generate the passcode from.  Account data is not  */
-/*           updated, such as the HOTP counter value.  This must be updated   */
-/*           seperately.                                                      */
+/* account -                                                                  */
+/*    The account to generate the passcode from.  Account data is not         */
+/*    updated, such as the HOTP counter value.  This must be updated          */
+/*    seperately.                                                             */
 /*                                                                            */
-/* output - A pointer to a 32-bit integer where the generated passcode will   */
-/*            be written to.  The generated passcode will only be valid if    */
-/*            the function returns                                            */
-/*            'CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_SUCCESS'.    */
+/* output -                                                                   */
+/*    A pointer to a 32-bit integer where the generated passcode will be      */
+/*    written to.  The generated passcode will only be valid if the function  */
+/*    function returns                                                        */
+/*    'CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_SUCCESS'.            */
 /*                                                                            */
-/* hotp_context - The HOTP context struct used internally to execute the HOTP */
-/*                algorithm.  This should not be previously initialized or    */
-/*                considered in any deterministic state after execution.      */
+/* hotp_context -                                                             */
+/*    The HOTP context struct used internally to execute the HOTP algorithm.  */
+/*    This should not be previously initialized or considered in any          */
+/*    deterministic state after execution.                                    */
 /*                                                                            */
-/* totp_parameters - TOTP-specific algorithm parameters.  If the account type */
-/*                   is 'CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP',       */
-/*                   this argument   is ignored.  If the account type is      */
-/*                   'CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP',          */
-/*                   this argument must be set.                               */
+/* totp_parameters -                                                          */
+/*    TOTP-specific algorithm parameters.  If the account type is             */
+/*    'CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP', this argument is        */
+/*    ignored.  If the account type is                                        */
+/*    'CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP', this argument must be   */
+/*    set.                                                                    */
 /*                                                                            */
-/* index - The passcode index to generate relative to the current parameters. */
-/*         A value of '0' will generate the current passcode.  A value of '1' */
-/*         will generate the next passcode.  A value of '-1' will generate    */
-/*         the previous passcode.                                             */
+/* index -                                                                    */
+/*    The passcode index to generate relative to the current parameters.  A   */
+/*    value of '0' will generate the current passcode.  A value of '1' will   */
+/*    generate the next passcode.  A value of '-1' will generate the previous */
+/*    passcode.                                                               */
 /*----------------------------------------------------------------------------*/
-/* Return value - An enum representing the state of the generated passcode    */
-/*                in 'output'.                                                */
+/* Return value -                                                             */
+/*    An enum representing the state of the generated passcode in 'output'.   */
 /*----------------------------------------------------------------------------*/
 enum CliAuthDatabaseAccountGeneratePasscodeResult
 cliauth_database_account_generate_passcode(
