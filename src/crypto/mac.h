@@ -2,33 +2,33 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/mac.h - Message authentication code (MAC) algorithms header.           */
+/* src/crypto/mac.h - Message authentication code (MAC) algorithms header.    */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _CLIAUTH_MAC_H
-#define _CLIAUTH_MAC_H
+#ifndef _CLIAUTH_CRYPTO_MAC_H
+#define _CLIAUTH_CRYPTO_MAC_H
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "hash.h"
-#include "io.h"
+#include "crypto/hash/hash.h"
+#include "io/io.h"
 
 /*----------------------------------------------------------------------------*/
 /* Stores internal variables used when calculating a keyed-hash message       */
 /* authentication code (HMAC) digest.                                         */
 /*----------------------------------------------------------------------------*/
-struct CliAuthMacHmacContext {
+struct CliAuthCryptoMacHmacContext {
    /* the hash context to use with the hash function */
-   struct CliAuthHashContext hash_context;
+   struct CliAuthCryptoHashContext hash_context;
 
    /* the hash function to use */
-   const struct CliAuthHashFunction * hash_function;
+   const struct CliAuthCryptoHashFunction * hash_function;
 
    /* the buffer to compute and store k0 in */
-   CliAuthUInt8 k0_buffer [CLIAUTH_HASH_MAXIMUM_INPUT_BLOCK_LENGTH];
+   CliAuthUInt8 k0_buffer [CLIAUTH_CRYPTO_HASH_MAXIMUM_INPUT_BLOCK_LENGTH];
 
    /* the buffer to compute intermediate digest values */
-   CliAuthUInt8 digest_buffer [CLIAUTH_HASH_MAXIMUM_DIGEST_LENGTH];
+   CliAuthUInt8 digest_buffer [CLIAUTH_CRYPTO_HASH_MAXIMUM_DIGEST_LENGTH];
 
    /* the number of remaining bytes in the k0 buffer */
    CliAuthUInt8 k0_capacity;
@@ -46,18 +46,18 @@ struct CliAuthMacHmacContext {
 /* hash_function - The hash function to compute the HMAC digest with.         */
 /*----------------------------------------------------------------------------*/
 void
-cliauth_mac_hmac_initialize(
-   struct CliAuthMacHmacContext * context,
-   const struct CliAuthHashFunction * hash_function
+cliauth_crypto_mac_hmac_initialize(
+   struct CliAuthCryptoMacHmacContext * context,
+   const struct CliAuthCryptoHashFunction * hash_function
 );
 
 /*----------------------------------------------------------------------------*/
 /* Digests bytes as the secret key value for the HMAC algorithm.              */
 /*----------------------------------------------------------------------------*/
 /* context - The HMAC context to digest into.  The given context must         */
-/*           first be initialized with 'cliauth_mac_hmac_initialize()' and    */
-/*           must not have been finalized by                                  */
-/*           'cliauth_mac_hmac_key_finalize()'.                               */
+/*           first be initialized with 'cliauth_crypto_mac_hmac_initialize()' */
+/*           and must not have been finalized by                              */
+/*           'cliauth_crypto_mac_hmac_key_finalize()'.                        */
 /*                                                                            */
 /* key_reader - The stream reader to source the key bytes from.               */
 /*                                                                            */
@@ -70,8 +70,8 @@ cliauth_mac_hmac_initialize(
 /*                result.                                                     */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
-cliauth_mac_hmac_key_digest(
-   struct CliAuthMacHmacContext * context,
+cliauth_crypto_mac_hmac_key_digest(
+   struct CliAuthCryptoMacHmacContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 );
@@ -80,13 +80,13 @@ cliauth_mac_hmac_key_digest(
 /* Finalizes the HMAC secret key value.                                       */
 /*----------------------------------------------------------------------------*/
 /* context - The HMAC context whose key to finalize.  The context must have   */
-/*           been initialized with 'cliauth_mac_hmac_initialize()'.  Key      */
-/*           bytes may no longer be digested by                               */
-/*           'cliauth_mac_hmac_key_digest()' after execution.                 */
+/*           been initialized with 'cliauth_crypto_mac_hmac_initialize()'.    */
+/*           Key bytes may no longer be digested by                           */
+/*           'cliauth_crypto_mac_hmac_key_digest()' after execution.          */
 /*----------------------------------------------------------------------------*/
 void
-cliauth_mac_hmac_key_finalize(
-   struct CliAuthMacHmacContext * context
+cliauth_crypto_mac_hmac_key_finalize(
+   struct CliAuthCryptoMacHmacContext * context
 );
 
 /*----------------------------------------------------------------------------*/
@@ -94,8 +94,8 @@ cliauth_mac_hmac_key_finalize(
 /*----------------------------------------------------------------------------*/
 /* context - The HMAC context to digest into.  The given context must first   */
 /*           have had its secret key digested and finalized with              */
-/*           'cliauth_mac_hmac_key_finalize()' and must not have been         */
-/*           finalized with 'cliauth_mac_hmac_finalize()'.                    */
+/*           'cliauth_crypto_mac_hmac_key_finalize()' and must not have been  */
+/*           finalized with 'cliauth_crypto_mac_hmac_finalize()'.             */
 /*                                                                            */
 /* message_reader - The stream reader to source the message bytes from.       */
 /*                                                                            */
@@ -108,8 +108,8 @@ cliauth_mac_hmac_key_finalize(
 /*                result.                                                     */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
-cliauth_mac_hmac_message_digest(
-   struct CliAuthMacHmacContext * context,
+cliauth_crypto_mac_hmac_message_digest(
+   struct CliAuthCryptoMacHmacContext * context,
    const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
 );
@@ -119,18 +119,18 @@ cliauth_mac_hmac_message_digest(
 /*----------------------------------------------------------------------------*/
 /* context - The context to finalize.  The given context must first have had  */
 /*           its secret key value finalized with                              */
-/*           'cliauth_mac_hmac_key_finalize()'.  To use the HMAC context      */
-/*           again, it must be re-initialized with                            */
-/*           'cliauth_mac_hmac_initialize()'.                                 */
+/*           'cliauth_crypto_mac_hmac_key_finalize()'.  To use the HMAC       */
+/*           context again, it must be re-initialized with                    */
+/*           'cliauth_crypto_mac_hmac_initialize()'.                          */
 /*----------------------------------------------------------------------------*/
 /* Return value - A pointer to the final digest value.  The pointer will be   */
 /*                valid until the context is re-initialized.                  */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt8 *
-cliauth_mac_hmac_finalize(
-   struct CliAuthMacHmacContext * context
+cliauth_crypto_mac_hmac_finalize(
+   struct CliAuthCryptoMacHmacContext * context
 );
 
 /*----------------------------------------------------------------------------*/
-#endif /* _CLIAUTH_MAC_H */
+#endif /* _CLIAUTH_CRYPTO_MAC_H */
 

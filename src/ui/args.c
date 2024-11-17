@@ -2,17 +2,18 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/args.c - Command-line arguments parsing implementation.                */
+/* src/args/args.c - Command-line arguments parsing implementation.           */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "args.h"
+#include "ui/args.h"
 
 #include <time.h>
-#include "memory.h"
-#include "hash.h"
-#include "account.h"
-#include "log.h"
+
+#include "memory/memory.h"
+#include "crypto/hash/hash.h"
+#include "database/account.h"
+#include "io/log.h"
 
 #define TEST_SECRETS "\xde\xad\xbe\xef"
 #define TEST_ISSUER  "Account Authority Inc."
@@ -25,16 +26,16 @@
 #define TEST_NAME_BYTES\
    (((sizeof(TEST_NAME) / sizeof(char)) - 1u) * sizeof(char))
 
-static const struct CliAuthHashFunction *
+static const struct CliAuthCryptoHashFunction *
 cliauth_args_parse_hash_function(
    const char identifier [],
    CliAuthUInt32 identifier_characters
 ) {
-   const struct CliAuthHashFunction * hash_iterator;
+   const struct CliAuthCryptoHashFunction * hash_iterator;
    CliAuthUInt8 i;
 
-   hash_iterator = cliauth_hash;
-   i = CLIAUTH_HASH_ENABLED_COUNT;
+   hash_iterator = cliauth_crypto_hash;
+   i = CLIAUTH_CRYPTO_HASH_ENABLED_COUNT;
    while (i != 0) {
       if (cliauth_memory_compare(
          hash_iterator->identifier,
@@ -52,9 +53,9 @@ cliauth_args_parse_hash_function(
    return CLIAUTH_NULLPTR;
 }
 
-enum CliAuthArgsParseResult
-cliauth_args_parse(
-   struct CliAuthArgsPayload * payload,
+enum CliAuthUiArgsParseResult
+cliauth_ui_args_parse(
+   struct CliAuthUiArgsPayload * payload,
    const char * const args [],
    CliAuthUInt16 args_count
 ) {
@@ -62,14 +63,14 @@ cliauth_args_parse(
    CliAuthUInt32 key_uri_characters;
    char key_uri_terminator;
    struct CliAuthMemoryFindResult key_uri_terminator_find_result;
-   const struct CliAuthHashFunction * hash_function;
+   const struct CliAuthCryptoHashFunction * hash_function;
 
    if (args_count < CLIAUTH_LITERAL_UINT16(2u)) {
-      cliauth_log(CLIAUTH_LOG_ERROR("no key URI was given as an argument"));
-      return CLIAUTH_ARGS_PARSE_RESULT_MISSING;
+      cliauth_io_log(CLIAUTH_IO_LOG_ERROR("no key URI was given as an argument"));
+      return CLIAUTH_UI_ARGS_PARSE_RESULT_MISSING;
    }
    if (args_count > CLIAUTH_LITERAL_UINT16(2u)) {
-      cliauth_log(CLIAUTH_LOG_WARNING("more than 1 argument was given, any excess arguments will be ignored"));
+      cliauth_io_log(CLIAUTH_IO_LOG_WARNING("more than 1 argument was given, any excess arguments will be ignored"));
    }
 
    key_uri = args[1u];
@@ -84,20 +85,20 @@ cliauth_args_parse(
 
    /* TODO: re-implement key URI parsing, right now we're treating the key */
    /* URI as a hash function identifier and nothing else */
-   cliauth_log(CLIAUTH_LOG_WARNING("key URI parsing is temporarily regressed, arguments parsing will use hard-coded values, except for the hash algorithm"));
+   cliauth_io_log(CLIAUTH_IO_LOG_WARNING("key URI parsing is temporarily regressed, arguments parsing will use hard-coded values, except for the hash algorithm"));
 
-   payload->account.algorithm.type = CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP;
+   payload->account.algorithm.type = CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP;
    payload->account.algorithm.parameters.totp.period = CLIAUTH_LITERAL_UINT64(0u, 30u);
 
    hash_function = cliauth_args_parse_hash_function(key_uri, key_uri_characters);
    if (hash_function == CLIAUTH_NULLPTR) {
-      cliauth_log(
-         CLIAUTH_LOG_ERROR("unknown hash algorithm \'%.*s\'"),
+      cliauth_io_log(
+         CLIAUTH_IO_LOG_ERROR("unknown hash algorithm \'%.*s\'"),
          key_uri_characters,
          key_uri
       );
 
-      return CLIAUTH_ARGS_PARSE_RESULT_INVALID;
+      return CLIAUTH_UI_ARGS_PARSE_RESULT_INVALID;
    }
 
    payload->account.hash_function = hash_function;
@@ -130,6 +131,6 @@ cliauth_args_parse(
 
    payload->index = CLIAUTH_LITERAL_SINT64(0u, 0u, 0u, 0u);
 
-   return CLIAUTH_ARGS_PARSE_RESULT_SUCCESS;
+   return CLIAUTH_UI_ARGS_PARSE_RESULT_SUCCESS;
 }
 

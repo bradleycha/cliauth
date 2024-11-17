@@ -9,7 +9,7 @@ Makefile
 Makefile.in
 cliauth
 *.o
-*/.deps
-*/.dirstamp
+**/.deps
+**/.dirstamp
 .Tpo
 

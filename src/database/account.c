@@ -6,13 +6,13 @@
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "account.h"
+#include "database/account.h"
 
-#include "otp.h"
-#include "io.h"
+#include "crypto/otp.h"
+#include "io/io.h"
 
 static CliAuthBoolean
-cliauth_account_generate_passcode_index_exists(
+cliauth_database_account_generate_passcode_index_exists(
    CliAuthUInt64 counter_initial,
    CliAuthSInt64 index
 ) {
@@ -34,12 +34,12 @@ cliauth_account_generate_passcode_index_exists(
    return CLIAUTH_BOOLEAN_TRUE;
 }
 
-enum CliAuthAccountGeneratePasscodeResult
-cliauth_account_generate_passcode(
-   const struct CliAuthAccount * account,
+enum CliAuthDatabaseAccountGeneratePasscodeResult
+cliauth_database_account_generate_passcode(
+   const struct CliAuthDatabaseAccount * account,
    CliAuthUInt32 * output,
-   struct CliAuthOtpHotpContext * hotp_context,
-   const struct CliAuthAccountGeneratePasscodeTotpParameters * totp_parameters,
+   struct CliAuthCryptoOtpHotpContext * hotp_context,
+   const struct CliAuthDatabaseAccountGeneratePasscodeTotpParameters * totp_parameters,
    CliAuthSInt64 index
 ) {
    struct CliAuthIoByteArrayMapperReader secrets_byte_array_mapper_reader;
@@ -50,12 +50,12 @@ cliauth_account_generate_passcode(
 
    /* get the current HOTP counter value */
    switch (account->algorithm.type) {
-      case CLIAUTH_ACCOUNT_ALGORITHM_TYPE_HOTP:
+      case CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP:
          counter = account->algorithm.parameters.hotp.counter;
          break;
 
-      case CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP:
-         counter = cliauth_otp_totp_calculate_counter(
+      case CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP:
+         counter = cliauth_crypto_otp_totp_calculate_counter(
             totp_parameters->time_initial,
             totp_parameters->time_current,
             account->algorithm.parameters.totp.period
@@ -67,18 +67,18 @@ cliauth_account_generate_passcode(
    }
 
    /* check to make sure the given passcode index offset exists */
-   if (cliauth_account_generate_passcode_index_exists(
+   if (cliauth_database_account_generate_passcode_index_exists(
       counter,
       index
    ) == CLIAUTH_BOOLEAN_FALSE) {
-      return CLIAUTH_GENERATE_PASSCODE_RESULT_DOES_NOT_EXIST;
+      return CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_DOES_NOT_EXIST;
    }
 
    /* apply the index offset */
    counter += index;
 
    /* run the HOTP algorithm to generate the passcode */
-   cliauth_otp_hotp_initialize(
+   cliauth_crypto_otp_hotp_initialize(
       hotp_context,
       account->hash_function,
       counter,
@@ -103,14 +103,14 @@ cliauth_account_generate_passcode(
       CLIAUTH_LITERAL_UINT32(0u)
    );
 
-   (void)cliauth_otp_hotp_key_digest(
+   (void)cliauth_crypto_otp_hotp_key_digest(
       hotp_context,
       &secrets_stream_reader,
       account->secrets_bytes
    );
 
-   *output = cliauth_otp_hotp_finalize(hotp_context);
+   *output = cliauth_crypto_otp_hotp_finalize(hotp_context);
 
-   return CLIAUTH_GENERATE_PASSCODE_RESULT_SUCCESS;
+   return CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_SUCCESS;
 }
 

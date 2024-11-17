@@ -6,10 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "args.h"
-#include "otp.h"
-#include "account.h"
-#include "log.h"
+#include "ui/args.h"
+#include "crypto/otp.h"
+#include "database/account.h"
+#include "io/log.h"
 #include <inttypes.h>
 
 #define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION
@@ -29,70 +29,70 @@ enum CliAuthExitStatus {
 
 static enum CliAuthExitStatus
 cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
-   struct CliAuthArgsPayload args;
-   enum CliAuthAccountGeneratePasscodeResult passcode_result;
-   struct CliAuthOtpHotpContext passcode_hotp_context;
+   struct CliAuthUiArgsPayload args;
+   enum CliAuthDatabaseAccountGeneratePasscodeResult passcode_result;
+   struct CliAuthCryptoOtpHotpContext passcode_hotp_context;
    CliAuthUInt32 passcode;
 
-   cliauth_log(CLIAUTH_LOG_INFO(CLIAUTH_ABOUT));
+   cliauth_io_log(CLIAUTH_IO_LOG_INFO(CLIAUTH_ABOUT));
 
-   switch (cliauth_args_parse(&args, argv, argc)) {
-      case CLIAUTH_ARGS_PARSE_RESULT_SUCCESS:
+   switch (cliauth_ui_args_parse(&args, argv, argc)) {
+      case CLIAUTH_UI_ARGS_PARSE_RESULT_SUCCESS:
          break;
 
       default:
-         cliauth_log(CLIAUTH_LOG_ERROR("failed to parse command-line arguments, exiting"));
+         cliauth_io_log(CLIAUTH_IO_LOG_ERROR("failed to parse command-line arguments, exiting"));
          return CLIAUTH_EXIT_STATUS_ARGS_PARSE_ERROR;
    }
 
-   cliauth_log(
-      CLIAUTH_LOG_INFO("account issuer: %.*s"),
+   cliauth_io_log(
+      CLIAUTH_IO_LOG_INFO("account issuer: %.*s"),
       args.account.issuer_characters,
       args.account.issuer
    );
-   cliauth_log(
-      CLIAUTH_LOG_INFO("account name: %.*s"),
+   cliauth_io_log(
+      CLIAUTH_IO_LOG_INFO("account name: %.*s"),
       args.account.name_characters,
       args.account.name
    );
-   cliauth_log(
-      CLIAUTH_LOG_INFO("hash algorithm: %.*s"),
+   cliauth_io_log(
+      CLIAUTH_IO_LOG_INFO("hash algorithm: %.*s"),
       args.account.hash_function->identifier_characters,
       args.account.hash_function->identifier
    );
 
    switch (args.account.algorithm.type) {
-      case CLIAUTH_ACCOUNT_ALGORITHM_TYPE_HOTP:
-         cliauth_log(
-            CLIAUTH_LOG_INFO("counter value: %" PRIu64),
+      case CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP:
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("counter value: %" PRIu64),
             args.account.algorithm.parameters.hotp.counter
          );
          break;
 
-      case CLIAUTH_ACCOUNT_ALGORITHM_TYPE_TOTP:
-         cliauth_log(
-            CLIAUTH_LOG_INFO("initial timestamp: %" PRIu64 " seconds"), 
+      case CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP:
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("initial timestamp: %" PRIu64 " seconds"), 
             args.totp_parameters.time_initial
          );
-         cliauth_log(
-            CLIAUTH_LOG_INFO("current timestamp: %" PRIu64 " seconds"),
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("current timestamp: %" PRIu64 " seconds"),
             args.totp_parameters.time_current
          );
-         cliauth_log(
-            CLIAUTH_LOG_INFO("period: %" PRIu64 " seconds"),
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("period: %" PRIu64 " seconds"),
             args.account.algorithm.parameters.totp.period
          );
          break;
    }
 
-   cliauth_log(
-      CLIAUTH_LOG_INFO("passcode index: %" PRId64),
+   cliauth_io_log(
+      CLIAUTH_IO_LOG_INFO("passcode index: %" PRId64),
       args.index
    );
 
-   cliauth_log(CLIAUTH_LOG_INFO("generating a passcode using the given parameters"));
+   cliauth_io_log(CLIAUTH_IO_LOG_INFO("generating a passcode using the given parameters"));
 
-   passcode_result = cliauth_account_generate_passcode(
+   passcode_result = cliauth_database_account_generate_passcode(
       &args.account,
       &passcode,
       &passcode_hotp_context,
@@ -100,16 +100,16 @@ cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
       args.index
    );
    switch (passcode_result) {
-      case CLIAUTH_GENERATE_PASSCODE_RESULT_SUCCESS:
-         cliauth_log(
-            CLIAUTH_LOG_INFO("generated passcode: %0*" PRIu32),
+      case CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_SUCCESS:
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("generated passcode: %0*" PRIu32),
             args.account.digits,
             passcode
          );
          break;
 
-      case CLIAUTH_GENERATE_PASSCODE_RESULT_DOES_NOT_EXIST:
-         cliauth_log(CLIAUTH_LOG_ERROR("no passcode exists for this index"));
+      case CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_DOES_NOT_EXIST:
+         cliauth_io_log(CLIAUTH_IO_LOG_ERROR("no passcode exists for this index"));
          break;
    }
 

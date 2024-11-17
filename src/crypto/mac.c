@@ -2,23 +2,24 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/mac.c - Message authentication code (MAC) algorithm implementations.   */
+/* src/crypto/mac.c - Message authentication code (MAC) algorithm             */
+/*                    implementations.                                        */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "mac.h"
+#include "crypto/mac.h"
 
-#include "memory.h"
-#include "hash.h"
-#include "io.h"
+#include "memory/memory.h"
+#include "crypto/hash/hash.h"
+#include "io/io.h"
 
-#define CLIAUTH_MAC_HMAC_IPAD 0x36u
-#define CLIAUTH_MAC_HMAC_OPAD 0x5cu
+#define CLIAUTH_CRYPTO_MAC_HMAC_IPAD 0x36u
+#define CLIAUTH_CRYPTO_MAC_HMAC_OPAD 0x5cu
 
 void
-cliauth_mac_hmac_initialize(
-   struct CliAuthMacHmacContext * context,
-   const struct CliAuthHashFunction * hash_function
+cliauth_crypto_mac_hmac_initialize(
+   struct CliAuthCryptoMacHmacContext * context,
+   const struct CliAuthCryptoHashFunction * hash_function
 ) {
    context->hash_function = hash_function;
    context->k0_capacity = hash_function->input_block_length;
@@ -28,8 +29,8 @@ cliauth_mac_hmac_initialize(
 }
 
 static struct CliAuthIoResult
-cliauth_mac_hmac_key_digest_hash(
-   struct CliAuthMacHmacContext * context,
+cliauth_crypto_mac_hmac_key_digest_hash(
+   struct CliAuthCryptoMacHmacContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
@@ -45,8 +46,8 @@ cliauth_mac_hmac_key_digest_hash(
 }
 
 static struct CliAuthIoResult
-cliauth_mac_hmac_key_digest_rollover(
-   struct CliAuthMacHmacContext * context,
+cliauth_crypto_mac_hmac_key_digest_rollover(
+   struct CliAuthCryptoMacHmacContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
@@ -131,8 +132,8 @@ cliauth_mac_hmac_key_digest_rollover(
 }
 
 static struct CliAuthIoResult
-cliauth_mac_hmac_key_digest_append(
-   struct CliAuthMacHmacContext * context,
+cliauth_crypto_mac_hmac_key_digest_append(
+   struct CliAuthCryptoMacHmacContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
@@ -156,15 +157,15 @@ cliauth_mac_hmac_key_digest_append(
 }
 
 struct CliAuthIoResult
-cliauth_mac_hmac_key_digest(
-   struct CliAuthMacHmacContext * context,
+cliauth_crypto_mac_hmac_key_digest(
+   struct CliAuthCryptoMacHmacContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
    /* case 1: the key length already exceeded the maximum capacity of the  */
    /* k0 buffer */
    if (context->k0_hash_initiated == CLIAUTH_BOOLEAN_TRUE) {
-      return cliauth_mac_hmac_key_digest_hash(
+      return cliauth_crypto_mac_hmac_key_digest_hash(
          context,
          key_reader,
          key_bytes
@@ -174,7 +175,7 @@ cliauth_mac_hmac_key_digest(
    /* case 2: the key will exceed the maximum capacity of the k0 buffer */
    /* after appending the current key bytes */
    if (key_bytes > context->k0_capacity) {
-      return cliauth_mac_hmac_key_digest_rollover(
+      return cliauth_crypto_mac_hmac_key_digest_rollover(
          context,
          key_reader,
          key_bytes
@@ -183,7 +184,7 @@ cliauth_mac_hmac_key_digest(
 
    /* case 3: the key will not exceed the maximum capacity of the k0 buffer */
    /* after appending the current key bytes */
-   return cliauth_mac_hmac_key_digest_append(
+   return cliauth_crypto_mac_hmac_key_digest_append(
       context,
       key_reader,
       key_bytes
@@ -191,8 +192,8 @@ cliauth_mac_hmac_key_digest(
 }
 
 void
-cliauth_mac_hmac_key_finalize(
-   struct CliAuthMacHmacContext * context
+cliauth_crypto_mac_hmac_key_finalize(
+   struct CliAuthCryptoMacHmacContext * context
 ) {
    CliAuthUInt8 * message_source;
    CliAuthUInt8 * message_dest;
@@ -229,7 +230,7 @@ cliauth_mac_hmac_key_finalize(
    /* copy and xor the message (non-padded) portion of k0 */
    message_dest = context->k0_buffer;
    while (message_bytes != CLIAUTH_LITERAL_UINT8(0u)) {
-      *message_dest = *message_source ^ CLIAUTH_LITERAL_UINT8(CLIAUTH_MAC_HMAC_IPAD);
+      *message_dest = *message_source ^ CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_MAC_HMAC_IPAD);
 
       message_source++;
       message_dest++;
@@ -237,7 +238,7 @@ cliauth_mac_hmac_key_finalize(
    }
 
    /* pad any remainder bytes with ipad */
-   ipad_constant = CLIAUTH_LITERAL_UINT8(CLIAUTH_MAC_HMAC_IPAD);
+   ipad_constant = CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_MAC_HMAC_IPAD);
    cliauth_memory_fill(
       pad_ptr,
       &ipad_constant,
@@ -277,8 +278,8 @@ cliauth_mac_hmac_key_finalize(
 }
 
 struct CliAuthIoResult
-cliauth_mac_hmac_message_digest(
-   struct CliAuthMacHmacContext * context,
+cliauth_crypto_mac_hmac_message_digest(
+   struct CliAuthCryptoMacHmacContext * context,
    const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
@@ -290,8 +291,8 @@ cliauth_mac_hmac_message_digest(
 }
 
 CliAuthUInt8 *
-cliauth_mac_hmac_finalize(
-   struct CliAuthMacHmacContext * context
+cliauth_crypto_mac_hmac_finalize(
+   struct CliAuthCryptoMacHmacContext * context
 ) {
    CliAuthUInt8 * digest;
    CliAuthUInt8 * k0_opad_iter;
@@ -320,7 +321,7 @@ cliauth_mac_hmac_finalize(
    k0_opad_bytes = input_block_length;
    while (k0_opad_bytes != CLIAUTH_LITERAL_UINT8(0u)) {
       /* combined xors to undo ipad's xor in a single load/store */
-      *k0_opad_iter ^= CLIAUTH_LITERAL_UINT8(CLIAUTH_MAC_HMAC_OPAD ^ CLIAUTH_MAC_HMAC_IPAD);
+      *k0_opad_iter ^= CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_MAC_HMAC_OPAD ^ CLIAUTH_CRYPTO_MAC_HMAC_IPAD);
 
       k0_opad_iter++;
       k0_opad_bytes--;

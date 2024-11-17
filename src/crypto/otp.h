@@ -2,25 +2,25 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/otp.h - One-time-password (OTP) algorithms header.                     */
+/* src/crypto/otp.h - One-time-password (OTP) algorithms header.              */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _CLIAUTH_OTP_H
-#define _CLIAUTH_OTP_H
+#ifndef _CLIAUTH_CRYPTO_OTP_H
+#define _CLIAUTH_CRYPTO_OTP_H
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "hash.h"
-#include "mac.h"
-#include "io.h"
+#include "crypto/hash/hash.h"
+#include "crypto/mac.h"
+#include "io/io.h"
 
 /*----------------------------------------------------------------------------*/
 /* Stores internal variables used when calculaing an HMAC-based one time      */
 /* password (HOTP) value.                                                     */
 /*----------------------------------------------------------------------------*/
-struct CliAuthOtpHotpContext {
+struct CliAuthCryptoOtpHotpContext {
    /* hmac context */
-   struct CliAuthMacHmacContext hmac_context;
+   struct CliAuthCryptoMacHmacContext hmac_context;
 
    /* the counter value */
    CliAuthUInt64 counter;
@@ -36,8 +36,9 @@ struct CliAuthOtpHotpContext {
 /*                                                                            */
 /*                                                                            */
 /* hash_function - The 'hash_function' argument for the HMAC algorithm.  See  */
-/*                 the documentation for 'cliauth_mac_hmac_initialize()' for  */
-/*                 more information.                                          */
+/*                 the documentation for                                      */
+/*                 'cliauth_crypto_mac_hmac_initialize()' for more            */
+/*                 information.                                               */
 /*                                                                            */
 /* counter - The counter value for the HOTP algorithm.                        */
 /*                                                                            */
@@ -45,9 +46,9 @@ struct CliAuthOtpHotpContext {
 /*          output.  This must be at least 1, and may not be greater than 9.  */
 /*----------------------------------------------------------------------------*/
 void
-cliauth_otp_hotp_initialize(
-   struct CliAuthOtpHotpContext * context,
-   const struct CliAuthHashFunction * hash_function,
+cliauth_crypto_otp_hotp_initialize(
+   struct CliAuthCryptoOtpHotpContext * context,
+   const struct CliAuthCryptoHashFunction * hash_function,
    CliAuthUInt64 counter,
    CliAuthUInt8 digits
 );
@@ -56,8 +57,9 @@ cliauth_otp_hotp_initialize(
 /* Digests bytes as the secret key for the HOTP algorithm.                    */
 /*----------------------------------------------------------------------------*/
 /* context - The HOTP context to digest into.  The given context must have    */
-/*           been initialized with 'cliauth_otp_hotp_initialize()' and must   */
-/*           not have been finalized with 'cliauth_otp_hotp_finalize()'.      */
+/*           been initialized with 'cliauth_crypto_otp_hotp_initialize()' and */
+/*           must not have been finalized with                                */
+/*           'cliauth_crypto_otp_hotp_finalize()'.                            */
 /*                                                                            */
 /* key_reader - The stream reader to source the key bytes from.               */
 /*                                                                            */
@@ -70,8 +72,8 @@ cliauth_otp_hotp_initialize(
 /*                result.                                                     */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
-cliauth_otp_hotp_key_digest(
-   struct CliAuthOtpHotpContext * context,
+cliauth_crypto_otp_hotp_key_digest(
+   struct CliAuthCryptoOtpHotpContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 );
@@ -80,16 +82,16 @@ cliauth_otp_hotp_key_digest(
 /* Finalizes the HOTP value, generating a one-time-password.                  */
 /*----------------------------------------------------------------------------*/
 /* context - The HOTP context to finalize.  The context must have been        */
-/*           initialized with 'cliauth_otp_hotp_initialize()'.  Key bytes may */
-/*           no longer be digested by 'cliauth_otp_hotp_key_digest()' after   */
-/*           execution.  To generate another code, the context must be        */
-/*           re-initialized.                                                  */
+/*           initialized with 'cliauth_crypto_otp_hotp_initialize()'.  Key    */
+/*           bytes may no longer be digested by                               */
+/*           'cliauth_crypto_otp_hotp_key_digest()' after execution.  To      */
+/*           generate another code, the context must be re-initialized.       */
 /*----------------------------------------------------------------------------*/
 /* Return value - The final generated HMAC-based one-time-password.           */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt32
-cliauth_otp_hotp_finalize(
-   struct CliAuthOtpHotpContext * context
+cliauth_crypto_otp_hotp_finalize(
+   struct CliAuthCryptoOtpHotpContext * context
 );
 
 /*----------------------------------------------------------------------------*/
@@ -110,12 +112,12 @@ cliauth_otp_hotp_finalize(
 /*                passcode.                                                   */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt64
-cliauth_otp_totp_calculate_counter(
+cliauth_crypto_otp_totp_calculate_counter(
    CliAuthUInt64 time_initial,
    CliAuthUInt64 time_current,
    CliAuthUInt64 time_interval
 );
 
 /*----------------------------------------------------------------------------*/
-#endif /* _CLIAUTH_OTP_H */
+#endif /* _CLIAUTH_CRYPTO_OTP_H */
 

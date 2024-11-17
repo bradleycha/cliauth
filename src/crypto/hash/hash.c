@@ -2,30 +2,30 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/hash.c - Hash algorithm implementations                                */
+/* src/crypto/hash/hash.c - Hash algorithm implementations                    */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "hash.h"
+#include "crypto/hash/hash.h"
 
-#include "memory.h"
-#include "endian.h"
-#include "bitwise.h"
-#include "io.h"
+#include "memory/memory.h"
+#include "math/endian.h"
+#include "math/bitwise.h"
+#include "io/io.h"
 
-#if _CLIAUTH_HASH_SHA1_2
+#if _CLIAUTH_CRYPTO_HASH_SHA1_2
 /*----------------------------------------------------------------------------*/
 
-typedef void (*CliAuthHashSha12RingBufferDigestBlock)(
-   struct CliAuthHashContext * hash_context,
+typedef void (*CliAuthCryptoHashSha12RingBufferDigestBlock)(
+   struct CliAuthCryptoHashContext * hash_context,
    const CliAuthUInt8 block []
 );
 
 /* used to implement the ring buffer interface on a hash function at */
 /* compile-time */
-struct CliAuthHashSha12RingBufferImplementation {
+struct CliAuthCryptoHashSha12RingBufferImplementation {
    /* digests an input block when the ring buffer is filled */
-   CliAuthHashSha12RingBufferDigestBlock digest;
+   CliAuthCryptoHashSha12RingBufferDigestBlock digest;
 
    /* the size of the ring buffer and each input block in bytes */
    CliAuthUInt32 bytes;
@@ -33,9 +33,9 @@ struct CliAuthHashSha12RingBufferImplementation {
 
 /* initializes the state of the ring buffer */
 static void
-cliauth_hash_sha1_2_ring_buffer_initialize(
-   const struct CliAuthHashSha12RingBufferImplementation * implementation,
-   struct _CliAuthHashSha12RingBufferContext * context
+cliauth_crypto_hash_sha1_2_ring_buffer_initialize(
+   const struct CliAuthCryptoHashSha12RingBufferImplementation * implementation,
+   struct _CliAuthCryptoHashSha12RingBufferContext * context
 ) {
    context->capacity = implementation->bytes;
    context->total = CLIAUTH_LITERAL_UINT32(0u);
@@ -45,10 +45,10 @@ cliauth_hash_sha1_2_ring_buffer_initialize(
 
 /* loads a message into the ring buffer, digesting if the ring buffer fills */
 static struct CliAuthIoResult
-cliauth_hash_sha1_2_ring_buffer_digest(
-   const struct CliAuthHashSha12RingBufferImplementation * implementation,
-   struct _CliAuthHashSha12RingBufferContext * context,
-   struct CliAuthHashContext * hash_context,
+cliauth_crypto_hash_sha1_2_ring_buffer_digest(
+   const struct CliAuthCryptoHashSha12RingBufferImplementation * implementation,
+   struct _CliAuthCryptoHashSha12RingBufferContext * context,
+   struct CliAuthCryptoHashContext * hash_context,
    CliAuthUInt8 buffer [],
    const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
@@ -145,10 +145,10 @@ cliauth_hash_sha1_2_ring_buffer_digest(
 /* resulting padded message.  this also invalidates the state of the ring */
 /* buffer, which will require initialization to be used again. */
 static void
-cliauth_hash_sha1_2_ring_buffer_finalize(
-   const struct CliAuthHashSha12RingBufferImplementation * implementation,
-   struct _CliAuthHashSha12RingBufferContext * context,
-   struct CliAuthHashContext * hash_context,
+cliauth_crypto_hash_sha1_2_ring_buffer_finalize(
+   const struct CliAuthCryptoHashSha12RingBufferImplementation * implementation,
+   struct _CliAuthCryptoHashSha12RingBufferContext * context,
+   struct CliAuthCryptoHashContext * hash_context,
    CliAuthUInt8 buffer []
 ) {
    CliAuthUInt8 * ring_buffer_iter;
@@ -202,9 +202,9 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
 
    /* calculate the message length in bits, convert to big endian, and append */
    /* to the end of the message */
-   message_length_bits_big_endian = cliauth_endian_convert_uint64(
+   message_length_bits_big_endian = cliauth_math_endian_convert_uint64(
       context->total * CLIAUTH_LITERAL_UINT32(8u),
-      CLIAUTH_ENDIAN_TARGET_BIG
+      CLIAUTH_MATH_ENDIAN_TARGET_BIG
    );
    cliauth_memory_copy(
       ring_buffer_iter,
@@ -220,7 +220,7 @@ cliauth_hash_sha1_2_ring_buffer_finalize(
 }
 
 static void
-cliauth_hash_sha1_2_load_message_block_big(
+cliauth_crypto_hash_sha1_2_load_message_block_big(
    const CliAuthUInt8 block [],
    CliAuthUInt8 schedule [],
    CliAuthUInt8 block_bytes,
@@ -237,7 +237,7 @@ cliauth_hash_sha1_2_load_message_block_big(
 }
 
 static void
-cliauth_hash_sha1_2_load_message_block_little(
+cliauth_crypto_hash_sha1_2_load_message_block_little(
    const CliAuthUInt8 block [],
    CliAuthUInt8 schedule [],
    CliAuthUInt8 block_bytes,
@@ -249,11 +249,11 @@ cliauth_hash_sha1_2_load_message_block_little(
    block_iter = block;
    schedule_iter = schedule;
    while (block_bytes != CLIAUTH_LITERAL_UINT8(0u)) {
-      cliauth_endian_convert_copy(
+      cliauth_math_endian_convert_copy(
          schedule_iter,
          block_iter,
          schedule_bytes_per_word,
-         CLIAUTH_ENDIAN_TARGET_BIG
+         CLIAUTH_MATH_ENDIAN_TARGET_BIG
       );
 
       block_iter += schedule_bytes_per_word;
@@ -266,23 +266,23 @@ cliauth_hash_sha1_2_load_message_block_little(
 
 /* loads the initial part of the message schedule from the input block */
 static void
-cliauth_hash_sha1_2_load_message_block(
+cliauth_crypto_hash_sha1_2_load_message_block(
    const CliAuthUInt8 block [],
    CliAuthUInt8 schedule [],
    CliAuthUInt8 block_bytes,
    CliAuthUInt8 schedule_bytes_per_word
 ) {
 #if CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE
-   (void)cliauth_hash_sha1_2_load_message_block_little;
-   cliauth_hash_sha1_2_load_message_block_big(
+   (void)cliauth_crypto_hash_sha1_2_load_message_block_little;
+   cliauth_crypto_hash_sha1_2_load_message_block_big(
       block,
       schedule,
       block_bytes,
       schedule_bytes_per_word
    );
 #else /* CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE */
-   (void)cliauth_hash_sha1_2_load_message_block_big;
-   cliauth_hash_sha1_2_load_message_block_little(
+   (void)cliauth_crypto_hash_sha1_2_load_message_block_big;
+   cliauth_crypto_hash_sha1_2_load_message_block_little(
       block,
       schedule,
       block_bytes,
@@ -294,7 +294,7 @@ cliauth_hash_sha1_2_load_message_block(
 }
 
 static void
-cliauth_hash_sha1_2_digest_endianess_finalize_big(
+cliauth_crypto_hash_sha1_2_digest_endianess_finalize_big(
    CliAuthUInt8 digest [],
    CliAuthUInt8 digest_bytes_per_word,
    CliAuthUInt8 digest_words
@@ -306,7 +306,7 @@ cliauth_hash_sha1_2_digest_endianess_finalize_big(
 }
 
 static void
-cliauth_hash_sha1_2_digest_endianess_finalize_little(
+cliauth_crypto_hash_sha1_2_digest_endianess_finalize_little(
    CliAuthUInt8 digest [],
    CliAuthUInt8 digest_bytes_per_word,
    CliAuthUInt8 digest_words
@@ -315,10 +315,10 @@ cliauth_hash_sha1_2_digest_endianess_finalize_little(
 
    digest_iter = digest;
    while (digest_words != CLIAUTH_LITERAL_UINT8(0u)) {
-      cliauth_endian_convert_inplace(
+      cliauth_math_endian_convert_inplace(
          digest_iter,
          digest_bytes_per_word,
-         CLIAUTH_ENDIAN_TARGET_BIG
+         CLIAUTH_MATH_ENDIAN_TARGET_BIG
       );
       
       digest_iter += digest_bytes_per_word;
@@ -330,21 +330,21 @@ cliauth_hash_sha1_2_digest_endianess_finalize_little(
 
 /* flips the endianess of a final digest to big-endian */
 static void
-cliauth_hash_sha1_2_digest_endianess_finalize(
+cliauth_crypto_hash_sha1_2_digest_endianess_finalize(
    CliAuthUInt8 digest [],
    CliAuthUInt8 digest_bytes_per_word,
    CliAuthUInt8 digest_words
 ) {
 #if CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE
-   (void)cliauth_hash_sha1_2_digest_endianess_finalize_little;
-   cliauth_hash_sha1_2_digest_endianess_finalize_big(
+   (void)cliauth_crypto_hash_sha1_2_digest_endianess_finalize_little;
+   cliauth_crypto_hash_sha1_2_digest_endianess_finalize_big(
       digest,
       digest_bytes_per_word,
       digest_words
    );
 #else /* CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE */
-   (void)cliauth_hash_sha1_2_digest_endianess_finalize_big;
-   cliauth_hash_sha1_2_digest_endianess_finalize_little(
+   (void)cliauth_crypto_hash_sha1_2_digest_endianess_finalize_big;
+   cliauth_crypto_hash_sha1_2_digest_endianess_finalize_little(
       digest,
       digest_bytes_per_word,
       digest_words
@@ -355,28 +355,40 @@ cliauth_hash_sha1_2_digest_endianess_finalize(
 }
 
 /*----------------------------------------------------------------------------*/
-#endif /* _CLIAUTH_HASH_SHA1_2 */
+#endif /* _CLIAUTH_CRYPTO_HASH_SHA1_2 */
 
-#if _CLIAUTH_HASH_SHA1_2_32
+#if _CLIAUTH_CRYPTO_HASH_SHA1_2_32
 /*----------------------------------------------------------------------------*/
 
 static CliAuthUInt32
-cliauth_hash_sha1_2_32_ch(CliAuthUInt32 x, CliAuthUInt32 y, CliAuthUInt32 z) {
+cliauth_crypto_hash_sha1_2_32_ch(
+   CliAuthUInt32 x,
+   CliAuthUInt32 y,
+   CliAuthUInt32 z
+) {
    return ((x & y) ^ ((~x) & z));
 }
 
 static CliAuthUInt32
-cliauth_hash_sha1_2_32_maj(CliAuthUInt32 x, CliAuthUInt32 y, CliAuthUInt32 z) {
+cliauth_crypto_hash_sha1_2_32_maj(
+   CliAuthUInt32 x,
+   CliAuthUInt32 y,
+   CliAuthUInt32 z
+) {
    return ((x & y) ^ (x & z) ^ (y & z));
 }
 
 static CliAuthUInt32
-cliauth_hash_sha1_2_32_parity(CliAuthUInt32 x, CliAuthUInt32 y, CliAuthUInt32 z) {
+cliauth_crypto_hash_sha1_2_32_parity(
+   CliAuthUInt32 x,
+   CliAuthUInt32 y,
+   CliAuthUInt32 z
+) {
    return (x ^ y ^ z);
 }
 
 static void
-cliauth_hash_sha1_2_32_compute_intermediate_digest(
+cliauth_crypto_hash_sha1_2_32_compute_intermediate_digest(
    const CliAuthUInt32 work [],
    CliAuthUInt32 digest [],
    CliAuthUInt8 digest_words_count
@@ -393,23 +405,27 @@ cliauth_hash_sha1_2_32_compute_intermediate_digest(
 }
 
 /*----------------------------------------------------------------------------*/
-#endif /* _CLIAUTH_HASH_SHA1_2_32 */
+#endif /* _CLIAUTH_CRYPTO_HASH_SHA1_2_32 */
 
-#if CLIAUTH_CONFIG_HASH_SHA1
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA1
 /*----------------------------------------------------------------------------*/
 
-typedef CliAuthUInt32 (*CliAuthHashSha1Function)(CliAuthUInt32 x, CliAuthUInt32 y, CliAuthUInt32 z);
+typedef CliAuthUInt32 (*CliAuthCryptoHashSha1Function)(
+   CliAuthUInt32 x,
+   CliAuthUInt32 y,
+   CliAuthUInt32 z
+);
 
-static const CliAuthHashSha1Function
-cliauth_hash_sha1_constants_rounds_function [_CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH] = {
-   cliauth_hash_sha1_2_32_ch,
-   cliauth_hash_sha1_2_32_parity,
-   cliauth_hash_sha1_2_32_maj,
-   cliauth_hash_sha1_2_32_parity
+static const CliAuthCryptoHashSha1Function
+cliauth_crypto_hash_sha1_constants_rounds_function [_CLIAUTH_CRYPTO_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH] = {
+   cliauth_crypto_hash_sha1_2_32_ch,
+   cliauth_crypto_hash_sha1_2_32_parity,
+   cliauth_crypto_hash_sha1_2_32_maj,
+   cliauth_crypto_hash_sha1_2_32_parity
 };
 
 static const CliAuthUInt32
-cliauth_hash_sha1_constants_rounds_value [_CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH] = {
+cliauth_crypto_hash_sha1_constants_rounds_value [_CLIAUTH_CRYPTO_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH] = {
    CLIAUTH_LITERAL_UINT32(0x5a827999u),
    CLIAUTH_LITERAL_UINT32(0x6ed9eba1u),
    CLIAUTH_LITERAL_UINT32(0x8f1bbcdcu),
@@ -417,9 +433,9 @@ cliauth_hash_sha1_constants_rounds_value [_CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LE
 };
 
 static void
-cliauth_hash_sha1_create_message_schedule(
-   const CliAuthUInt8 block [_CLIAUTH_HASH_SHA1_BLOCK_LENGTH],
-   union _CliAuthHashContextAlgorithmSha1Schedule * schedule
+cliauth_crypto_hash_sha1_create_message_schedule(
+   const CliAuthUInt8 block [_CLIAUTH_CRYPTO_HASH_SHA1_BLOCK_LENGTH],
+   union _CliAuthCryptoHashContextAlgorithmSha1Schedule * schedule
 ) {
    CliAuthUInt32 * schedule_iter;
    CliAuthUInt32 a, b, c, d, e;
@@ -428,13 +444,13 @@ cliauth_hash_sha1_create_message_schedule(
    schedule_iter = schedule->words;
 
    /* 0 <= t <= 15 */
-   cliauth_hash_sha1_2_load_message_block(
+   cliauth_crypto_hash_sha1_2_load_message_block(
       block,
       schedule->bytes,
-      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA1_BLOCK_LENGTH),
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA1_BLOCK_LENGTH),
       CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt32))
    );
-   schedule_iter +=  _CLIAUTH_HASH_SHA1_BLOCK_LENGTH / sizeof(CliAuthUInt32);
+   schedule_iter +=  _CLIAUTH_CRYPTO_HASH_SHA1_BLOCK_LENGTH / sizeof(CliAuthUInt32);
 
    /* 16 <= t <= 79 */
    t = CLIAUTH_LITERAL_UINT8(64u);
@@ -445,7 +461,7 @@ cliauth_hash_sha1_create_message_schedule(
       d = schedule_iter[-16];
       e = a ^ b ^ c ^ d;
 
-      *schedule_iter = cliauth_bitwise_rotate_left_uint32(e, CLIAUTH_LITERAL_UINT8(1u));
+      *schedule_iter = cliauth_math_bitwise_rotate_left_uint32(e, CLIAUTH_LITERAL_UINT8(1u));
 
       schedule_iter++;
       t--;
@@ -455,38 +471,38 @@ cliauth_hash_sha1_create_message_schedule(
 }
 
 static void
-cliauth_hash_sha1_perform_rounds_and_additions(
-   CliAuthUInt32 work [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT],
-   const CliAuthUInt32 schedule [_CLIAUTH_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH]
+cliauth_crypto_hash_sha1_perform_rounds_and_additions(
+   CliAuthUInt32 work [_CLIAUTH_CRYPTO_HASH_SHA1_DIGEST_WORDS_COUNT],
+   const CliAuthUInt32 schedule [_CLIAUTH_CRYPTO_HASH_SHA1_MESSAGE_SCHEDULE_LENGTH]
 ) {
    CliAuthUInt8 t, i, j;
    CliAuthUInt32 a, b, c, d, e;
    CliAuthUInt32 t1;
    const CliAuthUInt32 * schedule_iter;
-   const CliAuthHashSha1Function * constants_function_iter;
+   const CliAuthCryptoHashSha1Function * constants_function_iter;
    const CliAuthUInt32 * constants_value_iter;
    CliAuthUInt32 * work_iter;
 
-   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA1_ROUNDS_COUNT);
+   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA1_ROUNDS_COUNT);
    j = CLIAUTH_LITERAL_UINT8(
-      _CLIAUTH_HASH_SHA1_ROUNDS_COUNT /
-      _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH
+      _CLIAUTH_CRYPTO_HASH_SHA1_ROUNDS_COUNT /
+      _CLIAUTH_CRYPTO_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH
    );
    schedule_iter = schedule;
-   constants_function_iter = cliauth_hash_sha1_constants_rounds_function;
-   constants_value_iter = cliauth_hash_sha1_constants_rounds_value;
+   constants_function_iter = cliauth_crypto_hash_sha1_constants_rounds_function;
+   constants_value_iter = cliauth_crypto_hash_sha1_constants_rounds_value;
 
    while (t != CLIAUTH_LITERAL_UINT8(0u)) {
       if (j == CLIAUTH_LITERAL_UINT8(0u)) {
          j = CLIAUTH_LITERAL_UINT8(
-            _CLIAUTH_HASH_SHA1_ROUNDS_COUNT /
-            _CLIAUTH_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH
+            _CLIAUTH_CRYPTO_HASH_SHA1_ROUNDS_COUNT /
+            _CLIAUTH_CRYPTO_HASH_SHA1_ROUNDS_CONSTANTS_LENGTH
          );
          constants_function_iter++;
          constants_value_iter++;
       }
 
-      a = cliauth_bitwise_rotate_left_uint32(work[0], CLIAUTH_LITERAL_UINT8(5u));
+      a = cliauth_math_bitwise_rotate_left_uint32(work[0], CLIAUTH_LITERAL_UINT8(5u));
       b = (*constants_function_iter)(work[1], work[2], work[3]);
       c = work[4];
       d = *constants_value_iter;
@@ -502,7 +518,7 @@ cliauth_hash_sha1_perform_rounds_and_additions(
          i--;
       }
 
-      work[2] = cliauth_bitwise_rotate_left_uint32(work[2], CLIAUTH_LITERAL_UINT8(30u));
+      work[2] = cliauth_math_bitwise_rotate_left_uint32(work[2], CLIAUTH_LITERAL_UINT8(30u));
       work[0] = t1;
 
       schedule_iter++;
@@ -514,15 +530,15 @@ cliauth_hash_sha1_perform_rounds_and_additions(
 }
 
 static void
-cliauth_hash_sha1_digest_block(
-   struct CliAuthHashContext * context,
-   const CliAuthUInt8 block [_CLIAUTH_HASH_SHA1_BLOCK_LENGTH]
+cliauth_crypto_hash_sha1_digest_block(
+   struct CliAuthCryptoHashContext * context,
+   const CliAuthUInt8 block [_CLIAUTH_CRYPTO_HASH_SHA1_BLOCK_LENGTH]
 ) {
-   struct _CliAuthHashContextAlgorithmSha1 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha1 * context_sha;
 
    context_sha = &context->algorithm.sha1;
 
-   cliauth_hash_sha1_create_message_schedule(
+   cliauth_crypto_hash_sha1_create_message_schedule(
       block,
       &context_sha->schedule
    );
@@ -531,33 +547,33 @@ cliauth_hash_sha1_digest_block(
       context_sha->work,
       context_sha->digest.words,
       CLIAUTH_LITERAL_UINT32(
-         _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT *
+         _CLIAUTH_CRYPTO_HASH_SHA1_DIGEST_WORDS_COUNT *
          sizeof(CliAuthUInt32)
       )
    );
 
-   cliauth_hash_sha1_perform_rounds_and_additions(
+   cliauth_crypto_hash_sha1_perform_rounds_and_additions(
       context_sha->work,
       context_sha->schedule.words
    );
 
-   cliauth_hash_sha1_2_32_compute_intermediate_digest(
+   cliauth_crypto_hash_sha1_2_32_compute_intermediate_digest(
       context_sha->work,
       context_sha->digest.words,
-      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT)
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA1_DIGEST_WORDS_COUNT)
    );
 
    return;
 }
 
-static const struct CliAuthHashSha12RingBufferImplementation
-cliauth_hash_sha1_ring_buffer_implementation = {
-   cliauth_hash_sha1_digest_block,
-   CLIAUTH_LITERAL_UINT32(_CLIAUTH_HASH_SHA1_BLOCK_LENGTH)
+static const struct CliAuthCryptoHashSha12RingBufferImplementation
+cliauth_crypto_hash_sha1_ring_buffer_implementation = {
+   cliauth_crypto_hash_sha1_digest_block,
+   CLIAUTH_LITERAL_UINT32(_CLIAUTH_CRYPTO_HASH_SHA1_BLOCK_LENGTH)
 };
 
 static const CliAuthUInt32
-cliauth_hash_sha1_constants_initialize [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT] = {
+cliauth_crypto_hash_sha1_constants_initialize [_CLIAUTH_CRYPTO_HASH_SHA1_DIGEST_WORDS_COUNT] = {
    CLIAUTH_LITERAL_UINT32(0x67452301u),
    CLIAUTH_LITERAL_UINT32(0xefcdab89u),
    CLIAUTH_LITERAL_UINT32(0x98badcfeu),
@@ -566,22 +582,24 @@ cliauth_hash_sha1_constants_initialize [_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT] =
 };
 
 static void
-cliauth_hash_sha1_initialize(struct CliAuthHashContext * context) {
-   struct _CliAuthHashContextAlgorithmSha1 * context_sha;
+cliauth_crypto_hash_sha1_initialize(
+   struct CliAuthCryptoHashContext * context
+) {
+   struct _CliAuthCryptoHashContextAlgorithmSha1 * context_sha;
 
    context_sha = &context->algorithm.sha1;
 
    cliauth_memory_copy(
       &context_sha->digest,
-      cliauth_hash_sha1_constants_initialize,
+      cliauth_crypto_hash_sha1_constants_initialize,
       CLIAUTH_LITERAL_UINT32(
-         _CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT *
+         _CLIAUTH_CRYPTO_HASH_SHA1_DIGEST_WORDS_COUNT *
          sizeof(CliAuthUInt32)
       )
    );
 
-   cliauth_hash_sha1_2_ring_buffer_initialize(
-      &cliauth_hash_sha1_ring_buffer_implementation,
+   cliauth_crypto_hash_sha1_2_ring_buffer_initialize(
+      &cliauth_crypto_hash_sha1_ring_buffer_implementation,
       &context_sha->ring_context
    );
 
@@ -589,17 +607,17 @@ cliauth_hash_sha1_initialize(struct CliAuthHashContext * context) {
 }
 
 static struct CliAuthIoResult
-cliauth_hash_sha1_digest(
-   struct CliAuthHashContext * context,
+cliauth_crypto_hash_sha1_digest(
+   struct CliAuthCryptoHashContext * context,
    const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
-   struct _CliAuthHashContextAlgorithmSha1 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha1 * context_sha;
 
    context_sha = &context->algorithm.sha1;
 
-   return cliauth_hash_sha1_2_ring_buffer_digest(
-      &cliauth_hash_sha1_ring_buffer_implementation,
+   return cliauth_crypto_hash_sha1_2_ring_buffer_digest(
+      &cliauth_crypto_hash_sha1_ring_buffer_implementation,
       &context_sha->ring_context,
       context,
       context_sha->ring_buffer,
@@ -609,46 +627,48 @@ cliauth_hash_sha1_digest(
 }
 
 static CliAuthUInt8 *
-cliauth_hash_sha1_finalize(struct CliAuthHashContext * context) {
-   struct _CliAuthHashContextAlgorithmSha1 * context_sha;
+cliauth_crypto_hash_sha1_finalize(
+   struct CliAuthCryptoHashContext * context
+) {
+   struct _CliAuthCryptoHashContextAlgorithmSha1 * context_sha;
 
    context_sha = &context->algorithm.sha1;
 
-   cliauth_hash_sha1_2_ring_buffer_finalize(
-      &cliauth_hash_sha1_ring_buffer_implementation,
+   cliauth_crypto_hash_sha1_2_ring_buffer_finalize(
+      &cliauth_crypto_hash_sha1_ring_buffer_implementation,
       &context_sha->ring_context,
       context,
       context_sha->ring_buffer
    );
 
-   cliauth_hash_sha1_2_digest_endianess_finalize(
+   cliauth_crypto_hash_sha1_2_digest_endianess_finalize(
       context_sha->digest.bytes,
       CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt32)),
-      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA1_DIGEST_WORDS_COUNT)
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA1_DIGEST_WORDS_COUNT)
    );
 
    return context_sha->digest.bytes;
 }
 
-static const struct CliAuthHashFunction
-cliauth_hash_sha1 = {
-   cliauth_hash_sha1_initialize,
-   cliauth_hash_sha1_digest,
-   cliauth_hash_sha1_finalize,
-   CLIAUTH_HASH_SHA1_IDENTIFIER,
-   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_HASH_SHA1_IDENTIFIER) / sizeof(char)) - 1u),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA1_INPUT_BLOCK_LENGTH),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA1_DIGEST_LENGTH)
+static const struct CliAuthCryptoHashFunction
+cliauth_crypto_hash_sha1 = {
+   cliauth_crypto_hash_sha1_initialize,
+   cliauth_crypto_hash_sha1_digest,
+   cliauth_crypto_hash_sha1_finalize,
+   CLIAUTH_CRYPTO_HASH_SHA1_IDENTIFIER,
+   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_CRYPTO_HASH_SHA1_IDENTIFIER) / sizeof(char)) - 1u),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA1_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA1_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
-#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA1 */
 
-#if _CLIAUTH_HASH_SHA2_32
+#if _CLIAUTH_CRYPTO_HASH_SHA2_32
 /*----------------------------------------------------------------------------*/
 
 static const CliAuthUInt32
-cliauth_hash_sha2_32_constants_rounds [_CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT] = {
+cliauth_crypto_hash_sha2_32_constants_rounds [_CLIAUTH_CRYPTO_HASH_SHA2_32_ROUNDS_COUNT] = {
    CLIAUTH_LITERAL_UINT32(0x428a2f98u),
    CLIAUTH_LITERAL_UINT32(0x71374491u),
    CLIAUTH_LITERAL_UINT32(0xb5c0fbcfu),
@@ -716,53 +736,61 @@ cliauth_hash_sha2_32_constants_rounds [_CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT] = {
 };
 
 static CliAuthUInt32
-cliauth_hash_sha2_32_sigma_u0(CliAuthUInt32 x) {
+cliauth_crypto_hash_sha2_32_sigma_u0(
+   CliAuthUInt32 x
+) {
    CliAuthUInt32 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(2u));
-   b = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(13u));
-   c = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(22u));
+   a = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(2u));
+   b = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(13u));
+   c = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(22u));
 
-   return cliauth_hash_sha1_2_32_parity(a, b, c);
+   return cliauth_crypto_hash_sha1_2_32_parity(a, b, c);
 }
 
 static CliAuthUInt32
-cliauth_hash_sha2_32_sigma_u1(CliAuthUInt32 x) {
+cliauth_crypto_hash_sha2_32_sigma_u1(
+   CliAuthUInt32 x
+) {
    CliAuthUInt32 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(6u));
-   b = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(11u));
-   c = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(25u));
+   a = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(6u));
+   b = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(11u));
+   c = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(25u));
 
-   return cliauth_hash_sha1_2_32_parity(a, b, c);
+   return cliauth_crypto_hash_sha1_2_32_parity(a, b, c);
 }
 
 static CliAuthUInt32
-cliauth_hash_sha2_32_sigma_l0(CliAuthUInt32 x) {
+cliauth_crypto_hash_sha2_32_sigma_l0(
+   CliAuthUInt32 x
+) {
    CliAuthUInt32 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(7u));
-   b = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(18u));
+   a = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(7u));
+   b = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(18u));
    c = (x >> CLIAUTH_LITERAL_UINT8(3u));
 
-   return cliauth_hash_sha1_2_32_parity(a, b, c);
+   return cliauth_crypto_hash_sha1_2_32_parity(a, b, c);
 }
 
 static CliAuthUInt32
-cliauth_hash_sha2_32_sigma_l1(CliAuthUInt32 x) {
+cliauth_crypto_hash_sha2_32_sigma_l1(
+   CliAuthUInt32 x
+) {
    CliAuthUInt32 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(17u));
-   b = cliauth_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(19u));
+   a = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(17u));
+   b = cliauth_math_bitwise_rotate_right_uint32(x, CLIAUTH_LITERAL_UINT8(19u));
    c = (x >> CLIAUTH_LITERAL_UINT8(10u));
 
-   return cliauth_hash_sha1_2_32_parity(a, b, c);
+   return cliauth_crypto_hash_sha1_2_32_parity(a, b, c);
 }
 
 static void
-cliauth_hash_sha2_32_create_message_schedule(
-   const CliAuthUInt8 block [_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH],
-   union _CliAuthHashContextAlgorithmSha232Schedule * schedule
+cliauth_crypto_hash_sha2_32_create_message_schedule(
+   const CliAuthUInt8 block [_CLIAUTH_CRYPTO_HASH_SHA2_32_BLOCK_LENGTH],
+   union _CliAuthCryptoHashContextAlgorithmSha232Schedule * schedule
 ) {
    CliAuthUInt32 * schedule_iter;
    CliAuthUInt32 a, b, c, d;
@@ -771,20 +799,20 @@ cliauth_hash_sha2_32_create_message_schedule(
    schedule_iter = schedule->words;
 
    /* 0 <= t <= 15 */
-   cliauth_hash_sha1_2_load_message_block(
+   cliauth_crypto_hash_sha1_2_load_message_block(
       block,
       schedule->bytes,
-      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH),
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA2_32_BLOCK_LENGTH),
       CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt32))
    );
-   schedule_iter += _CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH / sizeof(CliAuthUInt32);
+   schedule_iter += _CLIAUTH_CRYPTO_HASH_SHA2_32_BLOCK_LENGTH / sizeof(CliAuthUInt32);
 
    /* 16 <= t <= 63 */
    t = CLIAUTH_LITERAL_UINT8(48u);
    while (t != CLIAUTH_LITERAL_UINT8(0u)) {
-      a = cliauth_hash_sha2_32_sigma_l1(schedule_iter[-2]);
+      a = cliauth_crypto_hash_sha2_32_sigma_l1(schedule_iter[-2]);
       b = schedule_iter[-7];
-      c = cliauth_hash_sha2_32_sigma_l0(schedule_iter[-15]);
+      c = cliauth_crypto_hash_sha2_32_sigma_l0(schedule_iter[-15]);
       d = schedule_iter[-16];
 
       *schedule_iter = a + b + c + d;
@@ -797,9 +825,9 @@ cliauth_hash_sha2_32_create_message_schedule(
 }
 
 static void
-cliauth_hash_sha2_32_perform_rounds_and_additions(
-   CliAuthUInt32 work [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT],
-   const CliAuthUInt32 schedule [_CLIAUTH_HASH_SHA2_32_MESSAGE_SCHEDULE_LENGTH]
+cliauth_crypto_hash_sha2_32_perform_rounds_and_additions(
+   CliAuthUInt32 work [_CLIAUTH_CRYPTO_HASH_SHA2_32_DIGEST_WORDS_COUNT],
+   const CliAuthUInt32 schedule [_CLIAUTH_CRYPTO_HASH_SHA2_32_MESSAGE_SCHEDULE_LENGTH]
 ) {
    CliAuthUInt8 t, i;
    CliAuthUInt32 a, b, c, d, e, f, g;
@@ -808,20 +836,20 @@ cliauth_hash_sha2_32_perform_rounds_and_additions(
    const CliAuthUInt32 * constants_iter;
    CliAuthUInt32 * work_iter;
 
-   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_32_ROUNDS_COUNT);
+   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA2_32_ROUNDS_COUNT);
    schedule_iter = schedule;
-   constants_iter = cliauth_hash_sha2_32_constants_rounds;
+   constants_iter = cliauth_crypto_hash_sha2_32_constants_rounds;
 
    while (t != CLIAUTH_LITERAL_UINT8(0u)) {
       a = work[7];
-      b = cliauth_hash_sha2_32_sigma_u1(work[4]);
-      c = cliauth_hash_sha1_2_32_ch(work[4], work[5], work[6]);
+      b = cliauth_crypto_hash_sha2_32_sigma_u1(work[4]);
+      c = cliauth_crypto_hash_sha1_2_32_ch(work[4], work[5], work[6]);
       d = *constants_iter;
       e = *schedule_iter;
       t1 = a + b + c + d + e;
 
-      f = cliauth_hash_sha2_32_sigma_u0(work[0]);
-      g = cliauth_hash_sha1_2_32_maj(work[0], work[1], work[2]);
+      f = cliauth_crypto_hash_sha2_32_sigma_u0(work[0]);
+      g = cliauth_crypto_hash_sha1_2_32_maj(work[0], work[1], work[2]);
       t2 = f + g;
 
       i = CLIAUTH_LITERAL_UINT8(7u);
@@ -845,16 +873,16 @@ cliauth_hash_sha2_32_perform_rounds_and_additions(
 }
 
 static void
-cliauth_hash_sha2_32_digest_block(
-   struct CliAuthHashContext * context,
-   const CliAuthUInt8 block [_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH]
+cliauth_crypto_hash_sha2_32_digest_block(
+   struct CliAuthCryptoHashContext * context,
+   const CliAuthUInt8 block [_CLIAUTH_CRYPTO_HASH_SHA2_32_BLOCK_LENGTH]
 ) {
-   struct _CliAuthHashContextAlgorithmSha232 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha232 * context_sha;
 
    context_sha = &context->algorithm.sha2_32;
 
    /* create the message schedule */
-   cliauth_hash_sha2_32_create_message_schedule(
+   cliauth_crypto_hash_sha2_32_create_message_schedule(
       block,
       &context_sha->schedule
    );
@@ -864,39 +892,39 @@ cliauth_hash_sha2_32_digest_block(
       context_sha->work,
       context_sha->digest.words,
       CLIAUTH_LITERAL_UINT32(
-         _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT * 
+         _CLIAUTH_CRYPTO_HASH_SHA2_32_DIGEST_WORDS_COUNT * 
          sizeof(CliAuthUInt32)
       )
    );
 
    /* perform the rounds and additions */
-   cliauth_hash_sha2_32_perform_rounds_and_additions(
+   cliauth_crypto_hash_sha2_32_perform_rounds_and_additions(
       context_sha->work,
       context_sha->schedule.words
    );
 
    /* compute the intermediate result */
-   cliauth_hash_sha1_2_32_compute_intermediate_digest(
+   cliauth_crypto_hash_sha1_2_32_compute_intermediate_digest(
       context_sha->work,
       context_sha->digest.words,
-      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT)
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA2_32_DIGEST_WORDS_COUNT)
    );
    
    return;
 }
 
-static const struct CliAuthHashSha12RingBufferImplementation
-cliauth_hash_sha2_32_ring_buffer_implementation = {
-   cliauth_hash_sha2_32_digest_block,  
-   CLIAUTH_LITERAL_UINT32(_CLIAUTH_HASH_SHA2_32_BLOCK_LENGTH),
+static const struct CliAuthCryptoHashSha12RingBufferImplementation
+cliauth_crypto_hash_sha2_32_ring_buffer_implementation = {
+   cliauth_crypto_hash_sha2_32_digest_block,  
+   CLIAUTH_LITERAL_UINT32(_CLIAUTH_CRYPTO_HASH_SHA2_32_BLOCK_LENGTH),
 };
 
 static void
-cliauth_hash_sha2_32_initialize(
-   struct CliAuthHashContext * context,
-   const CliAuthUInt32 constants_initialize [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT]
+cliauth_crypto_hash_sha2_32_initialize(
+   struct CliAuthCryptoHashContext * context,
+   const CliAuthUInt32 constants_initialize [_CLIAUTH_CRYPTO_HASH_SHA2_32_DIGEST_WORDS_COUNT]
 ) {
-   struct _CliAuthHashContextAlgorithmSha232 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha232 * context_sha;
 
    context_sha = &context->algorithm.sha2_32;
 
@@ -905,14 +933,14 @@ cliauth_hash_sha2_32_initialize(
       &context_sha->digest,
       constants_initialize,
       CLIAUTH_LITERAL_UINT32(
-         _CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT *
+         _CLIAUTH_CRYPTO_HASH_SHA2_32_DIGEST_WORDS_COUNT *
          sizeof(CliAuthUInt32)
       )
    );
 
    /* initialize the ring buffer */
-   cliauth_hash_sha1_2_ring_buffer_initialize(
-      &cliauth_hash_sha2_32_ring_buffer_implementation,
+   cliauth_crypto_hash_sha1_2_ring_buffer_initialize(
+      &cliauth_crypto_hash_sha2_32_ring_buffer_implementation,
       &context_sha->ring_context
    );
 
@@ -920,17 +948,17 @@ cliauth_hash_sha2_32_initialize(
 }
 
 static struct CliAuthIoResult
-cliauth_hash_sha2_32_digest(
-   struct CliAuthHashContext * context,
+cliauth_crypto_hash_sha2_32_digest(
+   struct CliAuthCryptoHashContext * context,
    const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
-   struct _CliAuthHashContextAlgorithmSha232 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha232 * context_sha;
 
    context_sha = &context->algorithm.sha2_32;
 
-   return cliauth_hash_sha1_2_ring_buffer_digest(
-      &cliauth_hash_sha2_32_ring_buffer_implementation,
+   return cliauth_crypto_hash_sha1_2_ring_buffer_digest(
+      &cliauth_crypto_hash_sha2_32_ring_buffer_implementation,
       &context_sha->ring_context,
       context,
       context_sha->ring_buffer,
@@ -940,39 +968,39 @@ cliauth_hash_sha2_32_digest(
 }
 
 static CliAuthUInt8 *
-cliauth_hash_sha2_32_finalize(
-   struct CliAuthHashContext * context
+cliauth_crypto_hash_sha2_32_finalize(
+   struct CliAuthCryptoHashContext * context
 ) {
-   struct _CliAuthHashContextAlgorithmSha232 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha232 * context_sha;
 
    context_sha = &context->algorithm.sha2_32;
 
    /* pad the message and digest the final padded blocks */
-   cliauth_hash_sha1_2_ring_buffer_finalize(
-      &cliauth_hash_sha2_32_ring_buffer_implementation,
+   cliauth_crypto_hash_sha1_2_ring_buffer_finalize(
+      &cliauth_crypto_hash_sha2_32_ring_buffer_implementation,
       &context_sha->ring_context,
       context,
       context_sha->ring_buffer
    );
 
    /* flip the endianess to big-endian for each word */
-   cliauth_hash_sha1_2_digest_endianess_finalize(
+   cliauth_crypto_hash_sha1_2_digest_endianess_finalize(
       context_sha->digest.bytes,
       CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt32)),
-      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT)
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA2_32_DIGEST_WORDS_COUNT)
    );
 
    return context_sha->digest.bytes;
 }
 
 /*----------------------------------------------------------------------------*/
-#endif /* _CLIAUTH_HASH_SHA2_32 */
+#endif /* _CLIAUTH_CRYPTO_HASH_SHA2_32 */
 
-#if _CLIAUTH_HASH_SHA2_64
+#if _CLIAUTH_CRYPTO_HASH_SHA2_64
 /*----------------------------------------------------------------------------*/
 
 static const CliAuthUInt64
-cliauth_hash_sha2_64_constants_rounds [_CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT] = {
+cliauth_crypto_hash_sha2_64_constants_rounds [_CLIAUTH_CRYPTO_HASH_SHA2_64_ROUNDS_COUNT] = {
    CLIAUTH_LITERAL_UINT64(0x428a2f98u, 0xd728ae22u),
    CLIAUTH_LITERAL_UINT64(0x71374491u, 0x23ef65cdu),
    CLIAUTH_LITERAL_UINT64(0xb5c0fbcfu, 0xec4d3b2fu),
@@ -1056,68 +1084,88 @@ cliauth_hash_sha2_64_constants_rounds [_CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT] = {
 };
 
 static CliAuthUInt64
-cliauth_hash_sha2_64_ch(CliAuthUInt64 x, CliAuthUInt64 y, CliAuthUInt64 z) {
+cliauth_crypto_hash_sha2_64_ch(
+   CliAuthUInt64 x,
+   CliAuthUInt64 y,
+   CliAuthUInt64 z
+) {
    return ((x & y) ^ ((~x) & z));
 }
 
 static CliAuthUInt64
-cliauth_hash_sha2_64_maj(CliAuthUInt64 x, CliAuthUInt64 y, CliAuthUInt64 z) {
+cliauth_crypto_hash_sha2_64_maj(
+   CliAuthUInt64 x,
+   CliAuthUInt64 y,
+   CliAuthUInt64 z
+) {
    return ((x & y) ^ (x & z) ^ (y & z));
 }
 
 static CliAuthUInt64
-cliauth_hash_sha2_64_parity(CliAuthUInt64 x, CliAuthUInt64 y, CliAuthUInt64 z) {
+cliauth_crypto_hash_sha2_64_parity(
+   CliAuthUInt64 x,
+   CliAuthUInt64 y,
+   CliAuthUInt64 z
+) {
    return (x ^ y ^ z);
 }
 
 static CliAuthUInt64
-cliauth_hash_sha2_64_sigma_u0(CliAuthUInt64 x) {
+cliauth_crypto_hash_sha2_64_sigma_u0(
+   CliAuthUInt64 x
+) {
    CliAuthUInt64 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(28u));
-   b = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(34u));
-   c = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(39u));
+   a = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(28u));
+   b = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(34u));
+   c = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(39u));
 
-   return cliauth_hash_sha2_64_parity(a, b, c);
+   return cliauth_crypto_hash_sha2_64_parity(a, b, c);
 }
 
 static CliAuthUInt64
-cliauth_hash_sha2_64_sigma_u1(CliAuthUInt64 x) {
+cliauth_crypto_hash_sha2_64_sigma_u1(
+   CliAuthUInt64 x
+) {
    CliAuthUInt64 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(14u));
-   b = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(18u));
-   c = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(41u));
+   a = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(14u));
+   b = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(18u));
+   c = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(41u));
 
-   return cliauth_hash_sha2_64_parity(a, b, c);
+   return cliauth_crypto_hash_sha2_64_parity(a, b, c);
 }
 
 static CliAuthUInt64
-cliauth_hash_sha2_64_sigma_l0(CliAuthUInt64 x) {
+cliauth_crypto_hash_sha2_64_sigma_l0(
+   CliAuthUInt64 x
+) {
    CliAuthUInt64 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(1u));
-   b = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(8u));
+   a = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(1u));
+   b = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(8u));
    c = (x >> CLIAUTH_LITERAL_UINT8(7u));
 
-   return cliauth_hash_sha2_64_parity(a, b, c);
+   return cliauth_crypto_hash_sha2_64_parity(a, b, c);
 }
 
 static CliAuthUInt64
-cliauth_hash_sha2_64_sigma_l1(CliAuthUInt64 x) {
+cliauth_crypto_hash_sha2_64_sigma_l1(
+   CliAuthUInt64 x
+) {
    CliAuthUInt64 a, b, c;
 
-   a = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(19u));
-   b = cliauth_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(61u));
+   a = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(19u));
+   b = cliauth_math_bitwise_rotate_right_uint64(x, CLIAUTH_LITERAL_UINT8(61u));
    c = (x >> CLIAUTH_LITERAL_UINT8(6u));
 
-   return cliauth_hash_sha2_64_parity(a, b, c);
+   return cliauth_crypto_hash_sha2_64_parity(a, b, c);
 }
 
 static void
-cliauth_hash_sha2_64_create_message_schedule(
-   const CliAuthUInt8 block [_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH],
-   union _CliAuthHashContextAlgorithmSha264Schedule * schedule
+cliauth_crypto_hash_sha2_64_create_message_schedule(
+   const CliAuthUInt8 block [_CLIAUTH_CRYPTO_HASH_SHA2_64_BLOCK_LENGTH],
+   union _CliAuthCryptoHashContextAlgorithmSha264Schedule * schedule
 ) {
    CliAuthUInt64 * schedule_iter;
    CliAuthUInt64 a, b, c, d;
@@ -1126,20 +1174,20 @@ cliauth_hash_sha2_64_create_message_schedule(
    schedule_iter = schedule->words;
 
    /* 0 <= t <= 15 */
-   cliauth_hash_sha1_2_load_message_block(
+   cliauth_crypto_hash_sha1_2_load_message_block(
       block,
       schedule->bytes,
-      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH),
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA2_64_BLOCK_LENGTH),
       CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt64))
    );
-   schedule_iter += _CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH / sizeof(CliAuthUInt64);
+   schedule_iter += _CLIAUTH_CRYPTO_HASH_SHA2_64_BLOCK_LENGTH / sizeof(CliAuthUInt64);
 
    /* 16 <= t <= 79 */
    t = CLIAUTH_LITERAL_UINT8(64u);
    while (t != CLIAUTH_LITERAL_UINT8(0u)) {
-      a = cliauth_hash_sha2_64_sigma_l1(schedule_iter[-2]);
+      a = cliauth_crypto_hash_sha2_64_sigma_l1(schedule_iter[-2]);
       b = schedule_iter[-7];
-      c = cliauth_hash_sha2_64_sigma_l0(schedule_iter[-15]);
+      c = cliauth_crypto_hash_sha2_64_sigma_l0(schedule_iter[-15]);
       d = schedule_iter[-16];
 
       *schedule_iter = a + b + c + d;
@@ -1152,9 +1200,9 @@ cliauth_hash_sha2_64_create_message_schedule(
 }
 
 static void
-cliauth_hash_sha2_64_perform_rounds_and_additions(
-   CliAuthUInt64 work [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT],
-   const CliAuthUInt64 schedule [_CLIAUTH_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH]
+cliauth_crypto_hash_sha2_64_perform_rounds_and_additions(
+   CliAuthUInt64 work [_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT],
+   const CliAuthUInt64 schedule [_CLIAUTH_CRYPTO_HASH_SHA2_64_MESSAGE_SCHEDULE_LENGTH]
 ) {
    CliAuthUInt8 t, i;
    CliAuthUInt64 a, b, c, d, e, f, g;
@@ -1163,20 +1211,20 @@ cliauth_hash_sha2_64_perform_rounds_and_additions(
    const CliAuthUInt64 * constants_iter;
    CliAuthUInt64 * work_iter;
 
-   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_64_ROUNDS_COUNT);
+   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA2_64_ROUNDS_COUNT);
    schedule_iter = schedule;
-   constants_iter = cliauth_hash_sha2_64_constants_rounds;
+   constants_iter = cliauth_crypto_hash_sha2_64_constants_rounds;
 
    while (t != CLIAUTH_LITERAL_UINT8(0u)) {
       a = work[7];
-      b = cliauth_hash_sha2_64_sigma_u1(work[4]);
-      c = cliauth_hash_sha2_64_ch(work[4], work[5], work[6]);
+      b = cliauth_crypto_hash_sha2_64_sigma_u1(work[4]);
+      c = cliauth_crypto_hash_sha2_64_ch(work[4], work[5], work[6]);
       d = *constants_iter;
       e = *schedule_iter;
       t1 = a + b + c + d + e;
 
-      f = cliauth_hash_sha2_64_sigma_u0(work[0]);
-      g = cliauth_hash_sha2_64_maj(work[0], work[1], work[2]);
+      f = cliauth_crypto_hash_sha2_64_sigma_u0(work[0]);
+      g = cliauth_crypto_hash_sha2_64_maj(work[0], work[1], work[2]);
       t2 = f + g;
 
       i = CLIAUTH_LITERAL_UINT8(7u);
@@ -1200,15 +1248,15 @@ cliauth_hash_sha2_64_perform_rounds_and_additions(
 }
 
 static void
-cliauth_hash_sha2_64_compute_intermediate_digest(
-   CliAuthUInt64 digest [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT],
-   const CliAuthUInt64 work [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT]
+cliauth_crypto_hash_sha2_64_compute_intermediate_digest(
+   CliAuthUInt64 digest [_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT],
+   const CliAuthUInt64 work [_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT]
 ) {
    CliAuthUInt8 t;
    CliAuthUInt64 * digest_iter;
    const CliAuthUInt64 * work_iter;
 
-   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT);
+   t = CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT);
    digest_iter = digest;
    work_iter = work;
 
@@ -1224,15 +1272,15 @@ cliauth_hash_sha2_64_compute_intermediate_digest(
 }
 
 static void
-cliauth_hash_sha2_64_digest_block(
-   struct CliAuthHashContext * context,
-   const CliAuthUInt8 block [_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH]
+cliauth_crypto_hash_sha2_64_digest_block(
+   struct CliAuthCryptoHashContext * context,
+   const CliAuthUInt8 block [_CLIAUTH_CRYPTO_HASH_SHA2_64_BLOCK_LENGTH]
 ) {
-   struct _CliAuthHashContextAlgorithmSha264 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha264 * context_sha;
 
    context_sha = &context->algorithm.sha2_64;
 
-   cliauth_hash_sha2_64_create_message_schedule(
+   cliauth_crypto_hash_sha2_64_create_message_schedule(
       block,
       &context_sha->schedule
    );
@@ -1241,17 +1289,17 @@ cliauth_hash_sha2_64_digest_block(
       context_sha->work,
       context_sha->digest.words,
       CLIAUTH_LITERAL_UINT32(
-         _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT *
+         _CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT *
          sizeof(CliAuthUInt64)
       )
    );
 
-   cliauth_hash_sha2_64_perform_rounds_and_additions(
+   cliauth_crypto_hash_sha2_64_perform_rounds_and_additions(
       context_sha->work,
       context_sha->schedule.words
    );
 
-   cliauth_hash_sha2_64_compute_intermediate_digest(
+   cliauth_crypto_hash_sha2_64_compute_intermediate_digest(
       context_sha->digest.words,
       context_sha->work
    );
@@ -1259,18 +1307,18 @@ cliauth_hash_sha2_64_digest_block(
    return;
 }
 
-static const struct CliAuthHashSha12RingBufferImplementation
-cliauth_hash_sha2_64_ring_buffer_implementation = {
-   cliauth_hash_sha2_64_digest_block,  
-   CLIAUTH_LITERAL_UINT32(_CLIAUTH_HASH_SHA2_64_BLOCK_LENGTH),
+static const struct CliAuthCryptoHashSha12RingBufferImplementation
+cliauth_crypto_hash_sha2_64_ring_buffer_implementation = {
+   cliauth_crypto_hash_sha2_64_digest_block,  
+   CLIAUTH_LITERAL_UINT32(_CLIAUTH_CRYPTO_HASH_SHA2_64_BLOCK_LENGTH),
 };
 
 static void
-cliauth_hash_sha2_64_initialize(
-   struct CliAuthHashContext * context,
-   const CliAuthUInt64 constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT]
+cliauth_crypto_hash_sha2_64_initialize(
+   struct CliAuthCryptoHashContext * context,
+   const CliAuthUInt64 constants_initialize [_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT]
 ) {
-   struct _CliAuthHashContextAlgorithmSha264 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha264 * context_sha;
 
    context_sha = &context->algorithm.sha2_64;
 
@@ -1278,13 +1326,13 @@ cliauth_hash_sha2_64_initialize(
       &context_sha->digest,
       constants_initialize,
       CLIAUTH_LITERAL_UINT32(
-         _CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT *
+         _CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT *
          sizeof(CliAuthUInt64)
       )
    );
 
-   cliauth_hash_sha1_2_ring_buffer_initialize(
-      &cliauth_hash_sha2_64_ring_buffer_implementation,
+   cliauth_crypto_hash_sha1_2_ring_buffer_initialize(
+      &cliauth_crypto_hash_sha2_64_ring_buffer_implementation,
       &context_sha->ring_context
    );
 
@@ -1292,17 +1340,17 @@ cliauth_hash_sha2_64_initialize(
 }
 
 static struct CliAuthIoResult
-cliauth_hash_sha2_64_digest(
-   struct CliAuthHashContext * context,
+cliauth_crypto_hash_sha2_64_digest(
+   struct CliAuthCryptoHashContext * context,
    const struct CliAuthIoStreamReader * message_reader,
    CliAuthUInt32 message_bytes
 ) {
-   struct _CliAuthHashContextAlgorithmSha264 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha264 * context_sha;
 
    context_sha = &context->algorithm.sha2_64;
    
-   return cliauth_hash_sha1_2_ring_buffer_digest(
-      &cliauth_hash_sha2_64_ring_buffer_implementation,
+   return cliauth_crypto_hash_sha1_2_ring_buffer_digest(
+      &cliauth_crypto_hash_sha2_64_ring_buffer_implementation,
       &context_sha->ring_context,
       context,
       context_sha->ring_buffer,
@@ -1312,37 +1360,37 @@ cliauth_hash_sha2_64_digest(
 }
 
 static CliAuthUInt8 *
-cliauth_hash_sha2_64_finalize(
-   struct CliAuthHashContext * context
+cliauth_crypto_hash_sha2_64_finalize(
+   struct CliAuthCryptoHashContext * context
 ) {
-   struct _CliAuthHashContextAlgorithmSha264 * context_sha;
+   struct _CliAuthCryptoHashContextAlgorithmSha264 * context_sha;
 
    context_sha = &context->algorithm.sha2_64;
 
-   cliauth_hash_sha1_2_ring_buffer_finalize(
-      &cliauth_hash_sha2_64_ring_buffer_implementation,
+   cliauth_crypto_hash_sha1_2_ring_buffer_finalize(
+      &cliauth_crypto_hash_sha2_64_ring_buffer_implementation,
       &context_sha->ring_context,
       context,
       context_sha->ring_buffer
    );
 
-   cliauth_hash_sha1_2_digest_endianess_finalize(
+   cliauth_crypto_hash_sha1_2_digest_endianess_finalize(
       context_sha->digest.bytes,
       CLIAUTH_LITERAL_UINT8(sizeof(CliAuthUInt64)),
-      CLIAUTH_LITERAL_UINT8(_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT)
+      CLIAUTH_LITERAL_UINT8(_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT)
    );
 
    return context_sha->digest.bytes;
 }
 
 /*----------------------------------------------------------------------------*/
-#endif /* _CLIAUTH_HASH_SHA2_64 */
+#endif /* _CLIAUTH_CRYPTO_HASH_SHA2_64 */
 
-#if CLIAUTH_CONFIG_HASH_SHA2_224
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_224
 /*----------------------------------------------------------------------------*/
 
 static const CliAuthUInt32
-cliauth_hash_sha2_224_constants_initialize [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT] = {
+cliauth_crypto_hash_sha2_224_constants_initialize [_CLIAUTH_CRYPTO_HASH_SHA2_32_DIGEST_WORDS_COUNT] = {
    CLIAUTH_LITERAL_UINT32(0xc1059ed8u),
    CLIAUTH_LITERAL_UINT32(0x367cd507u),
    CLIAUTH_LITERAL_UINT32(0x3070dd17u),
@@ -1354,30 +1402,36 @@ cliauth_hash_sha2_224_constants_initialize [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_C
 };
 
 static void
-cliauth_hash_sha2_224_initialize(struct CliAuthHashContext * context) {
-   cliauth_hash_sha2_32_initialize(context, cliauth_hash_sha2_224_constants_initialize);
+cliauth_crypto_hash_sha2_224_initialize(
+   struct CliAuthCryptoHashContext * context
+) {
+   cliauth_crypto_hash_sha2_32_initialize(
+      context,
+      cliauth_crypto_hash_sha2_224_constants_initialize
+   );
+
    return;
 }
 
-static const struct CliAuthHashFunction
-cliauth_hash_sha2_224 = {
-   cliauth_hash_sha2_224_initialize,
-   cliauth_hash_sha2_32_digest,
-   cliauth_hash_sha2_32_finalize,
-   CLIAUTH_HASH_SHA2_224_IDENTIFIER,
-   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_HASH_SHA2_224_IDENTIFIER) / sizeof(char)) - 1u),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_224_INPUT_BLOCK_LENGTH),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_224_DIGEST_LENGTH)
+static const struct CliAuthCryptoHashFunction
+cliauth_crypto_hash_sha2_224 = {
+   cliauth_crypto_hash_sha2_224_initialize,
+   cliauth_crypto_hash_sha2_32_digest,
+   cliauth_crypto_hash_sha2_32_finalize,
+   CLIAUTH_CRYPTO_HASH_SHA2_224_IDENTIFIER,
+   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_CRYPTO_HASH_SHA2_224_IDENTIFIER) / sizeof(char)) - 1u),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_224_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_224_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_224 */
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_224 */
 
-#if CLIAUTH_CONFIG_HASH_SHA2_256
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_256
 /*----------------------------------------------------------------------------*/
 
 static const CliAuthUInt32
-cliauth_hash_sha2_256_constants_initialize [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_COUNT] = {
+cliauth_crypto_hash_sha2_256_constants_initialize [_CLIAUTH_CRYPTO_HASH_SHA2_32_DIGEST_WORDS_COUNT] = {
    CLIAUTH_LITERAL_UINT32(0x6a09e667u),
    CLIAUTH_LITERAL_UINT32(0xbb67ae85u),
    CLIAUTH_LITERAL_UINT32(0x3c6ef372u),
@@ -1389,30 +1443,36 @@ cliauth_hash_sha2_256_constants_initialize [_CLIAUTH_HASH_SHA2_32_DIGEST_WORDS_C
 };
 
 static void
-cliauth_hash_sha2_256_initialize(struct CliAuthHashContext * context) {
-   cliauth_hash_sha2_32_initialize(context, cliauth_hash_sha2_256_constants_initialize);
+cliauth_crypto_hash_sha2_256_initialize(
+   struct CliAuthCryptoHashContext * context
+) {
+   cliauth_crypto_hash_sha2_32_initialize(
+      context,
+      cliauth_crypto_hash_sha2_256_constants_initialize
+   );
+
    return;
 }
 
-static const struct CliAuthHashFunction
-cliauth_hash_sha2_256 = {
-   cliauth_hash_sha2_256_initialize,
-   cliauth_hash_sha2_32_digest,
-   cliauth_hash_sha2_32_finalize,
-   CLIAUTH_HASH_SHA2_256_IDENTIFIER,
-   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_HASH_SHA2_256_IDENTIFIER) / sizeof(char)) - 1u),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_256_INPUT_BLOCK_LENGTH),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_256_DIGEST_LENGTH)
+static const struct CliAuthCryptoHashFunction
+cliauth_crypto_hash_sha2_256 = {
+   cliauth_crypto_hash_sha2_256_initialize,
+   cliauth_crypto_hash_sha2_32_digest,
+   cliauth_crypto_hash_sha2_32_finalize,
+   CLIAUTH_CRYPTO_HASH_SHA2_256_IDENTIFIER,
+   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_CRYPTO_HASH_SHA2_256_IDENTIFIER) / sizeof(char)) - 1u),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_256_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_256_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_256 */
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_256 */
 
-#if CLIAUTH_CONFIG_HASH_SHA2_384
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_384
 /*----------------------------------------------------------------------------*/
 
 static const CliAuthUInt64
-cliauth_hash_sha2_384_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
+cliauth_crypto_hash_sha2_384_constants_initialize [_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
    CLIAUTH_LITERAL_UINT64(0xcbbb9d5du, 0xc1059ed8u),
    CLIAUTH_LITERAL_UINT64(0x629a292au, 0x367cd507u),
    CLIAUTH_LITERAL_UINT64(0x9159015au, 0x3070dd17u),
@@ -1424,30 +1484,36 @@ cliauth_hash_sha2_384_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_C
 };
 
 static void
-cliauth_hash_sha2_384_initialize(struct CliAuthHashContext * context) {
-   cliauth_hash_sha2_64_initialize(context, cliauth_hash_sha2_384_constants_initialize);
+cliauth_crypto_hash_sha2_384_initialize(
+   struct CliAuthCryptoHashContext * context
+) {
+   cliauth_crypto_hash_sha2_64_initialize(
+      context, 
+      cliauth_crypto_hash_sha2_384_constants_initialize
+   );
+
    return;
 }
 
-static const struct CliAuthHashFunction
-cliauth_hash_sha2_384 = {
-   cliauth_hash_sha2_384_initialize,
-   cliauth_hash_sha2_64_digest,
-   cliauth_hash_sha2_64_finalize,
-   CLIAUTH_HASH_SHA2_384_IDENTIFIER,
-   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_HASH_SHA2_384_IDENTIFIER) / sizeof(char)) - 1u),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_384_INPUT_BLOCK_LENGTH),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_384_DIGEST_LENGTH)
+static const struct CliAuthCryptoHashFunction
+cliauth_crypto_hash_sha2_384 = {
+   cliauth_crypto_hash_sha2_384_initialize,
+   cliauth_crypto_hash_sha2_64_digest,
+   cliauth_crypto_hash_sha2_64_finalize,
+   CLIAUTH_CRYPTO_HASH_SHA2_384_IDENTIFIER,
+   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_CRYPTO_HASH_SHA2_384_IDENTIFIER) / sizeof(char)) - 1u),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_384_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_384_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_384 */
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_384 */
 
-#if CLIAUTH_CONFIG_HASH_SHA2_512
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512
 /*----------------------------------------------------------------------------*/
 
 static const CliAuthUInt64
-cliauth_hash_sha2_512_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
+cliauth_crypto_hash_sha2_512_constants_initialize [_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
    CLIAUTH_LITERAL_UINT64(0x6a09e667u, 0xf3bcc908u),
    CLIAUTH_LITERAL_UINT64(0xbb67ae85u, 0x84caa73bu),
    CLIAUTH_LITERAL_UINT64(0x3c6ef372u, 0xfe94f82bu),
@@ -1459,30 +1525,36 @@ cliauth_hash_sha2_512_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_C
 };
 
 static void
-cliauth_hash_sha2_512_initialize(struct CliAuthHashContext * context) {
-   cliauth_hash_sha2_64_initialize(context, cliauth_hash_sha2_512_constants_initialize);
+cliauth_crypto_hash_sha2_512_initialize(
+   struct CliAuthCryptoHashContext * context
+) {
+   cliauth_crypto_hash_sha2_64_initialize(
+      context,
+      cliauth_crypto_hash_sha2_512_constants_initialize
+   );
+
    return;
 }
 
-static const struct CliAuthHashFunction
-cliauth_hash_sha2_512 = {
-   cliauth_hash_sha2_512_initialize,
-   cliauth_hash_sha2_64_digest,
-   cliauth_hash_sha2_64_finalize,
-   CLIAUTH_HASH_SHA2_512_IDENTIFIER,
-   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_HASH_SHA2_512_IDENTIFIER) / sizeof(char)) - 1u),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_INPUT_BLOCK_LENGTH),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_DIGEST_LENGTH)
+static const struct CliAuthCryptoHashFunction
+cliauth_crypto_hash_sha2_512 = {
+   cliauth_crypto_hash_sha2_512_initialize,
+   cliauth_crypto_hash_sha2_64_digest,
+   cliauth_crypto_hash_sha2_64_finalize,
+   CLIAUTH_CRYPTO_HASH_SHA2_512_IDENTIFIER,
+   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_CRYPTO_HASH_SHA2_512_IDENTIFIER) / sizeof(char)) - 1u),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_512_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_512_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_512 */
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512 */
 
-#if CLIAUTH_CONFIG_HASH_SHA2_512_224
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_224
 /*----------------------------------------------------------------------------*/
 
 static const CliAuthUInt64
-cliauth_hash_sha2_512_224_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
+cliauth_crypto_hash_sha2_512_224_constants_initialize [_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
    CLIAUTH_LITERAL_UINT64(0x8c3d37c8u, 0x19544da2u),
    CLIAUTH_LITERAL_UINT64(0x73e19966u, 0x89dcd4d6u),
    CLIAUTH_LITERAL_UINT64(0x1dfab7aeu, 0x32ff9c82u),
@@ -1494,30 +1566,36 @@ cliauth_hash_sha2_512_224_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WOR
 };
 
 static void
-cliauth_hash_sha2_512_224_initialize(struct CliAuthHashContext * context) {
-   cliauth_hash_sha2_64_initialize(context, cliauth_hash_sha2_512_224_constants_initialize);
+cliauth_crypto_hash_sha2_512_224_initialize(
+   struct CliAuthCryptoHashContext * context
+) {
+   cliauth_crypto_hash_sha2_64_initialize(
+      context,
+      cliauth_crypto_hash_sha2_512_224_constants_initialize
+   );
+
    return;
 }
 
-static const struct CliAuthHashFunction
-cliauth_hash_sha2_512_224 = {
-   cliauth_hash_sha2_512_224_initialize,
-   cliauth_hash_sha2_64_digest,
-   cliauth_hash_sha2_64_finalize,
-   CLIAUTH_HASH_SHA2_512_224_IDENTIFIER,
-   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_HASH_SHA2_512_224_IDENTIFIER) / sizeof(char)) - 1u),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_224_INPUT_BLOCK_LENGTH),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_224_DIGEST_LENGTH)
+static const struct CliAuthCryptoHashFunction
+cliauth_crypto_hash_sha2_512_224 = {
+   cliauth_crypto_hash_sha2_512_224_initialize,
+   cliauth_crypto_hash_sha2_64_digest,
+   cliauth_crypto_hash_sha2_64_finalize,
+   CLIAUTH_CRYPTO_HASH_SHA2_512_224_IDENTIFIER,
+   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_CRYPTO_HASH_SHA2_512_224_IDENTIFIER) / sizeof(char)) - 1u),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_512_224_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_512_224_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_224 */
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_224 */
 
-#if CLIAUTH_CONFIG_HASH_SHA2_512_256
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_256
 /*----------------------------------------------------------------------------*/
 
 static const CliAuthUInt64
-cliauth_hash_sha2_512_256_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
+cliauth_crypto_hash_sha2_512_256_constants_initialize [_CLIAUTH_CRYPTO_HASH_SHA2_64_DIGEST_WORDS_COUNT] = {
    CLIAUTH_LITERAL_UINT64(0x22312194u, 0xfc2bf72cu),
    CLIAUTH_LITERAL_UINT64(0x9f555fa3u, 0xc84c64c2u),
    CLIAUTH_LITERAL_UINT64(0x2393b86bu, 0x6f53b151u),
@@ -1529,47 +1607,53 @@ cliauth_hash_sha2_512_256_constants_initialize [_CLIAUTH_HASH_SHA2_64_DIGEST_WOR
 };
 
 static void
-cliauth_hash_sha2_512_256_initialize(struct CliAuthHashContext * context) {
-   cliauth_hash_sha2_64_initialize(context, cliauth_hash_sha2_512_256_constants_initialize);
+cliauth_crypto_hash_sha2_512_256_initialize(
+   struct CliAuthCryptoHashContext * context
+) {
+   cliauth_crypto_hash_sha2_64_initialize(
+      context,
+      cliauth_crypto_hash_sha2_512_256_constants_initialize
+   );
+
    return;
 }
 
-static const struct CliAuthHashFunction
-cliauth_hash_sha2_512_256 = {
-   cliauth_hash_sha2_512_256_initialize,
-   cliauth_hash_sha2_64_digest,
-   cliauth_hash_sha2_64_finalize,
-   CLIAUTH_HASH_SHA2_512_256_IDENTIFIER,
-   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_HASH_SHA2_512_256_IDENTIFIER) / sizeof(char)) - 1u),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_256_INPUT_BLOCK_LENGTH),
-   CLIAUTH_LITERAL_UINT8(CLIAUTH_HASH_SHA2_512_256_DIGEST_LENGTH)
+static const struct CliAuthCryptoHashFunction
+cliauth_crypto_hash_sha2_512_256 = {
+   cliauth_crypto_hash_sha2_512_256_initialize,
+   cliauth_crypto_hash_sha2_64_digest,
+   cliauth_crypto_hash_sha2_64_finalize,
+   CLIAUTH_CRYPTO_HASH_SHA2_512_256_IDENTIFIER,
+   CLIAUTH_LITERAL_UINT32((sizeof(CLIAUTH_CRYPTO_HASH_SHA2_512_256_IDENTIFIER) / sizeof(char)) - 1u),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_512_256_INPUT_BLOCK_LENGTH),
+   CLIAUTH_LITERAL_UINT8(CLIAUTH_CRYPTO_HASH_SHA2_512_256_DIGEST_LENGTH)
 };
 
 /*----------------------------------------------------------------------------*/
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_256 */
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_256 */
 
-const struct CliAuthHashFunction
-cliauth_hash [CLIAUTH_HASH_ENABLED_COUNT] = {
-#if CLIAUTH_CONFIG_HASH_SHA1
-   cliauth_hash_sha1,
-#endif /* CLIAUTH_CONFIG_HASH_SHA1 */
-#if CLIAUTH_CONFIG_HASH_SHA2_224
-   cliauth_hash_sha2_224,
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_224 */
-#if CLIAUTH_CONFIG_HASH_SHA2_256
-   cliauth_hash_sha2_256,
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_256 */
-#if CLIAUTH_CONFIG_HASH_SHA2_384
-   cliauth_hash_sha2_384,
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_384 */
-#if CLIAUTH_CONFIG_HASH_SHA2_512
-   cliauth_hash_sha2_512,
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_512 */
-#if CLIAUTH_CONFIG_HASH_SHA2_512_224
-   cliauth_hash_sha2_512_224,
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_224 */
-#if CLIAUTH_CONFIG_HASH_SHA2_512_256
-   cliauth_hash_sha2_512_256,
-#endif /* CLIAUTH_CONFIG_HASH_SHA2_512_256 */
+const struct CliAuthCryptoHashFunction
+cliauth_crypto_hash [CLIAUTH_CRYPTO_HASH_ENABLED_COUNT] = {
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA1
+   cliauth_crypto_hash_sha1,
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA1 */
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_224
+   cliauth_crypto_hash_sha2_224,
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_224 */
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_256
+   cliauth_crypto_hash_sha2_256,
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_256 */
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_384
+   cliauth_crypto_hash_sha2_384,
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_384 */
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512
+   cliauth_crypto_hash_sha2_512,
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512 */
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_224
+   cliauth_crypto_hash_sha2_512_224,
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_224 */
+#if CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_256
+   cliauth_crypto_hash_sha2_512_256,
+#endif /* CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_256 */
 };
 

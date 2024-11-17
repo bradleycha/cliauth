@@ -9,6 +9,7 @@ bin_PROGRAMS = \
 	cliauth
 
 cliauth_CFLAGS = \
+	-I$(top_srcdir)/src \
 	-std=c89 \
 	-Wall \
 	-Wextra \
@@ -18,28 +19,28 @@ cliauth_CFLAGS = \
 cliauth_SOURCES = \
 	src/cliauth.c \
 	src/cliauth.h \
-	src/types.h \
 	src/imports.h \
-	src/log.c \
-	src/log.h \
-	src/bitwise.c \
-	src/bitwise.h \
-	src/memory.c \
-	src/memory.h \
-	src/endian.c \
-	src/endian.h \
-	src/io.c \
-	src/io.h \
-	src/parse.c \
-	src/parse.h \
-	src/hash.c \
-	src/hash.h \
-	src/mac.c \
-	src/mac.h \
-	src/otp.c \
-	src/otp.h \
-	src/account.c \
-	src/account.h \
-	src/args.c \
-	src/args.h
+	src/types.h \
+	src/crypto/mac.c \
+	src/crypto/mac.h \
+	src/crypto/otp.c \
+	src/crypto/otp.h \
+	src/crypto/hash/hash.c \
+	src/crypto/hash/hash.h \
+	src/database/account.c \
+	src/database/account.h \
+	src/io/io.c \
+	src/io/io.h \
+	src/io/log.c \
+	src/io/log.h \
+	src/io/parse/parse.c \
+	src/io/parse/parse.h \
+	src/math/bitwise.c \
+	src/math/bitwise.h \
+	src/math/endian.c \
+	src/math/endian.h \
+	src/memory/memory.c \
+	src/memory/memory.h \
+	src/ui/args.c \
+	src/ui/args.h
 

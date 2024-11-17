@@ -2,11 +2,11 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/memory.c - Memory manipulation implementations.                        */
+/* src/memory/memory.c - Essential memory manipulation implementations.       */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "memory.h"
+#include "memory/memory.h"
 
 #if CLIAUTH_IMPORTS_USE_C_STRING_H
 /*----------------------------------------------------------------------------*/

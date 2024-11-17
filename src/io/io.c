@@ -2,13 +2,13 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io.c - Generic I/O interface implementations.                          */
+/* src/io/io.c - Generic I/O interface implementations.                       */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "io.h"
+#include "io/io.h"
 
-#include "memory.h"
+#include "memory/memory.h"
 
 struct CliAuthIoResult
 cliauth_io_stream_reader_read(
@@ -508,7 +508,7 @@ cliauth_io_buffered_stream_reader_read(
 
    /* buffer in a new block into the read buffer, ignoring errors and simply */
    /* accepting whatever number of bytes we were given */
-   read_result = cliauth_io_stream_reader_read_all(
+   result = cliauth_io_stream_reader_read_all(
       context_reader->backing_reader,
       context_reader->buffer,
       context_reader->length
@@ -583,8 +583,8 @@ cliauth_io_buffered_stream_writer_write(
 
    /* attempt to flush the write buffer */
    result = cliauth_io_buffered_stream_writer_flush(context_writer);
-   write_total += write_result.bytes;
-   data_iter += write_result.bytes;
+   write_total += result.bytes;
+   data_iter += result.bytes;
 
    if (result.status != CLIAUTH_IO_STATUS_SUCCESS) {
       result.bytes = write_total;
@@ -622,7 +622,7 @@ cliauth_io_buffered_stream_writer_write(
 
 void
 cliauth_io_buffered_stream_reader_initialize(
-   struct CliAuthIoBufferedReader * context,
+   struct CliAuthIoBufferedStreamReader * context,
    const struct CliAuthIoStreamReader * backing_reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 length
@@ -652,7 +652,7 @@ cliauth_io_buffered_stream_writer_initialize(
    return;
 }
 
-struct CliAuthIoReader
+struct CliAuthIoStreamReader
 cliauth_io_buffered_stream_reader_interface(
    struct CliAuthIoBufferedStreamReader * context
 ) {
@@ -664,7 +664,7 @@ cliauth_io_buffered_stream_reader_interface(
    return retn;
 }
 
-struct CliAuthIoWriter
+struct CliAuthIoStreamWriter
 cliauth_io_buffered_stream_writer_interface(
    struct CliAuthIoBufferedStreamWriter * context
 ) {

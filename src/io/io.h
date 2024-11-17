@@ -2,7 +2,7 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io.h - Generic I/O interface header.                                   */
+/* src/io/io.h - Generic I/O interfaces.                                      */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_IO_H

@@ -2,24 +2,24 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/bitwise.c - Implementations for bitwise operations.                    */
+/* src/math/bitwise.c - Implementations for bitwise operations.               */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "bitwise.h"
+#include "math/bitwise.h"
 
-#define CLIAUTH_BITWISE_ROTATE_LEFT(bitwidth, value, bits)\
+#define CLIAUTH_MATH_BITWISE_ROTATE_LEFT(bitwidth, value, bits)\
    (((value) << (bits)) | ((value) >> ((bitwidth) - (bits))))
 
-#define CLIAUTH_BITWISE_ROTATE_RIGHT(bitwidth, value, bits)\
+#define CLIAUTH_MATH_BITWISE_ROTATE_RIGHT(bitwidth, value, bits)\
    (((value) >> (bits)) | ((value) << ((bitwidth) - (bits))))
 
 CliAuthUInt8
-cliauth_bitwise_rotate_left_uint8(
+cliauth_math_bitwise_rotate_left_uint8(
    CliAuthUInt8 value,
    CliAuthUInt8 bits
 ) {
-   return CLIAUTH_BITWISE_ROTATE_LEFT(
+   return CLIAUTH_MATH_BITWISE_ROTATE_LEFT(
       sizeof(CliAuthUInt8) * 8u,
       value,
       bits
@@ -27,11 +27,11 @@ cliauth_bitwise_rotate_left_uint8(
 }
 
 CliAuthUInt16
-cliauth_bitwise_rotate_left_uint16(
+cliauth_math_bitwise_rotate_left_uint16(
    CliAuthUInt16 value,
    CliAuthUInt8 bits
 ) {
-   return CLIAUTH_BITWISE_ROTATE_LEFT(
+   return CLIAUTH_MATH_BITWISE_ROTATE_LEFT(
       sizeof(CliAuthUInt16) * 8u,
       value,
       bits
@@ -39,11 +39,11 @@ cliauth_bitwise_rotate_left_uint16(
 }
 
 CliAuthUInt32
-cliauth_bitwise_rotate_left_uint32(
+cliauth_math_bitwise_rotate_left_uint32(
    CliAuthUInt32 value,
    CliAuthUInt8 bits
 ) {
-   return CLIAUTH_BITWISE_ROTATE_LEFT(
+   return CLIAUTH_MATH_BITWISE_ROTATE_LEFT(
       sizeof(CliAuthUInt32) * 8u,
       value,
       bits
@@ -51,11 +51,11 @@ cliauth_bitwise_rotate_left_uint32(
 }
 
 CliAuthUInt64
-cliauth_bitwise_rotate_left_uint64(
+cliauth_math_bitwise_rotate_left_uint64(
    CliAuthUInt64 value,
    CliAuthUInt8 bits
 ) {
-   return CLIAUTH_BITWISE_ROTATE_LEFT(
+   return CLIAUTH_MATH_BITWISE_ROTATE_LEFT(
       sizeof(CliAuthUInt64) * 8u,
       value,
       bits
@@ -63,11 +63,11 @@ cliauth_bitwise_rotate_left_uint64(
 }
 
 CliAuthUInt8
-cliauth_bitwise_rotate_right_uint8(
+cliauth_math_bitwise_rotate_right_uint8(
    CliAuthUInt8 value,
    CliAuthUInt8 bits
 ) {
-   return CLIAUTH_BITWISE_ROTATE_RIGHT(
+   return CLIAUTH_MATH_BITWISE_ROTATE_RIGHT(
       sizeof(CliAuthUInt8) * 8u,
       value,
       bits
@@ -75,11 +75,11 @@ cliauth_bitwise_rotate_right_uint8(
 }
 
 CliAuthUInt16
-cliauth_bitwise_rotate_right_uint16(
+cliauth_math_bitwise_rotate_right_uint16(
    CliAuthUInt16 value,
    CliAuthUInt8 bits
 ) {
-   return CLIAUTH_BITWISE_ROTATE_RIGHT(
+   return CLIAUTH_MATH_BITWISE_ROTATE_RIGHT(
       sizeof(CliAuthUInt16) * 8u,
       value,
       bits
@@ -87,11 +87,11 @@ cliauth_bitwise_rotate_right_uint16(
 }
 
 CliAuthUInt32
-cliauth_bitwise_rotate_right_uint32(
+cliauth_math_bitwise_rotate_right_uint32(
    CliAuthUInt32 value,
    CliAuthUInt8 bits
 ) {
-   return CLIAUTH_BITWISE_ROTATE_RIGHT(
+   return CLIAUTH_MATH_BITWISE_ROTATE_RIGHT(
       sizeof(CliAuthUInt32) * 8u,
       value,
       bits
@@ -99,11 +99,11 @@ cliauth_bitwise_rotate_right_uint32(
 }
 
 CliAuthUInt64
-cliauth_bitwise_rotate_right_uint64(
+cliauth_math_bitwise_rotate_right_uint64(
    CliAuthUInt64 value,
    CliAuthUInt8 bits
 ) {
-   return CLIAUTH_BITWISE_ROTATE_RIGHT(
+   return CLIAUTH_MATH_BITWISE_ROTATE_RIGHT(
       sizeof(CliAuthUInt64) * 8u,
       value,
       bits
@@ -111,7 +111,7 @@ cliauth_bitwise_rotate_right_uint64(
 }
 
 static CliAuthSInt64
-cliauth_bitwise_magnitude_deposit_negative_sint64_sign_magnitude(
+cliauth_math_bitwise_magnitude_deposit_negative_sint64_sign_magnitude(
    CliAuthUInt64 magnitude
 ) {
    union CliAuthInt64 output;
@@ -126,7 +126,7 @@ cliauth_bitwise_magnitude_deposit_negative_sint64_sign_magnitude(
 }
 
 static CliAuthSInt64
-cliauth_bitwise_magnitude_deposit_negative_sint64_ones_complement(
+cliauth_math_bitwise_magnitude_deposit_negative_sint64_ones_complement(
    CliAuthUInt64 magnitude
 ) {
    union CliAuthInt64 output;
@@ -141,7 +141,7 @@ cliauth_bitwise_magnitude_deposit_negative_sint64_ones_complement(
 }
 
 static CliAuthSInt64
-cliauth_bitwise_magnitude_deposit_negative_sint64_twos_complement(
+cliauth_math_bitwise_magnitude_deposit_negative_sint64_twos_complement(
    CliAuthUInt64 magnitude
 ) {
    union CliAuthInt64 output;
@@ -159,7 +159,7 @@ cliauth_bitwise_magnitude_deposit_negative_sint64_twos_complement(
 }
 
 static CliAuthUInt64
-cliauth_bitwise_magnitude_extract_negative_sint64_sign_magnitude(
+cliauth_math_bitwise_magnitude_extract_negative_sint64_sign_magnitude(
    CliAuthSInt64 value
 ) {
    union CliAuthInt64 output;
@@ -174,7 +174,7 @@ cliauth_bitwise_magnitude_extract_negative_sint64_sign_magnitude(
 }
 
 static CliAuthUInt64
-cliauth_bitwise_magnitude_extract_negative_sint64_ones_complement(
+cliauth_math_bitwise_magnitude_extract_negative_sint64_ones_complement(
    CliAuthSInt64 value
 ) {
    union CliAuthInt64 output;
@@ -189,7 +189,7 @@ cliauth_bitwise_magnitude_extract_negative_sint64_ones_complement(
 }
 
 static CliAuthUInt64
-cliauth_bitwise_magnitude_extract_negative_sint64_twos_complement(
+cliauth_math_bitwise_magnitude_extract_negative_sint64_twos_complement(
    CliAuthSInt64 value
 ) {
    union CliAuthInt64 output;
@@ -207,56 +207,56 @@ cliauth_bitwise_magnitude_extract_negative_sint64_twos_complement(
 }
 
 CliAuthSInt8
-cliauth_bitwise_magnitude_deposit_negative_sint8(
+cliauth_math_bitwise_magnitude_deposit_negative_sint8(
    CliAuthUInt8 magnitude
 ) {
-   return (CliAuthSInt8)cliauth_bitwise_magnitude_deposit_negative_sint64(
+   return (CliAuthSInt8)cliauth_math_bitwise_magnitude_deposit_negative_sint64(
       (CliAuthUInt64)magnitude
    );
 }
 
 CliAuthSInt16
-cliauth_bitwise_magnitude_deposit_negative_sint16(
+cliauth_math_bitwise_magnitude_deposit_negative_sint16(
    CliAuthUInt16 magnitude
 ) {
-   return (CliAuthSInt16)cliauth_bitwise_magnitude_deposit_negative_sint64(
+   return (CliAuthSInt16)cliauth_math_bitwise_magnitude_deposit_negative_sint64(
       (CliAuthUInt64)magnitude
    );
 }
 
 CliAuthSInt32
-cliauth_bitwise_magnitude_deposit_negative_sint32(
+cliauth_math_bitwise_magnitude_deposit_negative_sint32(
    CliAuthUInt32 magnitude
 ) {
-   return (CliAuthSInt32)cliauth_bitwise_magnitude_deposit_negative_sint64(
+   return (CliAuthSInt32)cliauth_math_bitwise_magnitude_deposit_negative_sint64(
       (CliAuthUInt64)magnitude
    );
 }
 
 CliAuthSInt64
-cliauth_bitwise_magnitude_deposit_negative_sint64(
+cliauth_math_bitwise_magnitude_deposit_negative_sint64(
    CliAuthUInt64 magnitude
 ) {
    CliAuthSInt64 retn;
 
 #if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_SIGN_MAGNITUDE
-   (void)cliauth_bitwise_magnitude_deposit_negative_sint64_ones_complement;
-   (void)cliauth_bitwise_magnitude_deposit_negative_sint64_twos_complement;
-   retn = cliauth_bitwise_magnitude_deposit_negative_sint64_sign_magnitude(
+   (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_ones_complement;
+   (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_twos_complement;
+   retn = cliauth_math_bitwise_magnitude_deposit_negative_sint64_sign_magnitude(
       magnitude
    );
 #endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_SIGN_MAGNITUDE */
 #if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_ONES_COMPLEMENT
-   (void)cliauth_bitwise_magnitude_deposit_negative_sint64_sign_magnitude;
-   (void)cliauth_bitwise_magnitude_deposit_negative_sint64_twos_complement;
-   retn = cliauth_bitwise_magnitude_deposit_negative_sint64_ones_complement(
+   (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_sign_magnitude;
+   (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_twos_complement;
+   retn = cliauth_math_bitwise_magnitude_deposit_negative_sint64_ones_complement(
       magnitude
    );
 #endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_ONES_COMPLEMENT */
 #if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT
-   (void)cliauth_bitwise_magnitude_deposit_negative_sint64_sign_magnitude;
-   (void)cliauth_bitwise_magnitude_deposit_negative_sint64_ones_complement;
-   retn = cliauth_bitwise_magnitude_deposit_negative_sint64_twos_complement(
+   (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_sign_magnitude;
+   (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_ones_complement;
+   retn = cliauth_math_bitwise_magnitude_deposit_negative_sint64_twos_complement(
       magnitude
    );
 #endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT */
@@ -265,56 +265,56 @@ cliauth_bitwise_magnitude_deposit_negative_sint64(
 }
 
 CliAuthUInt8
-cliauth_bitwise_magnitude_extract_negative_sint8(
+cliauth_math_bitwise_magnitude_extract_negative_sint8(
    CliAuthSInt8 value
 ) {
-   return (CliAuthUInt8)cliauth_bitwise_magnitude_extract_negative_sint64(
+   return (CliAuthUInt8)cliauth_math_bitwise_magnitude_extract_negative_sint64(
       (CliAuthSInt64)value
    );
 }
 
 CliAuthUInt16
-cliauth_bitwise_magnitude_extract_negative_sint16(
+cliauth_math_bitwise_magnitude_extract_negative_sint16(
    CliAuthSInt16 value
 ) {
-   return (CliAuthUInt16)cliauth_bitwise_magnitude_extract_negative_sint64(
+   return (CliAuthUInt16)cliauth_math_bitwise_magnitude_extract_negative_sint64(
       (CliAuthSInt64)value
    );
 }
 
 CliAuthUInt32
-cliauth_bitwise_magnitude_extract_negative_sint32(
+cliauth_math_bitwise_magnitude_extract_negative_sint32(
    CliAuthSInt32 value
 ) {
-   return (CliAuthUInt32)cliauth_bitwise_magnitude_extract_negative_sint64(
+   return (CliAuthUInt32)cliauth_math_bitwise_magnitude_extract_negative_sint64(
       (CliAuthSInt64)value
    );
 }
 
 CliAuthUInt64
-cliauth_bitwise_magnitude_extract_negative_sint64(
+cliauth_math_bitwise_magnitude_extract_negative_sint64(
    CliAuthSInt64 value
 ) {
    CliAuthUInt64 retn;
 
 #if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_SIGN_MAGNITUDE
-   (void)cliauth_bitwise_magnitude_extract_negative_sint64_ones_complement;
-   (void)cliauth_bitwise_magnitude_extract_negative_sint64_twos_complement;
-   retn = cliauth_bitwise_magnitude_extract_negative_sint64_sign_magnitude(
+   (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_ones_complement;
+   (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_twos_complement;
+   retn = cliauth_math_bitwise_magnitude_extract_negative_sint64_sign_magnitude(
       value
    );
 #endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_SIGN_MAGNITUDE */
 #if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_ONES_COMPLEMENT
-   (void)cliauth_bitwise_magnitude_extract_negative_sint64_sign_magnitude;
-   (void)cliauth_bitwise_magnitude_extract_negative_sint64_twos_complement;
-   retn = cliauth_bitwise_magnitude_extract_negative_sint64_ones_complement(
+   (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_sign_magnitude;
+   (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_twos_complement;
+   retn = cliauth_math_bitwise_magnitude_extract_negative_sint64_ones_complement(
       value
    );
 #endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_ONES_COMPLEMENT */
 #if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT
-   (void)cliauth_bitwise_magnitude_extract_negative_sint64_sign_magnitude;
-   (void)cliauth_bitwise_magnitude_extract_negative_sint64_ones_complement;
-   retn = cliauth_bitwise_magnitude_extract_negative_sint64_twos_complement(
+   (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_sign_magnitude;
+   (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_ones_complement;
+   retn = cliauth_math_bitwise_magnitude_extract_negative_sint64_twos_complement(
       value
    );
 #endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT */

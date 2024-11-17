@@ -2,20 +2,20 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/otp.c - One-time-password (OTP) algorithm implementations.             */
+/* src/crypto/otp.c - One-time-password (OTP) algorithm implementations.      */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "otp.h"
+#include "crypto/otp.h"
 
-#include "memory.h"
-#include "endian.h"
-#include "hash.h"
-#include "mac.h"
-#include "io.h"
+#include "memory/memory.h"
+#include "math/endian.h"
+#include "crypto/hash/hash.h"
+#include "crypto/mac.h"
+#include "io/io.h"
 
 static CliAuthUInt32
-cliauth_otp_hotp_truncate_digest(
+cliauth_crypto_otp_hotp_truncate_digest(
    const CliAuthUInt8 digest [],
    CliAuthUInt32 bytes
 ) {
@@ -34,9 +34,9 @@ cliauth_otp_hotp_truncate_digest(
       &digest_bytes[offset],
       sizeof(passcode)
    );
-   passcode = cliauth_endian_convert_uint32(
+   passcode = cliauth_math_endian_convert_uint32(
       passcode,
-      CLIAUTH_ENDIAN_TARGET_BIG
+      CLIAUTH_MATH_ENDIAN_TARGET_BIG
    );
 
    /* discard the top-most bit */
@@ -46,7 +46,7 @@ cliauth_otp_hotp_truncate_digest(
 }
 
 static CliAuthUInt32
-cliauth_otp_hotp_trim_digits(
+cliauth_crypto_otp_hotp_trim_digits(
    CliAuthUInt32 passcode,
    CliAuthUInt8 digits
 ) {
@@ -62,13 +62,13 @@ cliauth_otp_hotp_trim_digits(
 }
 
 void
-cliauth_otp_hotp_initialize(
-   struct CliAuthOtpHotpContext * context,
-   const struct CliAuthHashFunction * hash_function,
+cliauth_crypto_otp_hotp_initialize(
+   struct CliAuthCryptoOtpHotpContext * context,
+   const struct CliAuthCryptoHashFunction * hash_function,
    CliAuthUInt64 counter,
    CliAuthUInt8 digits
 ) {
-   cliauth_mac_hmac_initialize(
+   cliauth_crypto_mac_hmac_initialize(
       &context->hmac_context,
       hash_function
    );
@@ -80,12 +80,12 @@ cliauth_otp_hotp_initialize(
 }
 
 struct CliAuthIoResult
-cliauth_otp_hotp_key_digest(
-   struct CliAuthOtpHotpContext * context,
+cliauth_crypto_otp_hotp_key_digest(
+   struct CliAuthCryptoOtpHotpContext * context,
    const struct CliAuthIoStreamReader * key_reader,
    CliAuthUInt32 key_bytes
 ) {
-   return cliauth_mac_hmac_key_digest(
+   return cliauth_crypto_mac_hmac_key_digest(
       &context->hmac_context,
       key_reader,
       key_bytes
@@ -93,8 +93,8 @@ cliauth_otp_hotp_key_digest(
 }
 
 CliAuthUInt32
-cliauth_otp_hotp_finalize(
-   struct CliAuthOtpHotpContext * context
+cliauth_crypto_otp_hotp_finalize(
+   struct CliAuthCryptoOtpHotpContext * context
 ) {
    struct CliAuthIoByteArrayMapperReader counter_byte_array_mapper_reader;
    struct CliAuthIoMapperReader counter_mapper_reader;
@@ -106,13 +106,13 @@ cliauth_otp_hotp_finalize(
    CliAuthUInt32 passcode_final;
 
    /* finalize the key digest */
-   cliauth_mac_hmac_key_finalize(&context->hmac_context);
+   cliauth_crypto_mac_hmac_key_finalize(&context->hmac_context);
 
    /* convert the counter value to big-endian and digest it as the HMAC */
    /* message */
-   counter_big_endian.uint = cliauth_endian_convert_uint64(
+   counter_big_endian.uint = cliauth_math_endian_convert_uint64(
       context->counter,
-      CLIAUTH_ENDIAN_TARGET_BIG
+      CLIAUTH_MATH_ENDIAN_TARGET_BIG
    );
 
    counter_mapper_reader = cliauth_io_byte_array_mapper_reader_interface(
@@ -133,23 +133,23 @@ cliauth_otp_hotp_finalize(
       CLIAUTH_LITERAL_UINT32(0u)
    );
 
-   (void)cliauth_mac_hmac_message_digest(
+   (void)cliauth_crypto_mac_hmac_message_digest(
       &context->hmac_context,
       &counter_stream_reader,
       CLIAUTH_LITERAL_UINT32(sizeof(counter_big_endian))
    );
 
    /* finalize the HMAC digest */
-   hmac_digest = cliauth_mac_hmac_finalize(&context->hmac_context);
+   hmac_digest = cliauth_crypto_mac_hmac_finalize(&context->hmac_context);
 
    /* truncate to a 32-bit word and convert to native endian */
-   passcode_untrimmed = cliauth_otp_hotp_truncate_digest(
+   passcode_untrimmed = cliauth_crypto_otp_hotp_truncate_digest(
       hmac_digest,
       context->hmac_context.hash_function->digest_length
    );
 
    /* modulo to keep only the desired number of digits*/
-   passcode_final = cliauth_otp_hotp_trim_digits(
+   passcode_final = cliauth_crypto_otp_hotp_trim_digits(
       passcode_untrimmed,
       context->digits
    );
@@ -158,7 +158,7 @@ cliauth_otp_hotp_finalize(
 }
 
 CliAuthUInt64
-cliauth_otp_totp_calculate_counter(
+cliauth_crypto_otp_totp_calculate_counter(
    CliAuthUInt64 time_initial,
    CliAuthUInt64 time_current,
    CliAuthUInt64 time_interval
