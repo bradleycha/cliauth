@@ -10,7 +10,7 @@
 
 #include "memory/memory.h"
 #include "math/endian.h"
-#include "crypto/hash/hash.h"
+#include "crypto/hash.h"
 #include "crypto/mac.h"
 #include "io/io.h"
 #include "io/byte_array_mapper.h"

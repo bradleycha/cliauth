@@ -9,7 +9,7 @@
 #include "ui/args.h"
 
 #include "memory/memory.h"
-#include "crypto/hash/hash.h"
+#include "crypto/hash.h"
 #include "database/account.h"
 #include "io/log.h"
 

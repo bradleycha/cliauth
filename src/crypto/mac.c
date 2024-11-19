@@ -10,7 +10,7 @@
 #include "crypto/mac.h"
 
 #include "memory/memory.h"
-#include "crypto/hash/hash.h"
+#include "crypto/hash.h"
 #include "io/io.h"
 #include "io/byte_array_mapper.h"
 #include "io/mapper_stream.h"

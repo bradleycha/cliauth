@@ -21,12 +21,12 @@ cliauth_SOURCES = \
 	src/cliauth.h \
 	src/imports.h \
 	src/types.h \
+	src/crypto/hash.c \
+	src/crypto/hash.h \
 	src/crypto/mac.c \
 	src/crypto/mac.h \
 	src/crypto/otp.c \
 	src/crypto/otp.h \
-	src/crypto/hash/hash.c \
-	src/crypto/hash/hash.h \
 	src/database/account.c \
 	src/database/account.h \
 	src/io/buffered_stream.c \

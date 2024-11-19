@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "crypto/hash/hash.h"
+#include "crypto/hash.h"
 
 #include "memory/memory.h"
 #include "math/endian.h"

@@ -10,7 +10,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "crypto/hash/hash.h"
+#include "crypto/hash.h"
 #include "crypto/mac.h"
 #include "io/io.h"
 
