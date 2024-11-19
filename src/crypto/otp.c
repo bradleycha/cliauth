@@ -13,6 +13,8 @@
 #include "crypto/hash/hash.h"
 #include "crypto/mac.h"
 #include "io/io.h"
+#include "io/byte_array_mapper.h"
+#include "io/mapper_stream.h"
 
 static CliAuthUInt32
 cliauth_crypto_otp_hotp_truncate_digest(

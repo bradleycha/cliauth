@@ -10,6 +10,8 @@
 
 #include "crypto/otp.h"
 #include "io/io.h"
+#include "io/byte_array_mapper.h"
+#include "io/mapper_stream.h"
 
 static CliAuthBoolean
 cliauth_database_account_generate_passcode_index_exists(

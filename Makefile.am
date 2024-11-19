@@ -29,8 +29,14 @@ cliauth_SOURCES = \
 	src/crypto/hash/hash.h \
 	src/database/account.c \
 	src/database/account.h \
+	src/io/buffered_stream.c \
+	src/io/buffered_stream.h \
+	src/io/byte_array_mapper.c \
+	src/io/byte_array_mapper.h \
 	src/io/io.c \
 	src/io/io.h \
+	src/io/mapper_stream.c \
+	src/io/mapper_stream.h \
 	src/io/log.c \
 	src/io/log.h \
 	src/io/parse/string_integer.c \

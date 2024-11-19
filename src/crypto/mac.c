@@ -12,6 +12,8 @@
 #include "memory/memory.h"
 #include "crypto/hash/hash.h"
 #include "io/io.h"
+#include "io/byte_array_mapper.h"
+#include "io/mapper_stream.h"
 
 #define CLIAUTH_CRYPTO_MAC_HMAC_IPAD 0x36u
 #define CLIAUTH_CRYPTO_MAC_HMAC_OPAD 0x5cu
