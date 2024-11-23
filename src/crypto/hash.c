@@ -2,7 +2,7 @@
 /*                         Copyright (c) CliAuth 2024                         */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/crypto/hash/hash.c - Hash algorithm implementations                    */
+/* src/crypto/hash.c - Hash algorithm implementations                         */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"

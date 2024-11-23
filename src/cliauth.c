@@ -7,7 +7,6 @@
 
 #include "cliauth.h"
 #include "ui/args.h"
-#include "crypto/otp.h"
 #include "database/account.h"
 #include "io/log.h"
 

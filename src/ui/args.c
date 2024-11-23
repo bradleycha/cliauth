@@ -36,7 +36,7 @@ cliauth_args_parse_hash_function(
 
    hash_iterator = cliauth_crypto_hash;
    i = CLIAUTH_CRYPTO_HASH_ENABLED_COUNT;
-   while (i != 0) {
+   while (i != CLIAUTH_LITERAL_UINT8(0u)) {
       if (cliauth_memory_compare(
          hash_iterator->identifier,
          identifier,
