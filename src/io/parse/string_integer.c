@@ -9,254 +9,251 @@
 #include "io/parse/string_integer.h"
 
 #include "io/io.h"
+#include "memory/memory.h"
 #include "math/bitwise.h"
 
-/* an integer represented in sign-magnitude format*/
-struct CliAuthIoParseStringIntegerSignMagnitude {
-   enum CliAuthIoParseStringIntegerSign sign;
-   CliAuthUInt64 magnitude;
+/* if the sign should be detected automatically or not */
+#define CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_DETECT_SIGN\
+   CLIAUTH_LITERAL_UINT8(1u << 0u)
+/* if the base should be detected automatically or not */
+#define CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_DETECT_BASE\
+   CLIAUTH_LITERAL_UINT8(1u << 1u)
+/* whether the sign character was encountered yet */
+#define CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_SIGN\
+   CLIAUTH_LITERAL_UINT8(1u << 2u)
+/* whether the base prefix character was encountered */
+#define CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_BASE_PREFIX\
+   CLIAUTH_LITERAL_UINT8(1u << 3u)
+/* whether the base prefix character was encountered on the last character */
+#define CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_BASE_PREFIX_PREVIOUS\
+   CLIAUTH_LITERAL_UINT8(1u << 4u)
+/* whether the base character was encountered */
+#define CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_BASE\
+   CLIAUTH_LITERAL_UINT8(1u << 5u)
+/* whether a normal digit was encountered */
+#define CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_DIGIT\
+   CLIAUTH_LITERAL_UINT8(1u << 6u)
+
+enum CliAuthIoParseStringIntegerDigitParserStatus {
+   CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS,
+   CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID
 };
 
-/* general parsing state for string integers */
-struct CliAuthIoParseStringIntegerState {
-   /* the base to parse digits as */
-   enum CliAuthIoParseStringIntegerBase base;
-
-   /* the current value */
-   struct CliAuthIoParseStringIntegerSignMagnitude value;
-
-   /* the number of remaining characters */
-   CliAuthUInt32 characters_remaining;
-
-   /* whether to automatically detect the sign or not */
-   CliAuthBoolean detect_sign;
-
-   /* whether to automatically detect the base or not */
-   CliAuthBoolean detect_base;
-
-   /* whether the sign character was encountered yet */
-   CliAuthBoolean encountered_sign;
-
-   /* whether the base prefix character was encountered */
-   CliAuthBoolean encountered_base_prefix;
-
-   /* whether the base prefix character was encountered on the last character */
-   CliAuthBoolean encountered_base_prefix_previous;
-
-   /* whether the base character was encountered */
-   CliAuthBoolean encountered_base;
-
-   /* whether a normal digit was encountered */
-   CliAuthBoolean encountered_digit;
-};
-
-/* parses a character into its integer value */
-typedef enum CliAuthIoParseStringIntegerStatus (*CliAuthIoParseStringIntegerBaseDigitContextParser)(
+/* a function which parses a digit into its value */
+typedef enum CliAuthIoParseStringIntegerDigitParserStatus (*CliAuthIoParseStringIntegerDigitParserFunction)(
    CliAuthUInt8 * output,
-   char digit
+   CliAuthUInt8 digit
 );
 
-/* information used to parse digits in an arbitrary number base */
-struct CliAuthIoParseStringIntegerBaseDigitContext {
-   CliAuthIoParseStringIntegerBaseDigitContextParser parser;
-   CliAuthUInt8 value;
+/* a parser function with its relevant base */
+struct CliAuthIoParseStringIntegerDigitParser {
+   CliAuthIoParseStringIntegerDigitParserFunction parser;  
+   CliAuthUInt8 base;
 };
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_base_digit_context_parser_base_2(
+static enum CliAuthIoParseStringIntegerDigitParserStatus
+cliauth_io_parse_string_integer_digit_parser_base_2(
    CliAuthUInt8 * output,
-   char digit
+   CliAuthUInt8 digit
 ) {
-   if (digit >= '0' && digit <= '1') {
-      *output = (CliAuthUInt8)(digit - '0');
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
+   if (digit >= CLIAUTH_LITERAL_UINT8('0') && digit <= CLIAUTH_LITERAL_UINT8('1')) {
+      *output = digit - CLIAUTH_LITERAL_UINT8('0');
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
    }
 
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_INVALID_DIGIT;
+   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID;
 }
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_base_digit_context_parser_base_8(
+static enum CliAuthIoParseStringIntegerDigitParserStatus
+cliauth_io_parse_string_integer_digit_parser_base_8(
    CliAuthUInt8 * output,
-   char digit
+   CliAuthUInt8 digit
 ) {
-   if (digit >= '0' && digit <= '7') {
-      *output = (CliAuthUInt8)(digit - '0');
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
+   if (digit >= CLIAUTH_LITERAL_UINT8('0') && digit <= CLIAUTH_LITERAL_UINT8('7')) {
+      *output = digit - CLIAUTH_LITERAL_UINT8('0');
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
    }
 
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_INVALID_DIGIT;
+   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID;
 }
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_base_digit_context_parser_base_10(
+static enum CliAuthIoParseStringIntegerDigitParserStatus
+cliauth_io_parse_string_integer_digit_parser_base_10(
    CliAuthUInt8 * output,
-   char digit
+   CliAuthUInt8 digit
 ) {
-   if (digit >= '0' && digit <= '9') {
-      *output = (CliAuthUInt8)(digit - '0');
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
+   if (digit >= CLIAUTH_LITERAL_UINT8('0') && digit <= CLIAUTH_LITERAL_UINT8('9')) {
+      *output = digit - CLIAUTH_LITERAL_UINT8('0');
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
    }
 
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_INVALID_DIGIT;
+   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID;
 }
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_base_digit_context_parser_base_16(
+static enum CliAuthIoParseStringIntegerDigitParserStatus
+cliauth_io_parse_string_integer_digit_parser_base_16(
    CliAuthUInt8 * output,
-   char digit
+   CliAuthUInt8 digit
 ) {
-   if (digit >= '0' && digit <= '9') {
-      *output = (CliAuthUInt8)(digit - '0');
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
+   if (digit >= CLIAUTH_LITERAL_UINT8('0') && digit <= CLIAUTH_LITERAL_UINT8('9')) {
+      *output = digit - CLIAUTH_LITERAL_UINT8('0');
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
    }
-   if (digit >= 'a' && digit <= 'f') {
-      *output = (CliAuthUInt8)(digit - 'a') + CLIAUTH_LITERAL_UINT8(10u);
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
+   if (digit >= CLIAUTH_LITERAL_UINT8('a') && digit <= CLIAUTH_LITERAL_UINT8('f')) {
+      *output = digit - CLIAUTH_LITERAL_UINT8('a') + CLIAUTH_LITERAL_UINT8(10u);
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
    }
-   if (digit >= 'A' && digit <= 'F') {
-      *output = (CliAuthUInt8)(digit - 'A') + CLIAUTH_LITERAL_UINT8(10u);
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
+   if (digit >= CLIAUTH_LITERAL_UINT8('A') && digit <= CLIAUTH_LITERAL_UINT8('F')) {
+      *output = digit - CLIAUTH_LITERAL_UINT8('A') + CLIAUTH_LITERAL_UINT8(10u);
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
    }
 
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_INVALID_DIGIT;
+   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID;
 }
 
-/* table of base digit contexts for every possible base */
-static const struct CliAuthIoParseStringIntegerBaseDigitContext
-cliauth_io_parse_string_integer_base_digit_contexts [CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_FIELD_COUNT - 1] = {
+/* table of all digit parsers */
+static const struct CliAuthIoParseStringIntegerDigitParser
+cliauth_io_parse_string_integer_digit_parsers [CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_FIELD_COUNT - 1] = {
    { /* CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_2 */
-      cliauth_io_parse_string_integer_base_digit_context_parser_base_2,
+      cliauth_io_parse_string_integer_digit_parser_base_2,
       CLIAUTH_LITERAL_UINT8(2u)
    },
    { /* CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_8 */
-      cliauth_io_parse_string_integer_base_digit_context_parser_base_8,
+      cliauth_io_parse_string_integer_digit_parser_base_8,
       CLIAUTH_LITERAL_UINT8(8u)
    },
    { /* CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_10 */
-      cliauth_io_parse_string_integer_base_digit_context_parser_base_10,
+      cliauth_io_parse_string_integer_digit_parser_base_10,
       CLIAUTH_LITERAL_UINT8(10u)
    },
    { /* CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_16 */
-      cliauth_io_parse_string_integer_base_digit_context_parser_base_16,
+      cliauth_io_parse_string_integer_digit_parser_base_16,
       CLIAUTH_LITERAL_UINT8(16u)
    }
 };
 
-/* initializes the string integer parsing state to default values */
-static void
-cliauth_io_parse_string_integer_state_initialize(
-   struct CliAuthIoParseStringIntegerState * state,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base,
-   CliAuthUInt32 characters
+static enum CliAuthIoParseStringIntegerDigestStatus
+cliauth_io_parse_string_integer_digest_character_magnitude(
+   struct CliAuthIoParseStringIntegerContext * context,
+   CliAuthUInt8 character
 ) {
-   state->value.magnitude = CLIAUTH_LITERAL_UINT64(0u, 0u);
-   state->characters_remaining = characters;
-   state->encountered_sign = CLIAUTH_BOOLEAN_FALSE;
-   state->encountered_base_prefix = CLIAUTH_BOOLEAN_FALSE;
-   state->encountered_base_prefix_previous = CLIAUTH_BOOLEAN_FALSE;
-   state->encountered_base = CLIAUTH_BOOLEAN_FALSE;
-   state->encountered_digit = CLIAUTH_BOOLEAN_FALSE;
+   const struct CliAuthIoParseStringIntegerDigitParser * digit_parser;
+   enum CliAuthIoParseStringIntegerDigitParserStatus digit_parser_status;
+   CliAuthUInt8 digit_value;
+   CliAuthUInt64 magnitude_max;
+   CliAuthUInt64 magnitude_new;
 
-   if (sign == CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_AUTOMATIC) {
-      state->value.sign = CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_POSITIVE;
-      state->detect_sign = CLIAUTH_BOOLEAN_TRUE;
-   } else {
-      state->value.sign = sign;
-      state->detect_sign = CLIAUTH_BOOLEAN_FALSE;
-   }
+   /* get the relevant digit parser */
+   digit_parser = &cliauth_io_parse_string_integer_digit_parsers[context->base];
 
-   if (base == CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_AUTOMATIC) {
-      state->base = CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_10;
-      state->detect_base = CLIAUTH_BOOLEAN_TRUE;
-   } else {
-      state->base = base;
-      state->detect_base = CLIAUTH_BOOLEAN_FALSE;
-   }
+   /* attempt to convert the digit to its integer value */
+   digit_parser_status = digit_parser->parser(&digit_value, character);
+   switch (digit_parser_status) {
+      case CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS:
+         break;
 
-   return;
-}
+      case CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID:
+         return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_INVALID_DIGIT;
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_state_digest_magnitude_digit(
-   struct CliAuthIoParseStringIntegerState * state,
-   char digit
-) {
-   enum CliAuthIoParseStringIntegerStatus status;
-   const struct CliAuthIoParseStringIntegerBaseDigitContext * base_digit_context;
-   CliAuthUInt8 value;
-   CliAuthUInt64 magnitude_appended;
-
-   /* get the base digit context struct */
-   base_digit_context = &cliauth_io_parse_string_integer_base_digit_contexts[state->base];
-
-   /* convert the digit into its integer value */
-   status = base_digit_context->parser(
-      &value,
-      digit
-   );
-   if (status != CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS) {
-      return status;
+      default:
+         CLIAUTH_UNREACHABLE;
    }
 
    /* prepare to append the digit to the magnitude */
-   magnitude_appended = state->value.magnitude;
+   magnitude_new = context->value.magnitude;
 
-   /* shift the existing magnitude up one digit, checking if it will overflow */
-   if (magnitude_appended > CLIAUTH_UINT64_MAX / base_digit_context->value) {
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_OUT_OF_RANGE;
+   /* choose which maximum magnitude we care about */
+   switch (context->value.sign) {
+      case CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_POSITIVE:
+         magnitude_max = context->range.maximum_magnitude_positive;
+         break;
+
+      case CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_NEGATIVE:
+         magnitude_max = context->range.minimum_magnitude_negative;
+         break;
+
+      case CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_AUTOMATIC:
+         CLIAUTH_UNREACHABLE;
+
+      default:
+         CLIAUTH_UNREACHABLE;
    }
-   magnitude_appended *= base_digit_context->value;
 
-   /* append the digit, checking if it will overflow */
-   if (magnitude_appended > CLIAUTH_UINT64_MAX - value) {
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_OUT_OF_RANGE;
+   /* shift the magnitude over for the new digit, checking if it will */
+   /* overflow */
+   if (magnitude_new > magnitude_max / digit_parser->base) {
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_OUT_OF_RANGE;
    }
-   magnitude_appended += value;
+   magnitude_new *= digit_parser->base;
 
-   /* store the new magnitude */
-   state->value.magnitude = magnitude_appended;
+   /* append the new digit to the shifted magnitude, checking if it will */
+   /* overflow */
+   if (magnitude_new > magnitude_max - digit_value) {
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_OUT_OF_RANGE;
+   }
+   magnitude_new += digit_value;
 
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
+   /* store the new magnitude and return */
+   context->value.magnitude = magnitude_new;
+   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_SUCCESS;
 }
 
 #define CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_SIGN_POSITIVE\
-   '+'
+   CLIAUTH_LITERAL_UINT8('+')
 #define CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_SIGN_NEGATIVE\
-   '-'
-#define CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_ESCAPE\
-   '0'
+   CLIAUTH_LITERAL_UINT8('-')
+#define CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_PREFIX\
+   CLIAUTH_LITERAL_UINT8('0')
 #define CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_2\
-   'b'
+   CLIAUTH_LITERAL_UINT8('b')
 #define CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_8\
-   'o'
+   CLIAUTH_LITERAL_UINT8('o')
 #define CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_16\
-   'x'
+   CLIAUTH_LITERAL_UINT8('x')
 
-/* TODO: Add new API for iterating over UTF-8 and UTF-16 strings.  This code */
-/* only works for ASCII.  This shouldn't require too much modifications to */
-/* existing code: use codepoints instead of raw chars.  The real work is */
-/* iterating over strings in differing formats. */
+static enum CliAuthIoParseStringIntegerDigestStatus
+cliauth_io_parse_string_integer_digest_character_prefix_as_magnitude(
+   struct CliAuthIoParseStringIntegerContext * context,
+   CliAuthUInt8 character
+) {
+   enum CliAuthIoParseStringIntegerDigestStatus status;
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_state_digest_prefix_character_sign(
-   struct CliAuthIoParseStringIntegerState * state,
-   char character
+   status = cliauth_io_parse_string_integer_digest_character_magnitude(
+      context,
+      character
+   );
+
+   /* this switches from prefix digestion to magnitude digestion for */
+   /* subsequent characters if we successfully digested this character */
+   if (status == CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_SUCCESS) {
+      context->flags = cliauth_math_bitwise_flags_set_uint8(
+         context->flags,
+         CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_DIGIT
+      );
+   }
+
+   return status;
+}
+
+static enum CliAuthIoParseStringIntegerDigestStatus
+cliauth_io_parse_string_integer_digest_character_prefix_sign(
+   struct CliAuthIoParseStringIntegerContext * context,
+   CliAuthUInt8 character
 ) {
    enum CliAuthIoParseStringIntegerSign sign;
 
-   if (state->detect_sign == CLIAUTH_BOOLEAN_FALSE) {
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_UNEXPECTED_SIGN;
+   if (cliauth_math_bitwise_flags_check_one_uint8(
+      context->flags,
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_DETECT_SIGN
+   ) == CLIAUTH_BOOLEAN_FALSE) {
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_UNEXPECTED_SIGN;
    }
-   if (state->encountered_sign == CLIAUTH_BOOLEAN_TRUE) {
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_INVALID_DIGIT;
-   }
-   if (state->encountered_base_prefix == CLIAUTH_BOOLEAN_TRUE) {
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_INVALID_DIGIT;
-   }
-   if (state->encountered_digit == CLIAUTH_BOOLEAN_TRUE) {
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_INVALID_DIGIT;
+   if (cliauth_math_bitwise_flags_check_one_uint8(
+      context->flags,
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_SIGN |
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_BASE_PREFIX
+   ) == CLIAUTH_BOOLEAN_TRUE) {
+      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_INVALID_DIGIT;
    }
 
    switch (character) {
@@ -272,58 +269,59 @@ cliauth_io_parse_string_integer_state_digest_prefix_character_sign(
          CLIAUTH_UNREACHABLE;
    }
 
-   state->value.sign = sign;
-   state->encountered_sign = CLIAUTH_BOOLEAN_TRUE;
+   context->value.sign = sign;
+   context->flags = cliauth_math_bitwise_flags_set_uint8(
+      context->flags,
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_SIGN
+   );
 
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
+   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_SUCCESS;
 }
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_state_digest_prefix_character_base_prefix(
-   struct CliAuthIoParseStringIntegerState * state,
-   char character
+static enum CliAuthIoParseStringIntegerDigestStatus
+cliauth_io_parse_string_integer_digest_character_prefix_base_prefix(
+   struct CliAuthIoParseStringIntegerContext * context,
+   CliAuthUInt8 character
 ) {
-   enum CliAuthIoParseStringIntegerStatus status;
-
    /* if we aren't using automatic sign detection, parse as a digit but also */
    /* note that we passed the base prefix */
-   if (
-      state->detect_base == CLIAUTH_BOOLEAN_FALSE ||
-      state->encountered_digit == CLIAUTH_BOOLEAN_TRUE
-   ) {
-      status = cliauth_io_parse_string_integer_state_digest_magnitude_digit(
-         state,
+   if (cliauth_math_bitwise_flags_check_one_uint8(
+      context->flags,
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_DETECT_BASE
+   ) == CLIAUTH_BOOLEAN_FALSE) {
+      return cliauth_io_parse_string_integer_digest_character_prefix_as_magnitude(
+         context,
          character
       );
-   } else {
-      status = CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
-      state->encountered_base_prefix = CLIAUTH_BOOLEAN_TRUE;
-      state->encountered_base_prefix_previous = CLIAUTH_BOOLEAN_TRUE;
    }
 
-   return status;
+   context->flags = cliauth_math_bitwise_flags_set_uint8(
+      context->flags,
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_BASE_PREFIX |
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_BASE_PREFIX_PREVIOUS
+   );
+
+   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_SUCCESS;
 }
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_state_digest_prefix_character_base(
-   struct CliAuthIoParseStringIntegerState * state,
-   char character
+static enum CliAuthIoParseStringIntegerDigestStatus
+cliauth_io_parse_string_integer_digest_character_prefix_base(
+   struct CliAuthIoParseStringIntegerContext * context,
+   CliAuthUInt8 character
 ) {
    enum CliAuthIoParseStringIntegerBase base;
 
    /* if we aren't parsing a base, just treat the character as a digit */
-   if (
-      state->detect_base == CLIAUTH_BOOLEAN_FALSE ||
-      state->encountered_base_prefix_previous == CLIAUTH_BOOLEAN_FALSE
-   ) {
-      return cliauth_io_parse_string_integer_state_digest_magnitude_digit(
-         state,
+   if (cliauth_math_bitwise_flags_check_one_uint8(
+      context->flags,
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_DETECT_BASE
+   ) == CLIAUTH_BOOLEAN_FALSE) {
+      return cliauth_io_parse_string_integer_digest_character_prefix_as_magnitude(
+         context,
          character
       );
    }
 
-   /* attempt to convert the character to its relevant base, note how the */
-   /* previous code makes it impossible to parse an invalid prefix */
    switch (character) {
       case CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_2:
          base = CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_2;
@@ -341,61 +339,51 @@ cliauth_io_parse_string_integer_state_digest_prefix_character_base(
          CLIAUTH_UNREACHABLE;
    }
 
-   /* mark the base character as encountered and set the new base */
-   state->base = base;
-   state->encountered_base_prefix_previous = CLIAUTH_BOOLEAN_FALSE;
-   state->encountered_base = CLIAUTH_BOOLEAN_TRUE;
+   context->base = base;
+   context->flags = cliauth_math_bitwise_flags_clear_uint8(
+      context->flags,
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_BASE_PREFIX_PREVIOUS
+   );
+   context->flags = cliauth_math_bitwise_flags_set_uint8(
+      context->flags,
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_BASE
+   );
 
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS;
+   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_SUCCESS;
 }
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_state_digest_prefix_character_default(
-   struct CliAuthIoParseStringIntegerState * state,
-   char character
+static enum CliAuthIoParseStringIntegerDigestStatus
+cliauth_io_parse_string_integer_digest_character_prefix_default(
+   struct CliAuthIoParseStringIntegerContext * context,
+   CliAuthUInt8 character
 ) {
-   enum CliAuthIoParseStringIntegerStatus status;
-
-   /* if we just encountered the base prefix, make sure to parse it */
-   if (state->encountered_base_prefix_previous == CLIAUTH_BOOLEAN_TRUE) {
-      status = cliauth_io_parse_string_integer_state_digest_magnitude_digit(
-         state,
-         CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_ESCAPE
-      );
-      state->encountered_base_prefix_previous = CLIAUTH_BOOLEAN_FALSE;
-
-      if (status != CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS) {
-         return status;
-      }
-   }
-
-   state->encountered_digit = CLIAUTH_BOOLEAN_TRUE;
-
-   return cliauth_io_parse_string_integer_state_digest_magnitude_digit(
-      state,
+   /* ignore parsing the base prefix character as it has no value in any of */
+   /* our bases.  simply just switch over to parsing magnitude digits */
+   return cliauth_io_parse_string_integer_digest_character_prefix_as_magnitude(
+      context,
       character
    );
 }
 
-static enum CliAuthIoParseStringIntegerStatus
-cliauth_io_parse_string_integer_state_digest_prefix_character(
-   struct CliAuthIoParseStringIntegerState * state,
-   char character
+static enum CliAuthIoParseStringIntegerDigestStatus
+cliauth_io_parse_string_integer_digest_character_prefix(
+   struct CliAuthIoParseStringIntegerContext * context,
+   CliAuthUInt8 character
 ) {
-   enum CliAuthIoParseStringIntegerStatus status; 
+   enum CliAuthIoParseStringIntegerDigestStatus status;
 
    switch (character) {
       case CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_SIGN_POSITIVE:
       case CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_SIGN_NEGATIVE:
-         status = cliauth_io_parse_string_integer_state_digest_prefix_character_sign(
-            state,
+         status = cliauth_io_parse_string_integer_digest_character_prefix_sign(
+            context,
             character
          );
          break;
 
-      case CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_ESCAPE:
-         status = cliauth_io_parse_string_integer_state_digest_prefix_character_base_prefix(
-            state,
+      case CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_PREFIX:
+         status = cliauth_io_parse_string_integer_digest_character_prefix_base_prefix(
+            context,
             character
          );
          break;
@@ -403,15 +391,15 @@ cliauth_io_parse_string_integer_state_digest_prefix_character(
       case CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_2:
       case CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_8:
       case CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_CHARACTER_BASE_16:
-         status = cliauth_io_parse_string_integer_state_digest_prefix_character_base(
-            state,
+         status = cliauth_io_parse_string_integer_digest_character_prefix_base(
+            context,
             character
          );
          break;
 
       default:
-         status = cliauth_io_parse_string_integer_state_digest_prefix_character_default(
-            state,
+         status = cliauth_io_parse_string_integer_digest_character_prefix_default(
+            context,
             character
          );
          break;
@@ -420,500 +408,250 @@ cliauth_io_parse_string_integer_state_digest_prefix_character(
    return status;
 }
 
-/* the maximum possible number of characters the prefix can be */
-/* ex: -0x, +0b */
-#define CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS\
-   3u
-
-static struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_state_digest_prefix(
-   struct CliAuthIoParseStringIntegerState * state,
-   const struct CliAuthIoStreamReader * reader
+static enum CliAuthIoParseStringIntegerDigestStatus
+cliauth_io_parse_string_integer_digest_character(
+   struct CliAuthIoParseStringIntegerContext * context,
+   CliAuthUInt8 character
 ) {
-   struct CliAuthIoParseStringIntegerResult result;
-   CliAuthUInt8 prefix_buffer [CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS];
-   CliAuthUInt32 prefix_characters;
-   const CliAuthUInt8 * prefix_iter;
+   enum CliAuthIoParseStringIntegerDigestStatus status;
 
-   /* decide on the number of characters to read in.  if the length of the */
-   /* entire string is less than the maximum prefix length, read in the whole */
-   /* string as the prefix characters. */
-   if (state->characters_remaining < CLIAUTH_LITERAL_UINT32(CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS)) {
-      prefix_characters = state->characters_remaining;
-   } else {
-      prefix_characters = CLIAUTH_LITERAL_UINT32(CLIAUTH_IO_PARSE_STRING_INTEGER_PREFIX_MAX_CHARACTERS);
-   }
-
-   /* attempt to read in the prefix string */
-   result.read_result = cliauth_io_stream_reader_read_all(
-      reader,
-      prefix_buffer,
-      prefix_characters * CLIAUTH_LITERAL_UINT32(sizeof(char))
-   );
-   state->characters_remaining -= result.read_result.bytes / CLIAUTH_LITERAL_UINT32(sizeof(char));
-
-   if (result.read_result.status != CLIAUTH_IO_STATUS_SUCCESS) {
-      result.status = CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_IO_ERROR;
-      return result;
-   }
-
-   /* parse all the characters in the prefix */
-   prefix_iter = prefix_buffer;
-   while (prefix_characters != CLIAUTH_LITERAL_UINT32(0u)) {
-      result.status = cliauth_io_parse_string_integer_state_digest_prefix_character(
-         state,
-         *prefix_iter
+   /* check whether we've already parsed the prefix or not */
+   if (cliauth_math_bitwise_flags_check_one_uint8(
+      context->flags,
+      CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_DIGIT
+   ) == CLIAUTH_BOOLEAN_TRUE) {
+      status = cliauth_io_parse_string_integer_digest_character_magnitude(
+         context,
+         character
       );
-      if (result.status != CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS) {
-         return result;
-      }
-
-      prefix_iter++;
-      prefix_characters--;
+   } else {
+      status = cliauth_io_parse_string_integer_digest_character_prefix(
+         context,
+         character
+      );
    }
 
-   /* successful result status is already set, return success */
-   return result;
+   return status;
 }
 
-static struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_state_digest_magnitude(
-   struct CliAuthIoParseStringIntegerState * state,
-   const struct CliAuthIoStreamReader * reader
+void
+cliauth_io_parse_string_integer_initialize(
+   struct CliAuthIoParseStringIntegerContext * context,
+   enum CliAuthIoParseStringIntegerSign sign,
+   enum CliAuthIoParseStringIntegerBase base,
+   const struct CliAuthIoParseStringIntegerRange * range
 ) {
-   struct CliAuthIoParseStringIntegerResult result;
+   context->value.magnitude = CLIAUTH_LITERAL_UINT64(0u, 0u);
+   cliauth_memory_copy(
+      &context->range,
+      range,
+      CLIAUTH_LITERAL_UINT32(sizeof(context->range))
+   );
+   context->flags = CLIAUTH_LITERAL_UINT8(0x00u);
+
+   if (sign == CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_AUTOMATIC) {
+      context->value.sign = CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_POSITIVE;
+      context->flags = cliauth_math_bitwise_flags_set_uint8(
+         context->flags,
+         CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_DETECT_SIGN
+      );
+   } else {
+      context->value.sign = sign;
+   }
+
+   if (base == CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_AUTOMATIC) {
+      context->base = CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_10;
+      context->flags = cliauth_math_bitwise_flags_set_uint8(
+         context->flags,
+         CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_DETECT_BASE
+      );
+   } else {
+      context->base = base;
+   }
+   
+   return;
+}
+
+struct CliAuthIoParseStringIntegerDigestResult
+cliauth_io_parse_string_integer_digest(
+   struct CliAuthIoParseStringIntegerContext * context,
+   const struct CliAuthIoStreamReader * reader,
+   CliAuthUInt32 bytes
+) {
+   struct CliAuthIoParseStringIntegerDigestResult result;
    CliAuthUInt32 bytes_read;
-   CliAuthUInt8 digit;
+   CliAuthUInt8 character;
 
    bytes_read = CLIAUTH_LITERAL_UINT32(0u);
-   while (state->characters_remaining != CLIAUTH_LITERAL_UINT32(0u)) {
+   while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
+      /* in the future, we will replace this with more advanced function so */
+      /* we can support unicode */
       result.read_result = cliauth_io_stream_reader_read_all(
          reader,
-         &digit,
-         CLIAUTH_LITERAL_UINT32(sizeof(digit))
+         &character,
+         CLIAUTH_LITERAL_UINT32(sizeof(character))
       );
       bytes_read += result.read_result.bytes;
 
       if (result.read_result.status != CLIAUTH_IO_STATUS_SUCCESS) {
-         result.status = CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_IO_ERROR;
+         result.status = CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_IO_ERROR;
          return result;
       }
 
-      result.status = cliauth_io_parse_string_integer_state_digest_magnitude_digit(
-         state,
-         digit
+      result.status = cliauth_io_parse_string_integer_digest_character(
+         context,
+         character
       );
 
-      if (result.status != CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS) {
-         result.read_result.bytes = bytes_read;
-         return result;
+      switch (result.status) {
+         case CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_SUCCESS:
+            break;
+
+         case CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_IO_ERROR:
+            goto error_exit;
+
+         case CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_INVALID_DIGIT:
+            result.payload.invalid_digit.digit = character;
+            goto error_exit;
+
+         case CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_OUT_OF_RANGE:
+            goto error_exit;
+
+         case CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_UNEXPECTED_SIGN:
+            result.payload.unexpected_sign.character = character;
+            goto error_exit;
+
+         error_exit:
+            result.read_result.bytes = bytes_read;
+            return result;
+
+         default:
+            CLIAUTH_UNREACHABLE;
       }
 
-      state->characters_remaining -= CLIAUTH_LITERAL_UINT32(1u);
+      bytes -= CLIAUTH_LITERAL_UINT32(sizeof(character));
    }
-
+   
    result.read_result.bytes = bytes_read;
    return result;
 }
 
-/* parses a string integer to its sign-magnitude representation */
-static struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sign_magnitude(
-   struct CliAuthIoParseStringIntegerSignMagnitude * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
+/* note that for all these finalization functions, we don't perform any */
+/* safety checks.  that's because it's documented undefined behavior to allow */
+/* a range of values which will result in an invalid cast that leads to */
+/* undefined behavior.  thus, we always assume each cast is valid. */
+
+CliAuthUInt8
+cliauth_io_parse_string_integer_finalize_uint8(
+   struct CliAuthIoParseStringIntegerContext * context
 ) {
-   struct CliAuthIoParseStringIntegerResult result;
-   struct CliAuthIoParseStringIntegerState state;
-   CliAuthUInt32 bytes_read;
+   CliAuthUInt8 value;
 
-   /* initialize the parsing state */
-   cliauth_io_parse_string_integer_state_initialize(
-      &state,
-      sign,
-      base,
-      characters
+   value = (CliAuthUInt8)cliauth_io_parse_string_integer_finalize_uint64(
+      context
    );
-   bytes_read = CLIAUTH_LITERAL_UINT32(0u);
 
-   /* attempt to parse the sign character and base */
-   result = cliauth_io_parse_string_integer_state_digest_prefix(
-      &state,
-      reader
-   );
-   bytes_read += result.read_result.bytes;
-
-   if (result.status != CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS) {
-      result.read_result.bytes = bytes_read;
-      return result;
-   }
-
-   /* attempt to parse the rest of the characters as the magnitude */
-   result = cliauth_io_parse_string_integer_state_digest_magnitude(
-      &state,
-      reader
-   );
-   bytes_read += result.read_result.bytes;
-
-   if (result.status != CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS) {
-      result.read_result.bytes = bytes_read;
-      return result;
-   }
-   
-   /* write the final sign and magnitude integer */
-   *output = state.value;
-
-   /* results are reused from previous function call, just need to accumulate */
-   /* the total number of read bytes */
-   result.read_result.bytes = bytes_read;
-   return result;
+   return value;
 }
 
-/* parses a string integer to its maximum representable unsigned integer */
-/* value */
-static struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_uint(
-   CliAuthUInt64 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base,
-   CliAuthUInt64 maximum_value_magnitude
+CliAuthUInt16
+cliauth_io_parse_string_integer_finalize_uint16(
+   struct CliAuthIoParseStringIntegerContext * context
 ) {
-   struct CliAuthIoParseStringIntegerResult result;
-   struct CliAuthIoParseStringIntegerSignMagnitude sign_magnitude;
+   CliAuthUInt16 value;
 
-   /* parse the string integer to sign and magnitude */
-   result = cliauth_io_parse_string_integer_sign_magnitude(
-      &sign_magnitude,
-      reader,
-      characters,
-      sign,
-      base
+   value = (CliAuthUInt16)cliauth_io_parse_string_integer_finalize_uint64(
+      context
    );
-   if (result.status != CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS) {
-      return result;
+
+   return value;
+}
+
+CliAuthUInt32
+cliauth_io_parse_string_integer_finalize_uint32(
+   struct CliAuthIoParseStringIntegerContext * context
+) {
+   CliAuthUInt32 value;
+
+   value = (CliAuthUInt32)cliauth_io_parse_string_integer_finalize_uint64(
+      context
+   );
+
+   return value;
+}
+
+CliAuthUInt64
+cliauth_io_parse_string_integer_finalize_uint64(
+   struct CliAuthIoParseStringIntegerContext * context
+) {
+   CliAuthUInt64 value;
+
+   value = context->value.magnitude;
+
+   return value;
+}
+
+CliAuthSInt8
+cliauth_io_parse_string_integer_finalize_sint8(
+   struct CliAuthIoParseStringIntegerContext * context
+) {
+   CliAuthSInt8 value;
+
+   value = (CliAuthSInt8)cliauth_io_parse_string_integer_finalize_sint64(
+      context
+   );
+
+   return value;
+}
+
+CliAuthSInt16
+cliauth_io_parse_string_integer_finalize_sint16(
+   struct CliAuthIoParseStringIntegerContext * context
+) {
+   CliAuthSInt16 value;
+
+   value = (CliAuthSInt16)cliauth_io_parse_string_integer_finalize_sint64(
+      context
+   );
+
+   return value;
+}
+
+CliAuthSInt32
+cliauth_io_parse_string_integer_finalize_sint32(
+   struct CliAuthIoParseStringIntegerContext * context
+) {
+   CliAuthSInt32 value;
+
+   value = (CliAuthSInt32)cliauth_io_parse_string_integer_finalize_sint64(
+      context
+   );
+
+   return value;
+}
+
+CliAuthSInt64
+cliauth_io_parse_string_integer_finalize_sint64(
+   struct CliAuthIoParseStringIntegerContext * context
+) {
+   CliAuthSInt64 value;
+
+   switch (context->value.sign) {
+      case CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_POSITIVE:
+         value = context->value.magnitude;
+         break;
+
+      case CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_NEGATIVE:
+         value = -context->value.magnitude;
+         break;
+
+      case CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_AUTOMATIC:
+         CLIAUTH_UNREACHABLE;
+
+      default:
+         CLIAUTH_UNREACHABLE;
    }
 
-   /* guard against a corner case where a negative zero will be considered out of range */
-   if (sign_magnitude.magnitude == CLIAUTH_LITERAL_UINT64(0u, 0u)) {
-      *output = CLIAUTH_LITERAL_UINT64(0u, 0u);
-      return result;
-   }
-
-   /* make sure the magnitude is within range */
-   if (sign_magnitude.magnitude > maximum_value_magnitude) {
-      result.status = CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_OUT_OF_RANGE;
-      return result;
-   }
-
-   /* make sure the value is positive */
-   if (sign_magnitude.sign == CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_NEGATIVE) {
-      result.status = CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_OUT_OF_RANGE;
-      return result;
-   }
-
-   /* output the parsed integer */
-   *output = sign_magnitude.magnitude;
-
-   return result;
-}
-
-static void
-cliauth_io_parse_string_integer_sint_positive(
-   CliAuthSInt64 * output,
-   struct CliAuthIoParseStringIntegerResult * result,
-   CliAuthUInt64 magnitude,
-   CliAuthUInt64 maximum_value_magnitude
-) {
-   union CliAuthInt64 value;
-
-   if (magnitude > maximum_value_magnitude) {
-      result->status = CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_OUT_OF_RANGE;
-      return;
-   }
-
-   value.uint = magnitude;
-
-   *output = value.sint;
-   
-   return;
-}
-
-static void
-cliauth_io_parse_string_integer_sint_negative(
-   CliAuthSInt64 * output,
-   struct CliAuthIoParseStringIntegerResult * result,
-   CliAuthUInt64 magnitude,
-   CliAuthUInt64 minimum_value_magnitude
-) {
-   if (magnitude > minimum_value_magnitude) {
-      result->status = CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_OUT_OF_RANGE;
-      return;
-   }
-
-   *output = cliauth_math_bitwise_magnitude_deposit_negative_sint64(
-      magnitude
-   );
-   
-   return;
-}
-
-/* parses a string integer to its maximum representable signed integer value */
-static struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sint(
-   CliAuthSInt64 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base,
-   CliAuthUInt64 maximum_value_magnitude,
-   CliAuthUInt64 minimum_value_magnitude
-) {
-   struct CliAuthIoParseStringIntegerResult result;
-   struct CliAuthIoParseStringIntegerSignMagnitude sign_magnitude;
-
-   /* parse the string integer to sign and magnitude */
-   result = cliauth_io_parse_string_integer_sign_magnitude(
-      &sign_magnitude,
-      reader,
-      characters,
-      sign,
-      base
-   );
-   if (result.status != CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS) {
-      return result;
-   }
-
-   /* check for zero magnitude to prevent possible issues with checks and */
-   /* conversion, similar to the check in the uint version */
-   if (sign_magnitude.magnitude == CLIAUTH_LITERAL_UINT64(0u, 0u)) {
-      *output = CLIAUTH_LITERAL_UINT64(0u, 0u);
-      return result;
-   }
-
-   /* perform range checking and sign conversion */
-   if (sign_magnitude.sign == CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_POSITIVE) {
-      cliauth_io_parse_string_integer_sint_positive(
-         output,
-         &result,
-         sign_magnitude.magnitude,
-         maximum_value_magnitude
-      );
-   }
-   if (sign_magnitude.sign == CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_NEGATIVE) {
-      cliauth_io_parse_string_integer_sint_negative(
-         output,
-         &result,
-         sign_magnitude.magnitude,
-         minimum_value_magnitude
-      );
-   }
-
-   /* the result will be leftover from the previous function calls, so no */
-   /* additional checks or enum setting is necessary */
-   return result;
-}
-
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_uint8(
-   CliAuthUInt8 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
-) {
-   struct CliAuthIoParseStringIntegerResult result;
-   CliAuthUInt64 generic_output;
-
-   result = cliauth_io_parse_string_integer_uint(
-      &generic_output,
-      reader,
-      characters,
-      sign,
-      base,
-      CLIAUTH_UINT8_MAX
-   );
-
-   *output = (CliAuthUInt8)generic_output;
-
-   return result;
-}
-
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_uint16(
-   CliAuthUInt16 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
-) {
-   struct CliAuthIoParseStringIntegerResult result;
-   CliAuthUInt64 generic_output;
-
-   result = cliauth_io_parse_string_integer_uint(
-      &generic_output,
-      reader,
-      characters,
-      sign,
-      base,
-      CLIAUTH_UINT16_MAX
-   );
-
-   *output = (CliAuthUInt16)generic_output;
-
-   return result;
-}
-
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_uint32(
-   CliAuthUInt32 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
-) {
-   struct CliAuthIoParseStringIntegerResult result;
-   CliAuthUInt64 generic_output;
-
-   result = cliauth_io_parse_string_integer_uint(
-      &generic_output,
-      reader,
-      characters,
-      sign,
-      base,
-      CLIAUTH_UINT32_MAX
-   );
-
-   *output = (CliAuthUInt32)generic_output;
-
-   return result;
-}
-
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_uint64(
-   CliAuthUInt64 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
-) {
-   /* we are already in the native type, no conversion needed */
-   return cliauth_io_parse_string_integer_uint(
-      output,
-      reader,
-      characters,
-      sign,
-      base,
-      CLIAUTH_UINT64_MAX
-   );
-}
-
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sint8(
-   CliAuthSInt8 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
-) {
-   struct CliAuthIoParseStringIntegerResult result;
-   CliAuthSInt64 generic_output;
-
-   result = cliauth_io_parse_string_integer_sint(
-      &generic_output,
-      reader,
-      characters,
-      sign,
-      base,
-      CLIAUTH_SINT8_MAX,
-      cliauth_math_bitwise_magnitude_extract_negative_sint64(
-         (CliAuthSInt64)CLIAUTH_SINT8_MIN
-      )
-   );
-
-   *output = (CliAuthSInt8)generic_output;
-
-   return result;
-}
-
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sint16(
-   CliAuthSInt16 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
-) {
-   struct CliAuthIoParseStringIntegerResult result;
-   CliAuthSInt64 generic_output;
-
-   result = cliauth_io_parse_string_integer_sint(
-      &generic_output,
-      reader,
-      characters,
-      sign,
-      base,
-      CLIAUTH_SINT16_MAX,
-      cliauth_math_bitwise_magnitude_extract_negative_sint64(
-         (CliAuthSInt64)CLIAUTH_SINT16_MIN
-      )
-   );
-
-   *output = (CliAuthSInt16)generic_output;
-
-   return result;
-}
-
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sint32(
-   CliAuthSInt32 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
-) {
-   struct CliAuthIoParseStringIntegerResult result;
-   CliAuthSInt64 generic_output;
-
-   result = cliauth_io_parse_string_integer_sint(
-      &generic_output,
-      reader,
-      characters,
-      sign,
-      base,
-      CLIAUTH_SINT32_MAX,
-      cliauth_math_bitwise_magnitude_extract_negative_sint64(
-         (CliAuthSInt64)CLIAUTH_SINT32_MIN
-      )
-   );
-
-   *output = (CliAuthSInt32)generic_output;
-
-   return result;
-}
-
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sint64(
-   CliAuthSInt64 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
-) {
-   /* again, we are already using the native types so no conversion is needed */
-   return cliauth_io_parse_string_integer_sint(
-      output,
-      reader,
-      characters,
-      sign,
-      base,
-      CLIAUTH_SINT64_MAX,
-      cliauth_math_bitwise_magnitude_extract_negative_sint64(
-         CLIAUTH_SINT64_MIN
-      )
-   );
+   return value;
 }
 

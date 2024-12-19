@@ -322,3 +322,202 @@ cliauth_math_bitwise_magnitude_extract_negative_sint64(
    return retn;
 }
 
+#define CLIAUTH_MATH_BITWISE_FLAGS_SET(value, flags)\
+   ((value) | (flags))
+
+CliAuthUInt8
+cliauth_math_bitwise_flags_set_uint8(
+   CliAuthUInt8 value,
+   CliAuthUInt8 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_SET(value, flags);
+}
+
+CliAuthUInt16
+cliauth_math_bitwise_flags_set_uint16(
+   CliAuthUInt16 value,
+   CliAuthUInt16 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_SET(value, flags);
+}
+
+CliAuthUInt32
+cliauth_math_bitwise_flags_set_uint32(
+   CliAuthUInt32 value,
+   CliAuthUInt32 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_SET(value, flags);
+}
+
+CliAuthUInt64
+cliauth_math_bitwise_flags_set_uint64(
+   CliAuthUInt64 value,
+   CliAuthUInt64 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_SET(value, flags);
+}
+
+#define CLIAUTH_MATH_BITWISE_FLAGS_CLEAR(value, flags)\
+   ((value) & (~(flags)))
+
+CliAuthUInt8
+cliauth_math_bitwise_flags_clear_uint8(
+   CliAuthUInt8 value,
+   CliAuthUInt8 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CLEAR(value, flags);
+}
+
+CliAuthUInt16
+cliauth_math_bitwise_flags_clear_uint16(
+   CliAuthUInt16 value,
+   CliAuthUInt16 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CLEAR(value, flags);
+}
+
+CliAuthUInt32
+cliauth_math_bitwise_flags_clear_uint32(
+   CliAuthUInt32 value,
+   CliAuthUInt32 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CLEAR(value, flags);
+}
+
+CliAuthUInt64
+cliauth_math_bitwise_flags_clear_uint64(
+   CliAuthUInt64 value,
+   CliAuthUInt64 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CLEAR(value, flags);
+}
+
+#define CLIAUTH_MATH_BITWISE_FLAGS_FLIP(value, flags)\
+   ((value) ^ (flags))
+
+CliAuthUInt8
+cliauth_math_bitwise_flags_flip_uint8(
+   CliAuthUInt8 value,
+   CliAuthUInt8 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_FLIP(value, flags);
+}
+
+CliAuthUInt16
+cliauth_math_bitwise_flags_flip_uint16(
+   CliAuthUInt16 value,
+   CliAuthUInt16 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_FLIP(value, flags);
+}
+
+CliAuthUInt32
+cliauth_math_bitwise_flags_flip_uint32(
+   CliAuthUInt32 value,
+   CliAuthUInt32 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_FLIP(value, flags);
+}
+
+CliAuthUInt64
+cliauth_math_bitwise_flags_flip_uint64(
+   CliAuthUInt64 value,
+   CliAuthUInt64 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_FLIP(value, flags);
+}
+
+#define CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ONE(value, flags, zero_literal)\
+   (\
+      (((value) & (flags)) != (zero_literal)) ?\
+      CLIAUTH_BOOLEAN_TRUE :\
+      CLIAUTH_BOOLEAN_FALSE\
+   )
+
+CliAuthBoolean
+cliauth_math_bitwise_flags_check_one_uint8(
+   CliAuthUInt8 value,
+   CliAuthUInt8 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ONE(
+      value,
+      flags,
+      CLIAUTH_LITERAL_UINT8(0u)
+   );
+}
+
+CliAuthBoolean
+cliauth_math_bitwise_flags_check_one_uint16(
+   CliAuthUInt16 value,
+   CliAuthUInt16 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ONE(
+      value,
+      flags,
+      CLIAUTH_LITERAL_UINT16(0u)
+   );
+}
+
+CliAuthBoolean
+cliauth_math_bitwise_flags_check_one_uint32(
+   CliAuthUInt32 value,
+   CliAuthUInt32 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ONE(
+      value,
+      flags,
+      CLIAUTH_LITERAL_UINT32(0u)
+   );
+}
+
+CliAuthBoolean
+cliauth_math_bitwise_flags_check_one_uint64(
+   CliAuthUInt64 value,
+   CliAuthUInt64 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ONE(
+      value,
+      flags,
+      CLIAUTH_LITERAL_UINT64(0u, 0u)
+   );
+}
+
+#define CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ALL(value, flags)\
+   (\
+      (((value) & (flags)) == (flags)) ?\
+      CLIAUTH_BOOLEAN_TRUE :\
+      CLIAUTH_BOOLEAN_FALSE\
+   )
+
+CliAuthBoolean
+cliauth_math_bitwise_flags_check_all_uint8(
+   CliAuthUInt8 value,
+   CliAuthUInt8 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ALL(value, flags);
+}
+
+CliAuthBoolean
+cliauth_math_bitwise_flags_check_all_uint16(
+   CliAuthUInt16 value,
+   CliAuthUInt16 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ALL(value, flags);
+}
+
+CliAuthBoolean
+cliauth_math_bitwise_flags_check_all_uint32(
+   CliAuthUInt32 value,
+   CliAuthUInt32 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ALL(value, flags);
+}
+
+CliAuthBoolean
+cliauth_math_bitwise_flags_check_all_uint64(
+   CliAuthUInt64 value,
+   CliAuthUInt64 flags
+) {
+   return CLIAUTH_MATH_BITWISE_FLAGS_CHECK_ALL(value, flags);
+}
+

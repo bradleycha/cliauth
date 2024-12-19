@@ -13,45 +13,85 @@
 #include "io/io.h"
 
 /*----------------------------------------------------------------------------*/
-/* The result status of parsing a string integer.                             */
+/* The result status of digesting string integer characters.                  */
 /*----------------------------------------------------------------------------*/
-/* CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS -                           */
+/* CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_SUCCESS -                    */
 /*    The integer was parsed successfully.                                    */
 /*                                                                            */
-/* CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_IO_ERROR -                          */
-/*    An IO read error occurred.                                              */
+/* CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_IO_ERROR -                   */
+/*    An I/O error occurred.                                                  */
 /*                                                                            */
-/* CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_INVALID_DIGIT -                     */
+/* CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_INVALID_DIGIT -              */
 /*    An invalid digit for the expected base was encountered.                 */
 /*                                                                            */
-/* CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_OUT_OF_RANGE -                      */
+/* CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_OUT_OF_RANGE -               */
 /*    The number is outside the range of possible values for the given        */
-/*    integer type.                                                           */
+/*    allowable range.                                                        */
 /*                                                                            */
-/* CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_UNEXPECTED_SIGN -                   */
+/* CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_UNEXPECTED_SIGN -            */
 /*    A sign character was found when the sign was already given.             */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_FIELD_COUNT 5u
-enum CliAuthIoParseStringIntegerStatus {
-   CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS,
-   CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_IO_ERROR,
-   CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_INVALID_DIGIT,
-   CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_OUT_OF_RANGE,
-   CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_UNEXPECTED_SIGN
+#define CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_FIELD_COUNT 5u
+enum CliAuthIoParseStringIntegerDigestStatus {
+   CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_SUCCESS,
+   CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_IO_ERROR,
+   CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_INVALID_DIGIT,
+   CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_OUT_OF_RANGE,
+   CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_UNEXPECTED_SIGN
 };
 
 /*----------------------------------------------------------------------------*/
-/* The result of attempting to parse an integer from a string.                */
+/* The payload struct for when an invalid digit is encountered.               */
+/*----------------------------------------------------------------------------*/
+/* digit -                                                                    */
+/*    The digit which could not be parsed.                                    */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoParseStringIntegerDigestPayloadInvalidDigit {
+   CliAuthUInt8 digit;
+};
+
+/*----------------------------------------------------------------------------*/
+/* The payload struct for when an unexpected sign character is encountered.   */
+/*----------------------------------------------------------------------------*/
+/* character -                                                                */
+/*    The unexpected sign character.                                          */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoParseStringIntegerDigestPayloadUnexpectedSign {
+   CliAuthUInt8 character;
+};
+
+/*----------------------------------------------------------------------------*/
+/* The payload struct for when a status enum contains additional data.        */
+/*----------------------------------------------------------------------------*/
+/* invalid_digit -                                                            */
+/*    The payload data for CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_...  */
+/*    ...INVALID_DIGIT.                                                       */
+/*                                                                            */
+/* unexpected_sign -                                                          */
+/*    The payload data for CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_...  */
+/*    ...UNEXPECTED_SIGN.                                                     */
+/*----------------------------------------------------------------------------*/
+union CliAuthIoParseStringIntegerDigestPayload {
+   struct CliAuthIoParseStringIntegerDigestPayloadInvalidDigit invalid_digit;
+   struct CliAuthIoParseStringIntegerDigestPayloadUnexpectedSign unexpected_sign;
+};
+
+/*----------------------------------------------------------------------------*/
+/* The result of attempting to digest bytes into a string integer parser.     */
 /*----------------------------------------------------------------------------*/
 /* status -                                                                   */
-/*    The status of the integer parsing.                                      */
+/*    The status of the string integer digestion.                             */
+/*                                                                            */
+/* payload -                                                                  */
+/*    Additional data relevant to the status of string integer digestion.     */
 /*                                                                            */
 /* read_result -                                                              */
 /*    The I/O read result.  This will contain further details about potential */
 /*    I/O read errors.                                                        */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoParseStringIntegerResult {
-   enum CliAuthIoParseStringIntegerStatus status;
+struct CliAuthIoParseStringIntegerDigestResult {
+   enum CliAuthIoParseStringIntegerDigestStatus status;
+   union CliAuthIoParseStringIntegerDigestPayload payload;
    struct CliAuthIoResult read_result;
 };
 
@@ -161,12 +201,86 @@ enum CliAuthIoParseStringIntegerBase {
 };
 
 /*----------------------------------------------------------------------------*/
-/* Attempts to read and parse an integer from a text stream.                  */
+/* A sign-magnitude integer value.                                            */
 /*----------------------------------------------------------------------------*/
-/* output -                                                                   */
-/*    The final parsed integer.  The integer will only be valid if the        */
-/*    'status' field of the return result is                                  */
-/*    'CLIAUTH_IO_PARSE_STRING_INTEGER_STATUS_SUCCESS'.                       */
+/* sign -                                                                     */
+/*    Whether the value is positive or negative.  This should never be set to */
+/*    CLIAUTH_IO_PARSE_STRING_INTEGER_SIGN_AUTOMATIC.                         */
+/*                                                                            */
+/* magnitude -                                                                */
+/*    The distance of the value from zero.                                    */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoParseStringIntegerValue {
+   enum CliAuthIoParseStringIntegerSign sign;
+   CliAuthUInt64 magnitude;
+};
+
+/*----------------------------------------------------------------------------*/
+/* A range of values to consider when parsing a string integer.               */
+/*----------------------------------------------------------------------------*/
+/* minimum_magnitude_negative -                                               */
+/*    The minimum negative magnitude to consider.  All values below will give */
+/*    an error.                                                               */
+/*                                                                            */
+/* maximum_magnitude_positive -                                               */
+/*    The maximum positive magnitude to consider.  All values above will give */
+/*    an error.                                                               */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoParseStringIntegerRange {
+   CliAuthUInt64 minimum_magnitude_negative;
+   CliAuthUInt64 maximum_magnitude_positive;
+};
+
+/*----------------------------------------------------------------------------*/
+/* Context for the string integer parser.                                     */
+/*----------------------------------------------------------------------------*/
+struct CliAuthIoParseStringIntegerContext {
+   /* the current value for all successfully parsed digits */
+   struct CliAuthIoParseStringIntegerValue value;
+
+   /* the base to parse digits as, this should never be set to automatic */
+   enum CliAuthIoParseStringIntegerBase base;
+
+   /* the range of values to consider */
+   struct CliAuthIoParseStringIntegerRange range;
+   
+   /* boolean flags related to parsing state */
+   CliAuthUInt8 flags;
+};
+
+/*----------------------------------------------------------------------------*/
+/* Initializes a given string integer parser context.                         */
+/*----------------------------------------------------------------------------*/
+/* context -                                                                  */
+/*    The string integer parser context to initialize.                        */
+/*                                                                            */
+/* sign -                                                                     */
+/*    The sign to parse the string integer in.                                */
+/*                                                                            */
+/* base -                                                                     */
+/*    The base to parse the string integer in.                                */
+/*                                                                            */
+/* range -                                                                    */
+/*    The range of valid values to parse the string integer with.  Allowing a */
+/*    range of values which may result in out-of-range integers for the       */
+/*    desired output type will result in undefined behavior.                  */
+/*----------------------------------------------------------------------------*/
+void
+cliauth_io_parse_string_integer_initialize(
+   struct CliAuthIoParseStringIntegerContext * context,
+   enum CliAuthIoParseStringIntegerSign sign,
+   enum CliAuthIoParseStringIntegerBase base,
+   const struct CliAuthIoParseStringIntegerRange * range
+);
+
+/*----------------------------------------------------------------------------*/
+/* Attempts to read and digest bytes as characters into a string integer      */
+/* parser from a reader.                                                      */
+/*----------------------------------------------------------------------------*/
+/* context -                                                                  */
+/*    The string integer parser context to digest bytes into.  This must      */
+/*    first have been initialized with                                        */
+/*    cliauth_io_parse_string_integer_initialize().                           */
 /*                                                                            */
 /* reader -                                                                   */
 /*    The stream reader interface to read from.  The integer string should    */
@@ -194,78 +308,68 @@ enum CliAuthIoParseStringIntegerBase {
 /*       base can be found in the documentation for                           */
 /*       CliAuthIoParseStringIntegerBase.                                     */
 /*                                                                            */
-/* characters -                                                               */
-/*    The number of characters to read from 'reader'.                         */
-/*                                                                            */
-/* base -                                                                     */
-/*    The base to parse the integer string in.                                */
+/* bytes -                                                                    */
+/*    The number of bytes to read from 'reader'.                              */
 /*----------------------------------------------------------------------------*/
 /* Return value -                                                             */
-/*    The result of parsing the integer.                                      */
+/*    The result of digesting the bytes from the reader.                      */
 /*----------------------------------------------------------------------------*/
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_uint8(
-   CliAuthUInt8 * output,
+struct CliAuthIoParseStringIntegerDigestResult
+cliauth_io_parse_string_integer_digest(
+   struct CliAuthIoParseStringIntegerContext * context,
    const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
+   CliAuthUInt32 bytes
 );
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_uint16(
-   CliAuthUInt16 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
+
+/*----------------------------------------------------------------------------*/
+/* Retrieves the current parsed string integer and converts to a standard     */
+/* integer type.                                                              */
+/*----------------------------------------------------------------------------*/
+/* context -                                                                  */
+/*    The string integer parser context to digest bytes into.  This must      */
+/*    first have been initialized with                                        */
+/*    cliauth_io_parse_string_integer_initialize().  The state will be        */
+/*    preserved and may still have characters digested after calling this     */
+/*    function.                                                               */
+/*----------------------------------------------------------------------------*/
+/* Return value -                                                             */
+/*    The final digested integer.  This function assumes that the range of    */
+/*    values to be considered will always be valid for the given integer      */
+/*    type.  If the range of values may result in an integer which is         */
+/*    unrepresentable in the given integer size, it will result in undefined  */
+/*    behavior.                                                               */
+/*----------------------------------------------------------------------------*/
+CliAuthUInt8
+cliauth_io_parse_string_integer_finalize_uint8(
+   struct CliAuthIoParseStringIntegerContext * context
 );
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_uint32(
-   CliAuthUInt32 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
+CliAuthUInt16
+cliauth_io_parse_string_integer_finalize_uint16(
+   struct CliAuthIoParseStringIntegerContext * context
 );
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_uint64(
-   CliAuthUInt64 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
+CliAuthUInt32
+cliauth_io_parse_string_integer_finalize_uint32(
+   struct CliAuthIoParseStringIntegerContext * context
 );
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sint8(
-   CliAuthSInt8 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
+CliAuthUInt64
+cliauth_io_parse_string_integer_finalize_uint64(
+   struct CliAuthIoParseStringIntegerContext * context
 );
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sint16(
-   CliAuthSInt16 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
+CliAuthSInt8
+cliauth_io_parse_string_integer_finalize_sint8(
+   struct CliAuthIoParseStringIntegerContext * context
 );
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sint32(
-   CliAuthSInt32 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
+CliAuthSInt16
+cliauth_io_parse_string_integer_finalize_sint16(
+   struct CliAuthIoParseStringIntegerContext * context
 );
-struct CliAuthIoParseStringIntegerResult
-cliauth_io_parse_string_integer_sint64(
-   CliAuthSInt64 * output,
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt32 characters,
-   enum CliAuthIoParseStringIntegerSign sign,
-   enum CliAuthIoParseStringIntegerBase base
+CliAuthSInt32
+cliauth_io_parse_string_integer_finalize_sint32(
+   struct CliAuthIoParseStringIntegerContext * context
+);
+CliAuthSInt64
+cliauth_io_parse_string_integer_finalize_sint64(
+   struct CliAuthIoParseStringIntegerContext * context
 );
 
 /*----------------------------------------------------------------------------*/
