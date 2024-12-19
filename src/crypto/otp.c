@@ -135,6 +135,7 @@ cliauth_crypto_otp_hotp_finalize(
       CLIAUTH_LITERAL_UINT32(0u)
    );
 
+   /* will always return success, so we discard the read result */
    (void)cliauth_crypto_mac_hmac_message_digest(
       &context->hmac_context,
       &counter_stream_reader,

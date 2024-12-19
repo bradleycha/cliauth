@@ -13,14 +13,16 @@
 #include "io/io.h"
 
 /*----------------------------------------------------------------------------*/
-/* A mapper reader implementation over a constant byte buffer.                */
+/* A mapper reader implementation over a constant byte buffer.  Reads will    */
+/* always return 'CLIAUTH_IO_STATUS_SUCCESS'.                                 */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoByteArrayMapperReader {
    const CliAuthUInt8 * data;
 };
 
 /*----------------------------------------------------------------------------*/
-/* A mapper writer implementation over a mutable byte buffer.                 */
+/* A mapper writer implementation over a mutable byte buffer.  Writes will    */
+/* always return 'CLIAUTH_IO_STATUS_SUCCESS'.                                 */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoByteArrayMapperWriter {
    CliAuthUInt8 * data;

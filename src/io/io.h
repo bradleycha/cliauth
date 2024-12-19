@@ -16,7 +16,12 @@
 /* A generic I/O result status.                                               */
 /*----------------------------------------------------------------------------*/
 /* CLIAUTH_IO_STATUS_SUCCESS -                                                */
-/*    The I/O function executed successfully.                                 */
+/*    The I/O function executed successfully and all bytes were read or       */
+/*    written.                                                                */
+/*                                                                            */
+/* CLIAUTH_IO_STATUS_BUSY -                                                   */
+/*    The I/O function is busy and and not all bytes were able to be read or  */
+/*    written.                                                                */
 /*                                                                            */
 /* CLIAUTH_IO_STATUS_END_OF_STREAM -                                          */
 /*    The end of the I/O stream was reached.                                  */
@@ -24,9 +29,10 @@
 /* CLIAUTH_IO_STATUS_ERROR_UNKNOWN -                                          */
 /*    An unknown I/O error occurred.                                          */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_IO_STATUS_FIELD_COUNT 3u
+#define CLIAUTH_IO_STATUS_FIELD_COUNT 4u
 enum CliAuthIoStatus {
    CLIAUTH_IO_STATUS_SUCCESS,
+   CLIAUTH_IO_STATUS_BUSY,
    CLIAUTH_IO_STATUS_END_OF_STREAM,
    CLIAUTH_IO_STATUS_ERROR_UNKNOWN
 };
@@ -91,34 +97,12 @@ struct CliAuthIoStreamReader {
 /*    read is output in the 'bytes' result field.                             */
 /*----------------------------------------------------------------------------*/
 /* Return value -                                                             */
-/*    A struct representing the result of reading.                            */
+/*    A struct representing the result of reading.  The number of bytes read  */
+/*    will always be 'bytes' if the 'status' field of the result is           */
+/*    'CLIAUTH_IO_STATUS_SUCCESS'.                                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_stream_reader_read(
-   const struct CliAuthIoStreamReader * reader,
-   CliAuthUInt8 buffer [],
-   CliAuthUInt32 bytes
-);
-
-/*----------------------------------------------------------------------------*/
-/* Attempts to read and completely fill a buffer from a stream reader.        */
-/*----------------------------------------------------------------------------*/
-/* reader -                                                                   */
-/*    The stream reader interface to read from.                               */
-/*                                                                            */
-/* buffer -                                                                   */
-/*    A byte buffer to store the read contents to.  The buffer will only be   */
-/*    valid up to the number of bytes successfully read in the returned read  */
-/*    result.                                                                 */
-/*                                                                            */
-/* bytes -                                                                    */
-/*    The length of 'buffer' in bytes.                                        */
-/*----------------------------------------------------------------------------*/
-/* Return value -                                                             */
-/*    A struct representing the result of reading.                            */
-/*----------------------------------------------------------------------------*/
-struct CliAuthIoResult
-cliauth_io_stream_reader_read_all(
    const struct CliAuthIoStreamReader * reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes
@@ -147,33 +131,12 @@ struct CliAuthIoStreamWriter {
 /*    written is output in the 'bytes' result field.                          */
 /*----------------------------------------------------------------------------*/
 /* Return value -                                                             */
-/*    A struct representing the result of writing.                            */
+/*    A struct representing the result of writing.  The number of bytes       */
+/*    written will always be 'bytes' if the 'status' field of the result is   */
+/*    'CLIAUTH_IO_STATUS_SUCCESS'.                                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_stream_writer_write(
-   const struct CliAuthIoStreamWriter * writer,
-   const CliAuthUInt8 data [],
-   CliAuthUInt32 bytes
-);
-
-/*----------------------------------------------------------------------------*/
-/* Attempts to completely write a buffer into a stream writer.                */
-/*----------------------------------------------------------------------------*/
-/* writer -                                                                   */
-/*    The stream writer interface to write bytes into.                        */
-/*                                                                            */
-/* data -                                                                     */
-/*    The bytes to write.  The number of bytes which are successfully written */
-/*    will be contained in the returned write result.                         */
-/*                                                                            */
-/* bytes -                                                                    */
-/*    The length of 'data' in bytes.                                          */
-/*----------------------------------------------------------------------------*/
-/* Return value -                                                             */
-/*    A struct representing the result of writing.                            */
-/*----------------------------------------------------------------------------*/
-struct CliAuthIoResult
-cliauth_io_stream_writer_write_all(
    const struct CliAuthIoStreamWriter * writer,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes
@@ -234,43 +197,12 @@ struct CliAuthIoMapperReader {
 /*    past the allocated region for the mapper.                               */
 /*----------------------------------------------------------------------------*/
 /* Return value -                                                             */
-/*    A struct representing the result of reading.                            */
+/*    A struct representing the result of reading.  The number of bytes read  */
+/*    will always be 'bytes' if the 'status' field of the result is           */
+/*    'CLIAUTH_IO_STATUS_SUCCESS'.                                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_mapper_reader_read(
-   const struct CliAuthIoMapperReader * reader,
-   CliAuthUInt8 buffer [],
-   CliAuthUInt32 bytes,
-   CliAuthUInt32 offset
-);
-
-/*----------------------------------------------------------------------------*/
-/* Attempts to read and completely fill a buffer from a mapper reader.        */
-/*----------------------------------------------------------------------------*/
-/* reader -                                                                   */
-/*    The mapper reader interface to read from.                               */
-/*                                                                            */
-/* buffer -                                                                   */
-/*    A byte buffer to store the read contents to.  The buffer will only be   */
-/*    valid up to the number of bytes successfully read in the returned read  */
-/*    result.                                                                 */
-/*                                                                            */
-/* bytes -                                                                    */
-/*    The number of bytes to attempt to read.  The actual number of bytes     */
-/*    read is output in the 'bytes' result field.  It is undefined behavior   */
-/*    to have a byte read count such that reading will take place past the    */
-/*    allocated region for the mapper.                                        */
-/*                                                                            */
-/* offset -                                                                   */
-/*    The position in the mapper to attempt to read bytes into.  It is        */
-/*    undefined behavior to have an offset such that reading will take place  */
-/*    past the allocated region for the mapper.                               */
-/*----------------------------------------------------------------------------*/
-/* Return value -                                                             */
-/*    A struct representing the result of reading.                            */
-/*----------------------------------------------------------------------------*/
-struct CliAuthIoResult
-cliauth_io_mapper_reader_read_all(
    const struct CliAuthIoMapperReader * reader,
    CliAuthUInt8 buffer [],
    CliAuthUInt32 bytes,
@@ -307,42 +239,12 @@ struct CliAuthIoMapperWriter {
 /*    past the allocated region for the mapper.                               */
 /*----------------------------------------------------------------------------*/
 /* Return value -                                                             */
-/*    A struct representing the result of writing.                            */
+/*    A struct representing the result of writing.  The number of bytes       */
+/*    written will always be 'bytes' if the 'status' field of the result is   */
+/*    'CLIAUTH_IO_STATUS_SUCCESS'.                                            */
 /*----------------------------------------------------------------------------*/
 struct CliAuthIoResult
 cliauth_io_mapper_writer_write(
-   const struct CliAuthIoMapperWriter * writer,
-   const CliAuthUInt8 data [],
-   CliAuthUInt32 bytes,
-   CliAuthUInt32 offset
-);
-
-/*----------------------------------------------------------------------------*/
-/* Attempts to completely write a buffer into a mapper writer.                */
-/*----------------------------------------------------------------------------*/
-/* writer -                                                                   */
-/*    The mapper writer interface to write bytes into.                        */
-/*                                                                            */
-/* data -                                                                     */
-/*    The bytes to write.  The number of bytes which are successfully written */
-/*    will be contained in the returned write result.                         */
-/*                                                                            */
-/* bytes -                                                                    */
-/*    The number of bytes to attempt to write.  The actual number of bytes    */
-/*    written is output in the 'bytes' result field.  It is undefined         */
-/*    behavior to have a byte write count such that writing will take place   */
-/*    past the allocated region for the mapper.                               */
-/*                                                                            */
-/* offset -                                                                   */
-/*    The position in the mapper to attempt to write bytes into.  It is       */
-/*    undefined behavior to have an offset such that writing will take place  */
-/*    past the allocated region for the mapper.                               */
-/*----------------------------------------------------------------------------*/
-/* Return value -                                                             */
-/*    A struct representing the result of writing.                            */
-/*----------------------------------------------------------------------------*/
-struct CliAuthIoResult
-cliauth_io_mapper_writer_write_all(
    const struct CliAuthIoMapperWriter * writer,
    const CliAuthUInt8 data [],
    CliAuthUInt32 bytes,

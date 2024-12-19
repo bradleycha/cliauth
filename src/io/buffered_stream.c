@@ -75,7 +75,7 @@ cliauth_io_buffered_stream_reader_read(
    buffer_iter += buffer_bytes;
 
    /* read the rest of the remaining bytes */
-   result = cliauth_io_stream_reader_read_all(
+   result = cliauth_io_stream_reader_read(
       context_reader->backing_reader,
       buffer_iter,
       residual_bytes
@@ -89,7 +89,7 @@ cliauth_io_buffered_stream_reader_read(
 
    /* buffer in a new block into the read buffer, ignoring errors and simply */
    /* accepting whatever number of bytes we were given */
-   result = cliauth_io_stream_reader_read_all(
+   result = cliauth_io_stream_reader_read(
       context_reader->backing_reader,
       context_reader->buffer,
       context_reader->length
@@ -173,7 +173,7 @@ cliauth_io_buffered_stream_writer_write(
    }
 
    /* attempt to write out all the full-sized blocks at once */
-   result = cliauth_io_stream_writer_write_all(
+   result = cliauth_io_stream_writer_write(
       context_writer->backing_writer,
       data_iter,
       block_bytes
@@ -270,7 +270,7 @@ cliauth_io_buffered_stream_writer_flush_unified(
    data_bytes  = context->length - context->capacity;
 
    /* attempt to write the buffer slice */
-   result = cliauth_io_stream_writer_write_all(
+   result = cliauth_io_stream_writer_write(
       context->backing_writer,
       data_ptr,
       data_bytes
@@ -301,7 +301,7 @@ cliauth_io_buffered_stream_writer_flush_fragmented(
    remainder_bytes = context->start - context->capacity;
 
    /* attempt to write the 'fill' buffer slice */
-   result = cliauth_io_stream_writer_write_all(
+   result = cliauth_io_stream_writer_write(
       context->backing_writer,
       fill_ptr,
       fill_bytes
@@ -317,7 +317,7 @@ cliauth_io_buffered_stream_writer_flush_fragmented(
    }
 
    /* attempt to write the 'remainder' buffer slice */
-   result = cliauth_io_stream_writer_write_all(
+   result = cliauth_io_stream_writer_write(
       context->backing_writer,
       remainder_ptr,
       remainder_bytes

@@ -486,7 +486,10 @@ cliauth_io_parse_string_integer_digest(
    while (bytes != CLIAUTH_LITERAL_UINT32(0u)) {
       /* in the future, we will replace this with more advanced function so */
       /* we can support unicode */
-      result.read_result = cliauth_io_stream_reader_read_all(
+      /* also note that there's no contingency for partial read results.  for */
+      /* now this is fine since a character can only be a single byte, however */
+      /* in the future we will need a circular read buffer. */
+      result.read_result = cliauth_io_stream_reader_read(
          reader,
          &character,
          CLIAUTH_LITERAL_UINT32(sizeof(character))

@@ -105,6 +105,7 @@ cliauth_database_account_generate_passcode(
       CLIAUTH_LITERAL_UINT32(0u)
    );
 
+   /* always return success, so we discard the read result */
    (void)cliauth_crypto_otp_hotp_key_digest(
       hotp_context,
       &secrets_stream_reader,

@@ -72,7 +72,7 @@ cliauth_crypto_mac_hmac_key_digest_rollover(
 
    /* attempt to read enough bytes to fill the k0 buffer.  this is done */
    /* seperately in the case of an IO error */
-   read_result = cliauth_io_stream_reader_read_all(
+   read_result = cliauth_io_stream_reader_read(
       key_reader,
       buffer_free,
       context->k0_capacity
@@ -105,6 +105,7 @@ cliauth_crypto_mac_hmac_key_digest_rollover(
       CLIAUTH_LITERAL_UINT32(0u)
    );
 
+   /* always returns success, so we discard the read result */
    (void)context->hash_function->digest(
       &context->hash_context,
       &buffer_stream_reader,
@@ -147,7 +148,7 @@ cliauth_crypto_mac_hmac_key_digest_append(
 
    buffer_free = &context->k0_buffer[input_block_length - context->k0_capacity];
 
-   read_result = cliauth_io_stream_reader_read_all(
+   read_result = cliauth_io_stream_reader_read(
       key_reader,
       buffer_free,
       key_bytes
@@ -270,6 +271,7 @@ cliauth_crypto_mac_hmac_key_finalize(
       CLIAUTH_LITERAL_UINT32(0u)
    );
 
+   /* always returns success, so we discard the read result */
    (void)context->hash_function->digest(
       &context->hash_context,
       &k0_stream_reader,
@@ -350,6 +352,7 @@ cliauth_crypto_mac_hmac_finalize(
       CLIAUTH_LITERAL_UINT32(0u)
    );
 
+   /* always returns success, so we discard the read result */
    (void)context->hash_function->digest(
       &context->hash_context,
       &stream_reader,
@@ -367,6 +370,7 @@ cliauth_crypto_mac_hmac_finalize(
       CLIAUTH_LITERAL_UINT32(0u)
    );
 
+   /* always returns success, so we discard the read result */
    (void)context->hash_function->digest(
       &context->hash_context,
       &stream_reader,
