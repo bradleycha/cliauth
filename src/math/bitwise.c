@@ -239,27 +239,27 @@ cliauth_math_bitwise_magnitude_deposit_negative_sint64(
 ) {
    CliAuthSInt64 retn;
 
-#if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_SIGN_MAGNITUDE
+#if CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_SIGN_MAGNITUDE
    (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_ones_complement;
    (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_twos_complement;
    retn = cliauth_math_bitwise_magnitude_deposit_negative_sint64_sign_magnitude(
       magnitude
    );
-#endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_SIGN_MAGNITUDE */
-#if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_ONES_COMPLEMENT
+#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_SIGN_MAGNITUDE */
+#if CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_ONES_COMPLEMENT
    (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_sign_magnitude;
    (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_twos_complement;
    retn = cliauth_math_bitwise_magnitude_deposit_negative_sint64_ones_complement(
       magnitude
    );
-#endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_ONES_COMPLEMENT */
-#if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT
+#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_ONES_COMPLEMENT */
+#if CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_TWOS_COMPLEMENT
    (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_sign_magnitude;
    (void)cliauth_math_bitwise_magnitude_deposit_negative_sint64_ones_complement;
    retn = cliauth_math_bitwise_magnitude_deposit_negative_sint64_twos_complement(
       magnitude
    );
-#endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT */
+#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_TWOS_COMPLEMENT */
 
    return retn;
 }
@@ -297,27 +297,27 @@ cliauth_math_bitwise_magnitude_extract_negative_sint64(
 ) {
    CliAuthUInt64 retn;
 
-#if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_SIGN_MAGNITUDE
+#if CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_SIGN_MAGNITUDE
    (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_ones_complement;
    (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_twos_complement;
    retn = cliauth_math_bitwise_magnitude_extract_negative_sint64_sign_magnitude(
       value
    );
-#endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_SIGN_MAGNITUDE */
-#if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_ONES_COMPLEMENT
+#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_SIGN_MAGNITUDE */
+#if CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_ONES_COMPLEMENT
    (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_sign_magnitude;
    (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_twos_complement;
    retn = cliauth_math_bitwise_magnitude_extract_negative_sint64_ones_complement(
       value
    );
-#endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_ONES_COMPLEMENT */
-#if CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT
+#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_ONES_COMPLEMENT */
+#if CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_TWOS_COMPLEMENT
    (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_sign_magnitude;
    (void)cliauth_math_bitwise_magnitude_extract_negative_sint64_ones_complement;
    retn = cliauth_math_bitwise_magnitude_extract_negative_sint64_twos_complement(
       value
    );
-#endif /* CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT */
+#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_TWOS_COMPLEMENT */
 
    return retn;
 }

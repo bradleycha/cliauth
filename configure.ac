@@ -11,6 +11,8 @@ AC_CONFIG_SRCDIR([src/cliauth.c])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_HEADERS([build/config.h])
 
+AC_CANONICAL_TARGET
+
 AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
 AC_CONFIG_FILES([Makefile])
 
@@ -20,10 +22,12 @@ AC_CHECK_FUNCS([memcpy])
 AC_CHECK_FUNCS([memset])
 AC_CHECK_FUNCS([memcmp])
 
-config_enable_platform_integer_sign_is_sign_magnitude=0
-config_enable_platform_integer_sign_is_ones_complement=0
-config_enable_platform_integer_sign_is_twos_complement=0
-config_enable_platform_endian_is_be=0
+config_enable_platform_cpu_integer_sign_is_sign_magnitude=0
+config_enable_platform_cpu_integer_sign_is_ones_complement=0
+config_enable_platform_cpu_integer_sign_is_twos_complement=0
+config_enable_platform_cpu_endian_is_be=0
+config_enable_platform_os_is_posix=0
+config_enable_platform_os_is_windows=0
 config_enable_feature_optional_library_imports=0
 config_enable_feature_ansi=0
 config_enable_feature_log_origin=0
@@ -39,17 +43,28 @@ config_enable_feature_io_buffering=0
 # TODO: figure out how to detect this from the target platform
 # pretty much every processor since the 70's uses two's complement, so for now
 # this is a safe default to use.
-config_enable_platform_integer_sign_is_sign_magnitude=0
-config_enable_platform_integer_sign_is_ones_complement=0
-config_enable_platform_integer_sign_is_twos_complement=1
+config_enable_platform_cpu_integer_sign_is_sign_magnitude=0
+config_enable_platform_cpu_integer_sign_is_ones_complement=0
+config_enable_platform_cpu_integer_sign_is_twos_complement=1
 
 # TODO: avoid copy+pasting descriptions
 # TODO: figure out how to set some features to default to '1'
 
 AC_C_BIGENDIAN(
-   [config_enable_platform_endian_is_be=1],
-   [config_enable_platform_endian_is_be=0],
+   [config_enable_platform_cpu_endian_is_be=1],
+   [config_enable_platform_cpu_endian_is_be=0],
 )
+
+case $target_os in
+   "windows")
+      config_enable_platform_os_is_windows=1
+   ;;
+   *)
+      # assume POSIX-compliance when all else fails
+      config_enable_platform_os_is_posix=1
+   ;;
+esac
+
 AC_ARG_ENABLE([optional-library-imports],
    AS_HELP_STRING([--enable-optional-library-imports], [Use optional library functions where possible]),
    [config_enable_feature_optional_library_imports=1],
@@ -106,21 +121,29 @@ AC_ARG_ENABLE([io-buffering],
    [config_enable_feature_io_buffering=0]
 )
 
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_SIGN_MAGNITUDE],
-   [$config_enable_platform_integer_sign_is_sign_magnitude],
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_SIGN_MAGNITUDE],
+   [$config_enable_platform_cpu_integer_sign_is_sign_magnitude],
    [Whether the target platform uses sign-magnitude to represent signed integers or not]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_ONES_COMPLEMENT],
-   [$config_enable_platform_integer_sign_is_ones_complement],
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_ONES_COMPLEMENT],
+   [$config_enable_platform_cpu_integer_sign_is_ones_complement],
    [Whether the target platform uses one's complement to represent signed integers or not]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_INTEGER_SIGN_IS_TWOS_COMPLEMENT],
-   [$config_enable_platform_integer_sign_is_twos_complement],
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_TWOS_COMPLEMENT],
+   [$config_enable_platform_cpu_integer_sign_is_twos_complement],
    [Whether the target platform uses two's complement to represent signed integers or not]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE],
-   [$config_enable_platform_endian_is_be],
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE],
+   [$config_enable_platform_cpu_endian_is_be],
    [Whether the target platform is big-endian or not]
+)
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_OS_IS_POSIX],
+   [$config_enable_platform_os_is_posix],
+   [Whether the target operating system is POSIX-compliant or not]
+)
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_OS_IS_WINDOWS],
+   [$config_enable_platform_os_is_windows],
+   [Whether the target operating system is Windows or not]
 )
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_OPTIONAL_LIBRARY_IMPORTS],
    [$config_enable_feature_optional_library_imports],

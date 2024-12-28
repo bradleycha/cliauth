@@ -29,11 +29,11 @@ enum CliAuthMathEndianTarget {
 /*----------------------------------------------------------------------------*/
 /* The native endianess of the target platform.                               */
 /*----------------------------------------------------------------------------*/
-#if CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE
+#if CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE
    #define CLIAUTH_MATH_ENDIAN_TARGET_NATIVE CLIAUTH_MATH_ENDIAN_TARGET_BIG
-#else /* CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE */
+#else /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE */
    #define CLIAUTH_MATH_ENDIAN_TARGET_NATIVE CLIAUTH_MATH_ENDIAN_TARGET_LITTLE
-#endif /* CLIAUTH_CONFIG_PLATFORM_ENDIAN_IS_BE */
+#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE */
 
 /*----------------------------------------------------------------------------*/
 /* Converts the endianess of an arbitrary number of bytes between the host    */
