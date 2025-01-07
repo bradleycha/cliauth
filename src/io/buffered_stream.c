@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*                         Copyright (c) CliAuth 2024                         */
+/*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
 /* src/io/buffered_stream.c - Buffered I/O stream layer implementations.      */

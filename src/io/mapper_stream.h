@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*                         Copyright (c) CliAuth 2024                         */
+/*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
 /* src/io/mapper_stream.h - I/O stream over an I/O mapper.                    */

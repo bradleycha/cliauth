@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*                         Copyright (c) CliAuth 2024                         */
+/*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
 /* src/database/account.h - Individual database account header.               */

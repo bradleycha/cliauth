@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*                         Copyright (c) CliAuth 2024                         */
+/*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
 /* src/io/parse/string_integer.c - String integer parser implementation.      */

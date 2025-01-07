@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-#                          Copyright (c) CliAuth 2024                          #
+#                       Copyright (c) CliAuth 2024, 2025                       #
 #                    https://github.com/bradleycha/cliauth                     #
 #------------------------------------------------------------------------------#
 # configure.ac - GNU Autoconf script                                           #
@@ -17,6 +17,11 @@ AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
 AC_CONFIG_FILES([Makefile])
 
 AC_PROG_CC
+
+AC_CHECK_SIZEOF([char])
+AC_CHECK_SIZEOF([short])
+AC_CHECK_SIZEOF([int])
+AC_CHECK_SIZEOF([long])
 
 AC_CHECK_FUNCS([memcpy])
 AC_CHECK_FUNCS([memset])
