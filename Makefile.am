@@ -39,6 +39,10 @@ cliauth_SOURCES = \
 	src/io/mapper_stream.h \
 	src/io/log.c \
 	src/io/log.h \
+	src/io/parse/i_digit_to_integer.c \
+	src/io/parse/i_digit_to_integer.h \
+	src/io/parse/string_block_data.c \
+	src/io/parse/string_block_data.h \
 	src/io/parse/string_integer.c \
 	src/io/parse/string_integer.h \
 	src/math/bitwise.c \

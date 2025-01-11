@@ -9,6 +9,7 @@
 #include "io/parse/string_integer.h"
 
 #include "io/io.h"
+#include "io/parse/i_digit_to_integer.h"
 #include "memory/memory.h"
 #include "math/bitwise.h"
 
@@ -34,100 +35,29 @@
 #define CLIAUTH_IO_PARSE_STRING_INTEGER_CONTEXT_FLAG_ENCOUNTERED_DIGIT\
    CLIAUTH_LITERAL_UINT8(1u << 6u)
 
-enum CliAuthIoParseStringIntegerDigitParserStatus {
-   CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS,
-   CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID
-};
-
-/* a function which parses a digit into its value */
-typedef enum CliAuthIoParseStringIntegerDigitParserStatus (*CliAuthIoParseStringIntegerDigitParserFunction)(
-   CliAuthUInt8 * output,
-   CliAuthUInt8 digit
-);
-
 /* a parser function with its relevant base */
 struct CliAuthIoParseStringIntegerDigitParser {
-   CliAuthIoParseStringIntegerDigitParserFunction parser;  
+   CliAuthIoParseIDigitToIntegerFunction parser;  
    CliAuthUInt8 base;
 };
-
-static enum CliAuthIoParseStringIntegerDigitParserStatus
-cliauth_io_parse_string_integer_digit_parser_base_2(
-   CliAuthUInt8 * output,
-   CliAuthUInt8 digit
-) {
-   if (digit >= CLIAUTH_LITERAL_UINT8('0') && digit <= CLIAUTH_LITERAL_UINT8('1')) {
-      *output = digit - CLIAUTH_LITERAL_UINT8('0');
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
-   }
-
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID;
-}
-
-static enum CliAuthIoParseStringIntegerDigitParserStatus
-cliauth_io_parse_string_integer_digit_parser_base_8(
-   CliAuthUInt8 * output,
-   CliAuthUInt8 digit
-) {
-   if (digit >= CLIAUTH_LITERAL_UINT8('0') && digit <= CLIAUTH_LITERAL_UINT8('7')) {
-      *output = digit - CLIAUTH_LITERAL_UINT8('0');
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
-   }
-
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID;
-}
-
-static enum CliAuthIoParseStringIntegerDigitParserStatus
-cliauth_io_parse_string_integer_digit_parser_base_10(
-   CliAuthUInt8 * output,
-   CliAuthUInt8 digit
-) {
-   if (digit >= CLIAUTH_LITERAL_UINT8('0') && digit <= CLIAUTH_LITERAL_UINT8('9')) {
-      *output = digit - CLIAUTH_LITERAL_UINT8('0');
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
-   }
-
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID;
-}
-
-static enum CliAuthIoParseStringIntegerDigitParserStatus
-cliauth_io_parse_string_integer_digit_parser_base_16(
-   CliAuthUInt8 * output,
-   CliAuthUInt8 digit
-) {
-   if (digit >= CLIAUTH_LITERAL_UINT8('0') && digit <= CLIAUTH_LITERAL_UINT8('9')) {
-      *output = digit - CLIAUTH_LITERAL_UINT8('0');
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
-   }
-   if (digit >= CLIAUTH_LITERAL_UINT8('a') && digit <= CLIAUTH_LITERAL_UINT8('f')) {
-      *output = digit - CLIAUTH_LITERAL_UINT8('a') + CLIAUTH_LITERAL_UINT8(10u);
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
-   }
-   if (digit >= CLIAUTH_LITERAL_UINT8('A') && digit <= CLIAUTH_LITERAL_UINT8('F')) {
-      *output = digit - CLIAUTH_LITERAL_UINT8('A') + CLIAUTH_LITERAL_UINT8(10u);
-      return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS;
-   }
-
-   return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID;
-}
 
 /* table of all digit parsers */
 static const struct CliAuthIoParseStringIntegerDigitParser
 cliauth_io_parse_string_integer_digit_parsers [CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_FIELD_COUNT - 1] = {
    { /* CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_2 */
-      cliauth_io_parse_string_integer_digit_parser_base_2,
+      cliauth_io_parse_i_digit_to_integer_base_2,
       CLIAUTH_LITERAL_UINT8(2u)
    },
    { /* CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_8 */
-      cliauth_io_parse_string_integer_digit_parser_base_8,
+      cliauth_io_parse_i_digit_to_integer_base_8,
       CLIAUTH_LITERAL_UINT8(8u)
    },
    { /* CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_10 */
-      cliauth_io_parse_string_integer_digit_parser_base_10,
+      cliauth_io_parse_i_digit_to_integer_base_10,
       CLIAUTH_LITERAL_UINT8(10u)
    },
    { /* CLIAUTH_IO_PARSE_STRING_INTEGER_BASE_16 */
-      cliauth_io_parse_string_integer_digit_parser_base_16,
+      cliauth_io_parse_i_digit_to_integer_base_16,
       CLIAUTH_LITERAL_UINT8(16u)
    }
 };
@@ -138,7 +68,7 @@ cliauth_io_parse_string_integer_digest_character_magnitude(
    CliAuthUInt8 character
 ) {
    const struct CliAuthIoParseStringIntegerDigitParser * digit_parser;
-   enum CliAuthIoParseStringIntegerDigitParserStatus digit_parser_status;
+   enum CliAuthIoParseIDigitToIntegerStatus digit_parser_status;
    CliAuthUInt8 digit_value;
    CliAuthUInt64 magnitude_max;
    CliAuthUInt64 magnitude_new;
@@ -149,10 +79,10 @@ cliauth_io_parse_string_integer_digest_character_magnitude(
    /* attempt to convert the digit to its integer value */
    digit_parser_status = digit_parser->parser(&digit_value, character);
    switch (digit_parser_status) {
-      case CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_SUCCESS:
+      case CLIAUTH_IO_PARSE_I_DIGIT_TO_INTEGER_STATUS_SUCCESS:
          break;
 
-      case CLIAUTH_IO_PARSE_STRING_INTEGER_DIGIT_PARSER_STATUS_INVALID:
+      case CLIAUTH_IO_PARSE_I_DIGIT_TO_INTEGER_STATUS_INVALID_DIGIT:
          return CLIAUTH_IO_PARSE_STRING_INTEGER_DIGEST_STATUS_INVALID_DIGIT;
 
       default:
