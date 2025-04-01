@@ -33,6 +33,30 @@
 #define CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_MSVC   0
 #endif
 
+#define CLIAUTH_CONFIG_PLATFORM_COMPILER_SUPPORTS_INLINE_ASSEMBLY_GNU\
+   (\
+      CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_GCC ||\
+      CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_CLANG\
+   )
+
+/* because microsoft's compiler developers have severe brain damage, they don't */
+/* see a reason to allow inline assembly outside of IA32.  guess you're just */
+/* supposed to hope there is a compiler intrinsic available for whatever */
+/* you're trying to do.  that or you can just go to hell and use a seperate */
+/* assembler to write fuck-shits and the compiler will insert fuck-shit calls */
+/* in order to execute a single instruction. */
+#define CLIAUTH_CONFIG_PLATFORM_COMPILER_SUPPORTS_INLINE_ASSEMBLY_MSVC\
+   (\
+      CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_MSVC &&\
+      CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_IA32\
+   )
+
+#define CLIAUTH_CONFIG_PLATFORM_COMPILER_SUPPORTS_INLINE_ASSEMBLY\
+   (\
+      CLIAUTH_CONFIG_PLATFORM_COMPILER_SUPPORTS_INLINE_ASSEMBLY_GNU ||\
+      CLIAUTH_CONFIG_PLATFORM_COMPILER_SUPPORTS_INLINE_ASSEMBLY_MSVC\
+   )
+
 #define _CLIAUTH_NULLPTR_SENTINEL\
    (0u)
 
