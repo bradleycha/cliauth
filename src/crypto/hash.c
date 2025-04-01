@@ -272,7 +272,7 @@ cliauth_crypto_hash_sha1_2_load_message_block(
    CliAuthUInt8 block_bytes,
    CliAuthUInt8 schedule_bytes_per_word
 ) {
-#if CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE
+#if CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG
    (void)cliauth_crypto_hash_sha1_2_load_message_block_little;
    cliauth_crypto_hash_sha1_2_load_message_block_big(
       block,
@@ -280,7 +280,7 @@ cliauth_crypto_hash_sha1_2_load_message_block(
       block_bytes,
       schedule_bytes_per_word
    );
-#else /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE */
+#else /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG */
    (void)cliauth_crypto_hash_sha1_2_load_message_block_big;
    cliauth_crypto_hash_sha1_2_load_message_block_little(
       block,
@@ -288,7 +288,7 @@ cliauth_crypto_hash_sha1_2_load_message_block(
       block_bytes,
       schedule_bytes_per_word
    );
-#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE */
+#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG */
 
    return;
 }
@@ -335,21 +335,21 @@ cliauth_crypto_hash_sha1_2_digest_endianess_finalize(
    CliAuthUInt8 digest_bytes_per_word,
    CliAuthUInt8 digest_words
 ) {
-#if CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE
+#if CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG
    (void)cliauth_crypto_hash_sha1_2_digest_endianess_finalize_little;
    cliauth_crypto_hash_sha1_2_digest_endianess_finalize_big(
       digest,
       digest_bytes_per_word,
       digest_words
    );
-#else /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE */
+#else /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG */
    (void)cliauth_crypto_hash_sha1_2_digest_endianess_finalize_big;
    cliauth_crypto_hash_sha1_2_digest_endianess_finalize_little(
       digest,
       digest_bytes_per_word,
       digest_words
    );
-#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BE */
+#endif /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG */
 
    return;
 }
