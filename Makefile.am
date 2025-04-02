@@ -17,6 +17,10 @@ cliauth_CFLAGS = \
 	-Werror
 
 cliauth_SOURCES = \
+	src/arch/ia32/instruction.c\
+	src/arch/ia32/instruction.h\
+	src/arch/amd64/instruction.c\
+	src/arch/amd64/instruction.h\
 	src/cliauth.c \
 	src/cliauth.h \
 	src/imports.h \

@@ -27,12 +27,13 @@ AC_CHECK_FUNCS([memcpy])
 AC_CHECK_FUNCS([memset])
 AC_CHECK_FUNCS([memcmp])
 
-config_platform_cpu_architecture_is_ia32=0
-config_platform_cpu_architecture_is_amd64=0
 config_platform_cpu_integer_sign_is_sign_magnitude=0
 config_platform_cpu_integer_sign_is_ones_complement=0
 config_platform_cpu_integer_sign_is_twos_complement=0
 config_platform_cpu_endian_is_big=0
+config_platform_cpu_architecture_is_ia32=0
+config_platform_cpu_architecture_is_amd64=0
+config_platform_cpu_architecture_ia32_has_instruction_bswap=0
 config_platform_os_is_posix=0
 config_platform_os_is_windows=0
 config_feature_optional_library_imports=0
@@ -62,6 +63,19 @@ AC_C_BIGENDIAN(
    [config_platform_cpu_endian_is_big=0],
 )
 
+case $target_cpu in
+   "x86_64")
+      config_platform_cpu_architecture_is_amd64=1
+   ;;
+   "i686" | "i586" | "i486")
+      config_platform_cpu_architecture_is_ia32=1
+      config_platform_cpu_architecture_ia32_has_instruction_bswap=1
+   ;;
+   "i386")
+      config_platform_cpu_architecture_is_ia32=1
+   ;;
+esac
+
 case $target_os in
    "windows")
       config_platform_os_is_windows=1
@@ -69,15 +83,6 @@ case $target_os in
    *)
       # assume POSIX-compliance when all else fails
       config_platform_os_is_posix=1
-   ;;
-esac
-
-case $target_cpu in
-   "x86_64")
-      config_platform_cpu_architecture_is_amd64=1
-   ;;
-   "i686" | "i586" | "i486" | "i386")
-      config_platform_cpu_architecture_is_ia32=1
    ;;
 esac
 
@@ -137,14 +142,6 @@ AC_ARG_ENABLE([io-buffering],
    [config_feature_io_buffering=0]
 )
 
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_IA32],
-   [$config_platform_cpu_architecture_is_ia32],
-   [Whether the target CPU architecture is IA32, also known as 32-bit x86]
-)
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_AMD64],
-   [$config_platform_cpu_architecture_is_amd64],
-   [Whether the target CPU architecture is AMD64, also known as 64-bit x86, x86-64, or x64]
-)
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_SIGN_MAGNITUDE],
    [$config_platform_cpu_integer_sign_is_sign_magnitude],
    [Whether the target platform uses sign-magnitude to represent signed integers or not]
@@ -160,6 +157,18 @@ AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_TWOS_COMPLEMENT]
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG],
    [$config_platform_cpu_endian_is_big],
    [Whether the target platform is big-endian or not]
+)
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_IA32],
+   [$config_platform_cpu_architecture_is_ia32],
+   [Whether the target CPU architecture is IA32, also known as 32-bit x86]
+)
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_AMD64],
+   [$config_platform_cpu_architecture_is_amd64],
+   [Whether the target CPU architecture is AMD64, also known as 64-bit x86, x86-64, or x64]
+)
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IA32_HAS_INSTRUCTION_BSWAP],
+   [$config_platform_cpu_architecture_ia32_has_instruction_bswap],
+   [Whether the target CPU supports the bswap instruction for IA32]
 )
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_OS_IS_POSIX],
    [$config_platform_os_is_posix],
