@@ -2,34 +2,34 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/arch/amd64/math/endian.c - AMD64-specific endian implementations.      */
+/* src/arch/amd64/memory/endian.c - AMD64-specific endian implementations.    */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "arch/amd64/math/endian.h"
+#include "arch/amd64/memory/endian.h"
 
 #if CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_AMD64
 /*----------------------------------------------------------------------------*/
 
 #include "arch/amd64/instruction.h"
 
-#if CLIAUTH_ARCH_AMD64_MATH_ENDIAN_SWAP_INT32_IS_OPTIMIZED
+#if CLIAUTH_ARCH_AMD64_MEMORY_ENDIAN_SWAP_INT32_IS_OPTIMIZED
 union CliAuthInt32
-cliauth_arch_amd64_math_endian_swap_int32(
+cliauth_arch_amd64_memory_endian_swap_int32(
    union CliAuthInt32 value
 ) {
    return cliauth_arch_amd64_instruction_bswap_r32(value);
 }
-#endif /* CLIAUTH_ARCH_AMD64_MATH_ENDIAN_SWAP_INT32_IS_OPTIMIZED */
+#endif /* CLIAUTH_ARCH_AMD64_MEMORY_ENDIAN_SWAP_INT32_IS_OPTIMIZED */
 
-#if CLIAUTH_ARCH_AMD64_MATH_ENDIAN_SWAP_INT64_IS_OPTIMIZED
+#if CLIAUTH_ARCH_AMD64_MEMORY_ENDIAN_SWAP_INT64_IS_OPTIMIZED
 union CliAuthInt64
-cliauth_arch_amd64_math_endian_swap_int64(
+cliauth_arch_amd64_memory_endian_swap_int64(
    union CliAuthInt64 value
 ) {
    return cliauth_arch_amd64_instruction_bswap_r64(value);
 }
-#endif /* CLIAUTH_ARCH_AMD64_MATH_ENDIAN_SWAP_INT64_IS_OPTIMIZED */
+#endif /* CLIAUTH_ARCH_AMD64_MEMORY_ENDIAN_SWAP_INT64_IS_OPTIMIZED */
 
 /*----------------------------------------------------------------------------*/
 #endif /* CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_AMD64 */

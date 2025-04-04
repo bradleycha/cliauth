@@ -2,11 +2,11 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/math/endian.h - Endian swapping functions                              */
+/* src/memory/endian.h - Endian swapping functions                            */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _CLIAUTH_MATH_ENDIAN_H
-#define _CLIAUTH_MATH_ENDIAN_H
+#ifndef _CLIAUTH_MEMORY_ENDIAN_H
+#define _CLIAUTH_MEMORY_ENDIAN_H
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
@@ -14,25 +14,27 @@
 /*----------------------------------------------------------------------------*/
 /* An endianess format.                                                       */
 /*----------------------------------------------------------------------------*/
-/* CLIAUTH_MATH_ENDIAN_TARGET_LITTLE -                                        */
+/* CLIAUTH_MEMORY_ENDIAN_TARGET_LITTLE -                                      */
 /*    Bytes will be ordered starting with least significant first.            */
 /*                                                                            */
-/* CLIAUTH_MATH_ENDIAN_TARGET_BIG -                                           */
+/* CLIAUTH_MEMORY_ENDIAN_TARGET_BIG -                                         */
 /*    Bytes will be ordered starting with most significant first.             */
 /*----------------------------------------------------------------------------*/
-#define CLIAUTH_MATH_ENDIAN_TARGET_FIELD_COUNT 2u
-enum CliAuthMathEndianTarget {
-   CLIAUTH_MATH_ENDIAN_TARGET_LITTLE = 0,
-   CLIAUTH_MATH_ENDIAN_TARGET_BIG = 1
+#define CLIAUTH_MEMORY_ENDIAN_TARGET_FIELD_COUNT 2u
+enum CliAuthMemoryEndianTarget {
+   CLIAUTH_MEMORY_ENDIAN_TARGET_LITTLE = 0,
+   CLIAUTH_MEMORY_ENDIAN_TARGET_BIG = 1
 };
 
 /*----------------------------------------------------------------------------*/
 /* The native endianess of the target platform.                               */
 /*----------------------------------------------------------------------------*/
 #if CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG
-   #define CLIAUTH_MATH_ENDIAN_TARGET_NATIVE CLIAUTH_MATH_ENDIAN_TARGET_BIG
+   #define CLIAUTH_MEMORY_ENDIAN_TARGET_NATIVE\
+      CLIAUTH_MEMORY_ENDIAN_TARGET_BIG
 #else /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG */
-   #define CLIAUTH_MATH_ENDIAN_TARGET_NATIVE CLIAUTH_MATH_ENDIAN_TARGET_LITTLE
+   #define CLIAUTH_MEMORY_ENDIAN_TARGET_NATIVE\
+      CLIAUTH_MEMORY_ENDIAN_TARGET_LITTLE
 #endif /* CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG */
 
 /*----------------------------------------------------------------------------*/
@@ -50,10 +52,10 @@ enum CliAuthMathEndianTarget {
 /*    The target endianess to convert between.                                */
 /*----------------------------------------------------------------------------*/
 void
-cliauth_math_endian_convert_inplace(
+cliauth_memory_endian_convert_inplace(
    CliAuthUInt8 data [],
    CliAuthUInt32 bytes,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 );
 
 /*----------------------------------------------------------------------------*/
@@ -75,11 +77,11 @@ cliauth_math_endian_convert_inplace(
 /*    The target endianess to convert between.                                */
 /*----------------------------------------------------------------------------*/
 void
-cliauth_math_endian_convert_copy(
+cliauth_memory_endian_convert_copy(
    CliAuthUInt8 dest [],
    const CliAuthUInt8 source [],
    CliAuthUInt32 bytes,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 );
 
 /*----------------------------------------------------------------------------*/
@@ -96,36 +98,36 @@ cliauth_math_endian_convert_copy(
 /*    The integer value with its endianess swapped.                           */
 /*----------------------------------------------------------------------------*/
 CliAuthUInt16
-cliauth_math_endian_convert_uint16(
+cliauth_memory_endian_convert_uint16(
    CliAuthUInt16 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 );
 CliAuthUInt32
-cliauth_math_endian_convert_uint32(
+cliauth_memory_endian_convert_uint32(
    CliAuthUInt32 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 );
 CliAuthUInt64
-cliauth_math_endian_convert_uint64(
+cliauth_memory_endian_convert_uint64(
    CliAuthUInt64 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 );
 CliAuthSInt16
-cliauth_math_endian_convert_sint16(
+cliauth_memory_endian_convert_sint16(
    CliAuthSInt16 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 );
 CliAuthSInt32
-cliauth_math_endian_convert_sint32(
+cliauth_memory_endian_convert_sint32(
    CliAuthSInt32 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 );
 CliAuthSInt64
-cliauth_math_endian_convert_sint64(
+cliauth_memory_endian_convert_sint64(
    CliAuthSInt64 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 );
 
 /*----------------------------------------------------------------------------*/
-#endif /* _CLIAUTH_MATH_ENDIAN_H */
+#endif /* _CLIAUTH_MEMORY_ENDIAN_H */
 

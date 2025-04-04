@@ -9,7 +9,7 @@
 #include "crypto/otp.h"
 
 #include "memory/memory.h"
-#include "math/endian.h"
+#include "memory/endian.h"
 #include "crypto/hash.h"
 #include "crypto/mac.h"
 #include "io/io.h"
@@ -36,9 +36,9 @@ cliauth_crypto_otp_hotp_truncate_digest(
       &digest_bytes[offset],
       sizeof(passcode)
    );
-   passcode = cliauth_math_endian_convert_uint32(
+   passcode = cliauth_memory_endian_convert_uint32(
       passcode,
-      CLIAUTH_MATH_ENDIAN_TARGET_BIG
+      CLIAUTH_MEMORY_ENDIAN_TARGET_BIG
    );
 
    /* discard the top-most bit */
@@ -112,9 +112,9 @@ cliauth_crypto_otp_hotp_finalize(
 
    /* convert the counter value to big-endian and digest it as the HMAC */
    /* message */
-   counter_big_endian.uint = cliauth_math_endian_convert_uint64(
+   counter_big_endian.uint = cliauth_memory_endian_convert_uint64(
       context->counter,
-      CLIAUTH_MATH_ENDIAN_TARGET_BIG
+      CLIAUTH_MEMORY_ENDIAN_TARGET_BIG
    );
 
    counter_mapper_reader = cliauth_io_byte_array_mapper_reader_interface(

@@ -8,8 +8,8 @@
 #include "cliauth.h"
 #include "crypto/hash.h"
 
+#include "memory/endian.h"
 #include "memory/memory.h"
-#include "math/endian.h"
 #include "math/bitwise.h"
 #include "io/io.h"
 
@@ -202,9 +202,9 @@ cliauth_crypto_hash_sha1_2_ring_buffer_finalize(
 
    /* calculate the message length in bits, convert to big endian, and append */
    /* to the end of the message */
-   message_length_bits_big_endian = cliauth_math_endian_convert_uint64(
+   message_length_bits_big_endian = cliauth_memory_endian_convert_uint64(
       context->total * CLIAUTH_LITERAL_UINT32(8u),
-      CLIAUTH_MATH_ENDIAN_TARGET_BIG
+      CLIAUTH_MEMORY_ENDIAN_TARGET_BIG
    );
    cliauth_memory_copy(
       ring_buffer_iter,
@@ -249,11 +249,11 @@ cliauth_crypto_hash_sha1_2_load_message_block_little(
    block_iter = block;
    schedule_iter = schedule;
    while (block_bytes != CLIAUTH_LITERAL_UINT8(0u)) {
-      cliauth_math_endian_convert_copy(
+      cliauth_memory_endian_convert_copy(
          schedule_iter,
          block_iter,
          schedule_bytes_per_word,
-         CLIAUTH_MATH_ENDIAN_TARGET_BIG
+         CLIAUTH_MEMORY_ENDIAN_TARGET_BIG
       );
 
       block_iter += schedule_bytes_per_word;
@@ -315,10 +315,10 @@ cliauth_crypto_hash_sha1_2_digest_endianess_finalize_little(
 
    digest_iter = digest;
    while (digest_words != CLIAUTH_LITERAL_UINT8(0u)) {
-      cliauth_math_endian_convert_inplace(
+      cliauth_memory_endian_convert_inplace(
          digest_iter,
          digest_bytes_per_word,
-         CLIAUTH_MATH_ENDIAN_TARGET_BIG
+         CLIAUTH_MEMORY_ENDIAN_TARGET_BIG
       );
       
       digest_iter += digest_bytes_per_word;

@@ -2,19 +2,19 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/endian.c - Endian swapping function implementations.                   */
+/* src/memory/endian.c - Endian swapping function implementations.            */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "math/endian.h"
+#include "memory/endian.h"
 
-#include "arch/ia32/math/endian.h"
-#include "arch/amd64/math/endian.h"
+#include "arch/ia32/memory/endian.h"
+#include "arch/amd64/memory/endian.h"
 
 #include "memory/memory.h"
 
 static void
-cliauth_math_endian_swap_inplace(
+cliauth_memory_endian_swap_inplace(
    CliAuthUInt8 data [],
    CliAuthUInt32 bytes
 ) {
@@ -38,7 +38,7 @@ cliauth_math_endian_swap_inplace(
 }
 
 static void
-cliauth_math_endian_swap_copy(
+cliauth_memory_endian_swap_copy(
    CliAuthUInt8 dest [],
    const CliAuthUInt8 source [],
    CliAuthUInt32 bytes
@@ -60,13 +60,13 @@ cliauth_math_endian_swap_copy(
 }
 
 static union CliAuthInt16
-cliauth_math_endian_swap_int16(
+cliauth_memory_endian_swap_int16(
    union CliAuthInt16 value
 ) {
    union CliAuthInt16 output;
 
    output.uint = value.uint;
-   cliauth_math_endian_swap_inplace(
+   cliauth_memory_endian_swap_inplace(
       output.bytes,
       CLIAUTH_LITERAL_UINT32(sizeof(output))
    );
@@ -75,18 +75,18 @@ cliauth_math_endian_swap_int16(
 }
 
 static union CliAuthInt32
-cliauth_math_endian_swap_int32(
+cliauth_memory_endian_swap_int32(
    union CliAuthInt32 value
 ) {
    union CliAuthInt32 output;
 
 #if CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_IA32 && CLIAUTH_ARCH_IA32_MATH_ENDIAN_SWAP_INT32_IS_OPTIMIZED
-   output = cliauth_arch_ia32_math_endian_swap_int32(value);
+   output = cliauth_arch_ia32_memory_endian_swap_int32(value);
 #elif CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_AMD64 && CLIAUTH_ARCH_AMD64_MATH_ENDIAN_SWAP_INT32_IS_OPTIMIZED
-   output = cliauth_arch_amd64_math_endian_swap_int32(value);
+   output = cliauth_arch_amd64_memory_endian_swap_int32(value);
 #else
    output.uint = value.uint;
-   cliauth_math_endian_swap_inplace(
+   cliauth_memory_endian_swap_inplace(
       output.bytes,
       CLIAUTH_LITERAL_UINT32(sizeof(output))
    );
@@ -96,18 +96,18 @@ cliauth_math_endian_swap_int32(
 }
 
 static union CliAuthInt64
-cliauth_math_endian_swap_int64(
+cliauth_memory_endian_swap_int64(
    union CliAuthInt64 value
 ) {
    union CliAuthInt64 output;
 
 #if CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_IA32 && CLIAUTH_ARCH_IA32_MATH_ENDIAN_SWAP_INT64_IS_OPTIMIZED
-   output = cliauth_arch_ia32_math_endian_swap_int64(value);
+   output = cliauth_arch_ia32_memory_endian_swap_int64(value);
 #elif CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_AMD64 && CLIAUTH_ARCH_AMD64_MATH_ENDIAN_SWAP_INT64_IS_OPTIMIZED
-   output = cliauth_arch_amd64_math_endian_swap_int64(value);
+   output = cliauth_arch_amd64_memory_endian_swap_int64(value);
 #else
    output.uint = value.uint;
-   cliauth_math_endian_swap_inplace(
+   cliauth_memory_endian_swap_inplace(
       output.bytes,
       CLIAUTH_LITERAL_UINT32(sizeof(output))
    );
@@ -117,63 +117,63 @@ cliauth_math_endian_swap_int64(
 }
 
 static union CliAuthInt16
-cliauth_math_endian_convert_int16(
+cliauth_memory_endian_convert_int16(
    union CliAuthInt16 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
-   if (target == CLIAUTH_MATH_ENDIAN_TARGET_NATIVE) {
+   if (target == CLIAUTH_MEMORY_ENDIAN_TARGET_NATIVE) {
       return value;
    }
 
-   return cliauth_math_endian_swap_int16(value);
+   return cliauth_memory_endian_swap_int16(value);
 }
 
 static union CliAuthInt32
-cliauth_math_endian_convert_int32(
+cliauth_memory_endian_convert_int32(
    union CliAuthInt32 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
-   if (target == CLIAUTH_MATH_ENDIAN_TARGET_NATIVE) {
+   if (target == CLIAUTH_MEMORY_ENDIAN_TARGET_NATIVE) {
       return value;
    }
 
-   return cliauth_math_endian_swap_int32(value);
+   return cliauth_memory_endian_swap_int32(value);
 }
 
 static union CliAuthInt64
-cliauth_math_endian_convert_int64(
+cliauth_memory_endian_convert_int64(
    union CliAuthInt64 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
-   if (target == CLIAUTH_MATH_ENDIAN_TARGET_NATIVE) {
+   if (target == CLIAUTH_MEMORY_ENDIAN_TARGET_NATIVE) {
       return value;
    }
 
-   return cliauth_math_endian_swap_int64(value);
+   return cliauth_memory_endian_swap_int64(value);
 }
 
 void
-cliauth_math_endian_convert_inplace(
+cliauth_memory_endian_convert_inplace(
    CliAuthUInt8 data [],
    CliAuthUInt32 bytes,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
-   if (target != CLIAUTH_MATH_ENDIAN_TARGET_NATIVE) {
-      cliauth_math_endian_swap_inplace(data, bytes);
+   if (target != CLIAUTH_MEMORY_ENDIAN_TARGET_NATIVE) {
+      cliauth_memory_endian_swap_inplace(data, bytes);
    }
 
    return;
 }
 
 void
-cliauth_math_endian_convert_copy(
+cliauth_memory_endian_convert_copy(
    CliAuthUInt8 dest [],
    const CliAuthUInt8 source [],
    CliAuthUInt32 bytes,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
-   if (target != CLIAUTH_MATH_ENDIAN_TARGET_NATIVE) {
-      cliauth_math_endian_swap_copy(dest, source, bytes);
+   if (target != CLIAUTH_MEMORY_ENDIAN_TARGET_NATIVE) {
+      cliauth_memory_endian_swap_copy(dest, source, bytes);
    } else {
       cliauth_memory_copy(
          dest,
@@ -186,16 +186,16 @@ cliauth_math_endian_convert_copy(
 }
 
 CliAuthUInt16
-cliauth_math_endian_convert_uint16(
+cliauth_memory_endian_convert_uint16(
    CliAuthUInt16 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
    union CliAuthInt16 value_generic;
    union CliAuthInt16 output;
 
    value_generic.uint = value;
 
-   output = cliauth_math_endian_convert_int16(
+   output = cliauth_memory_endian_convert_int16(
       value_generic,
       target
    );
@@ -204,16 +204,16 @@ cliauth_math_endian_convert_uint16(
 }
 
 CliAuthUInt32
-cliauth_math_endian_convert_uint32(
+cliauth_memory_endian_convert_uint32(
    CliAuthUInt32 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
    union CliAuthInt32 value_generic;
    union CliAuthInt32 output;
 
    value_generic.uint = value;
 
-   output = cliauth_math_endian_convert_int32(
+   output = cliauth_memory_endian_convert_int32(
       value_generic,
       target
    );
@@ -222,16 +222,16 @@ cliauth_math_endian_convert_uint32(
 }
 
 CliAuthUInt64
-cliauth_math_endian_convert_uint64(
+cliauth_memory_endian_convert_uint64(
    CliAuthUInt64 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
    union CliAuthInt64 value_generic;
    union CliAuthInt64 output;
 
    value_generic.uint = value;
 
-   output = cliauth_math_endian_convert_int64(
+   output = cliauth_memory_endian_convert_int64(
       value_generic,
       target
    );
@@ -240,16 +240,16 @@ cliauth_math_endian_convert_uint64(
 }
 
 CliAuthSInt16
-cliauth_math_endian_convert_sint16(
+cliauth_memory_endian_convert_sint16(
    CliAuthSInt16 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
    union CliAuthInt16 value_generic;
    union CliAuthInt16 output;
 
    value_generic.sint = value;
 
-   output = cliauth_math_endian_convert_int16(
+   output = cliauth_memory_endian_convert_int16(
       value_generic,
       target
    );
@@ -258,16 +258,16 @@ cliauth_math_endian_convert_sint16(
 }
 
 CliAuthSInt32
-cliauth_math_endian_convert_sint32(
+cliauth_memory_endian_convert_sint32(
    CliAuthSInt32 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
    union CliAuthInt32 value_generic;
    union CliAuthInt32 output;
 
    value_generic.sint = value;
 
-   output = cliauth_math_endian_convert_int32(
+   output = cliauth_memory_endian_convert_int32(
       value_generic,
       target
    );
@@ -276,16 +276,16 @@ cliauth_math_endian_convert_sint32(
 }
 
 CliAuthSInt64
-cliauth_math_endian_convert_sint64(
+cliauth_memory_endian_convert_sint64(
    CliAuthSInt64 value,
-   enum CliAuthMathEndianTarget target
+   enum CliAuthMemoryEndianTarget target
 ) {
    union CliAuthInt64 value_generic;
    union CliAuthInt64 output;
 
    value_generic.sint = value;
 
-   output = cliauth_math_endian_convert_int64(
+   output = cliauth_memory_endian_convert_int64(
       value_generic,
       target
    );

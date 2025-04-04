@@ -19,12 +19,12 @@ cliauth_CFLAGS = \
 cliauth_SOURCES = \
 	src/arch/amd64/instruction.c\
 	src/arch/amd64/instruction.h\
-	src/arch/amd64/math/endian.c\
-	src/arch/amd64/math/endian.h\
+	src/arch/amd64/memory/endian.c\
+	src/arch/amd64/memory/endian.h\
 	src/arch/ia32/instruction.c\
 	src/arch/ia32/instruction.h\
-	src/arch/ia32/math/endian.c\
-	src/arch/ia32/math/endian.h\
+	src/arch/ia32/memory/endian.c\
+	src/arch/ia32/memory/endian.h\
 	src/cliauth.c \
 	src/cliauth.h \
 	src/imports.h \
@@ -55,8 +55,8 @@ cliauth_SOURCES = \
 	src/io/parse/string_integer.h \
 	src/math/bitwise.c \
 	src/math/bitwise.h \
-	src/math/endian.c \
-	src/math/endian.h \
+	src/memory/endian.c \
+	src/memory/endian.h \
 	src/memory/memory.c \
 	src/memory/memory.h \
 	src/ui/args.c \

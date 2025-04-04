@@ -2,29 +2,29 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/arch/ia32/math/endian.c - IA32-specific endian implementations.        */
+/* src/arch/ia32/memory/endian.c - IA32-specific endian implementations.      */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth.h"
-#include "arch/ia32/math/endian.h"
+#include "arch/ia32/memory/endian.h"
 
 #if CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_IA32
 /*----------------------------------------------------------------------------*/
 
 #include "arch/ia32/instruction.h"
 
-#if CLIAUTH_ARCH_IA32_MATH_ENDIAN_SWAP_INT32_IS_OPTIMIZED
+#if CLIAUTH_ARCH_IA32_MEMORY_ENDIAN_SWAP_INT32_IS_OPTIMIZED
 union CliAuthInt32
-cliauth_arch_ia32_math_endian_swap_int32(
+cliauth_arch_ia32_memory_endian_swap_int32(
    union CliAuthInt32 value
 ) {
    return cliauth_arch_ia32_instruction_bswap_r32(value);
 }
-#endif /* CLIAUTH_ARCH_IA32_MATH_ENDIAN_SWAP_INT32_IS_OPTIMIZED */
+#endif /* CLIAUTH_ARCH_IA32_MEMORY_ENDIAN_SWAP_INT32_IS_OPTIMIZED */
 
-#if CLIAUTH_ARCH_IA32_MATH_ENDIAN_SWAP_INT64_IS_OPTIMIZED
+#if CLIAUTH_ARCH_IA32_MEMORY_ENDIAN_SWAP_INT64_IS_OPTIMIZED
 union CliAuthInt64
-cliauth_arch_ia32_math_endian_swap_int64(
+cliauth_arch_ia32_memory_endian_swap_int64(
    union CliAuthInt64 value
 ) {
    union CliAuthInt64 out;
@@ -46,7 +46,7 @@ cliauth_arch_ia32_math_endian_swap_int64(
 
    return out;
 }
-#endif /* CLIAUTH_ARCH_IA32_MATH_ENDIAN_SWAP_INT64_IS_OPTIMIZED */
+#endif /* CLIAUTH_ARCH_IA32_MEMORY_ENDIAN_SWAP_INT64_IS_OPTIMIZED */
 
 /*----------------------------------------------------------------------------*/
 #endif /* CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_IA32 */
