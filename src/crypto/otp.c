@@ -55,10 +55,11 @@ cliauth_crypto_otp_hotp_trim_digits(
    CliAuthUInt32 modulus;
 
    modulus = CLIAUTH_LITERAL_UINT32(1u);
-   while (digits != CLIAUTH_LITERAL_UINT8(0u)) {
+
+   do {
       modulus *= CLIAUTH_LITERAL_UINT32(10u);
       digits--;
-   }
+   } while (digits != CLIAUTH_LITERAL_UINT8(0u));
 
    return passcode % modulus;
 }
