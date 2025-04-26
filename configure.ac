@@ -39,6 +39,7 @@ config_platform_os_is_windows=0
 config_feature_optional_library_imports=0
 config_feature_ansi=0
 config_feature_log_origin=0
+config_feature_io_buffering=0
 config_feature_crypto_hash_sha1=0
 config_feature_crypto_hash_sha2_224=0
 config_feature_crypto_hash_sha2_256=0
@@ -46,7 +47,6 @@ config_feature_crypto_hash_sha2_384=0
 config_feature_crypto_hash_sha2_512=0
 config_feature_crypto_hash_sha2_512_224=0
 config_feature_crypto_hash_sha2_512_256=0
-config_feature_io_buffering=0
 
 # TODO: figure out how to detect this from the target platform
 # pretty much every processor since the 70's uses two's complement, so for now
@@ -101,6 +101,11 @@ AC_ARG_ENABLE([log-origin],
    [config_feature_log_origin=1],
    [config_feature_log_origin=0]
 )
+AC_ARG_ENABLE([io-buffering],
+   AS_HELP_STRING([--enable-io-buffering], [Enable support for file IO buffering]),
+   [config_feature_io_buffering=1],
+   [config_feature_io_buffering=0]
+)
 AC_ARG_ENABLE([hash-sha1],
    AS_HELP_STRING([--enable-hash-sha1], [Enable support for the SHA1 hash algorithm]),
    [config_feature_crypto_hash_sha1=1],
@@ -135,11 +140,6 @@ AC_ARG_ENABLE([hash-sha2-512-256],
    AS_HELP_STRING([--enable-hash-sha2-512-256], [Enable support for the SHA2-512-256 hash algorithm]),
    [config_feature_crypto_hash_sha2_512_256=1],
    [config_feature_crypto_hash_sha2_512_256=0]
-)
-AC_ARG_ENABLE([io-buffering],
-   AS_HELP_STRING([--enable-io-buffering], [Enable support for file IO buffering]),
-   [config_feature_io_buffering=1],
-   [config_feature_io_buffering=0]
 )
 
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_SIGN_MAGNITUDE],
@@ -190,6 +190,10 @@ AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_LOG_ORIGIN],
    [$config_feature_log_origin],
    [Include the location in source code every log message originates from]
 )
+AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_IO_BUFFERING],
+   [$config_feature_io_buffering],
+   [Enable support for file IO buffering]
+)
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA1],
    [$config_feature_crypto_hash_sha1],
    [Enable support for the SHA1 hash algorithm]
@@ -217,10 +221,6 @@ AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_224],
 AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_256],
    [$config_feature_crypto_hash_sha2_512_256],
    [Enable support for the SHA2-512-256 hash algorithm]
-)
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_IO_BUFFERING],
-   [$config_feature_io_buffering],
-   [Enable support for file IO buffering]
 )
 
 AC_OUTPUT
