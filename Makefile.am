@@ -17,48 +17,48 @@ cliauth_CFLAGS = \
 	-Werror
 
 cliauth_SOURCES = \
-	src/arch/amd64/instruction.c\
-	src/arch/amd64/instruction.h\
-	src/arch/amd64/memory/endian.c\
-	src/arch/amd64/memory/endian.h\
-	src/arch/ia32/instruction.c\
-	src/arch/ia32/instruction.h\
-	src/arch/ia32/memory/endian.c\
-	src/arch/ia32/memory/endian.h\
-	src/cliauth.c \
-	src/cliauth.h \
-	src/imports.h \
-	src/types.h \
-	src/crypto/hash.c \
-	src/crypto/hash.h \
-	src/crypto/mac.c \
-	src/crypto/mac.h \
-	src/crypto/otp.c \
-	src/crypto/otp.h \
-	src/database/account.c \
-	src/database/account.h \
-	src/io/buffered_stream.c \
-	src/io/buffered_stream.h \
-	src/io/byte_array_mapper.c \
-	src/io/byte_array_mapper.h \
-	src/io/io.c \
-	src/io/io.h \
-	src/io/mapper_stream.c \
-	src/io/mapper_stream.h \
-	src/io/log.c \
-	src/io/log.h \
-	src/io/parse/i_digit_to_integer.c \
-	src/io/parse/i_digit_to_integer.h \
-	src/io/parse/string_block_data.c \
-	src/io/parse/string_block_data.h \
-	src/io/parse/string_integer.c \
-	src/io/parse/string_integer.h \
-	src/math/bitwise.c \
-	src/math/bitwise.h \
-	src/memory/endian.c \
-	src/memory/endian.h \
-	src/memory/memory.c \
-	src/memory/memory.h \
-	src/ui/args.c \
-	src/ui/args.h
+	src/cliauth/arch/amd64/instruction.c\
+	src/cliauth/arch/amd64/instruction.h\
+	src/cliauth/arch/amd64/memory/endian.c\
+	src/cliauth/arch/amd64/memory/endian.h\
+	src/cliauth/arch/ia32/instruction.c\
+	src/cliauth/arch/ia32/instruction.h\
+	src/cliauth/arch/ia32/memory/endian.c\
+	src/cliauth/arch/ia32/memory/endian.h\
+	src/cliauth/cliauth.c \
+	src/cliauth/cliauth.h \
+	src/cliauth/imports.h \
+	src/cliauth/types.h \
+	src/cliauth/crypto/hash.c \
+	src/cliauth/crypto/hash.h \
+	src/cliauth/crypto/mac.c \
+	src/cliauth/crypto/mac.h \
+	src/cliauth/crypto/otp.c \
+	src/cliauth/crypto/otp.h \
+	src/cliauth/database/account.c \
+	src/cliauth/database/account.h \
+	src/cliauth/io/buffered_stream.c \
+	src/cliauth/io/buffered_stream.h \
+	src/cliauth/io/byte_array_mapper.c \
+	src/cliauth/io/byte_array_mapper.h \
+	src/cliauth/io/io.c \
+	src/cliauth/io/io.h \
+	src/cliauth/io/mapper_stream.c \
+	src/cliauth/io/mapper_stream.h \
+	src/cliauth/io/log.c \
+	src/cliauth/io/log.h \
+	src/cliauth/io/parse/i_digit_to_integer.c \
+	src/cliauth/io/parse/i_digit_to_integer.h \
+	src/cliauth/io/parse/string_block_data.c \
+	src/cliauth/io/parse/string_block_data.h \
+	src/cliauth/io/parse/string_integer.c \
+	src/cliauth/io/parse/string_integer.h \
+	src/cliauth/math/bitwise.c \
+	src/cliauth/math/bitwise.h \
+	src/cliauth/memory/endian.c \
+	src/cliauth/memory/endian.h \
+	src/cliauth/memory/memory.c \
+	src/cliauth/memory/memory.h \
+	src/cliauth/ui/args.c \
+	src/cliauth/ui/args.h
 

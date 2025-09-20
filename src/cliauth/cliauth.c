@@ -1,0 +1,133 @@
+/*----------------------------------------------------------------------------*/
+/*                      Copyright (c) CliAuth 2024, 2025                      */
+/*                   https://github.com/bradleycha/cliauth                    */
+/*----------------------------------------------------------------------------*/
+/* src/cliauth.c - Main application entrypoint                                */
+/*----------------------------------------------------------------------------*/
+
+#include "cliauth/cliauth.h"
+#include "cliauth/ui/args.h"
+#include "cliauth/database/account.h"
+#include "cliauth/io/log.h"
+
+#include <inttypes.h>
+
+#define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION
+
+/* Return status enum for cliauth_main(). */
+#define CLIAUTH_EXIT_STATUS_FIELD_COUNT 3u
+enum CliAuthExitStatus {
+   /* The program executed successfully without any errors. */
+   CLIAUTH_EXIT_STATUS_SUCCESS = 0,
+
+   /* More arguments were passed than can be handled. */
+   CLIAUTH_EXIT_STATUS_MAXIMUM_ARGUMENTS_EXCEEDED = 1,
+
+   /* There was an error parsing the arguments. */
+   CLIAUTH_EXIT_STATUS_ARGS_PARSE_ERROR = 2
+};
+
+static enum CliAuthExitStatus
+cliauth_main(CliAuthUInt16 argc, const char * const argv []) {
+   struct CliAuthUiArgsPayload args;
+   enum CliAuthDatabaseAccountGeneratePasscodeResult passcode_result;
+   struct CliAuthCryptoOtpHotpContext passcode_hotp_context;
+   CliAuthUInt32 passcode;
+
+   cliauth_io_log(CLIAUTH_IO_LOG_INFO(CLIAUTH_ABOUT));
+
+   switch (cliauth_ui_args_parse(&args, argv, argc)) {
+      case CLIAUTH_UI_ARGS_PARSE_RESULT_SUCCESS:
+         break;
+
+      default:
+         cliauth_io_log(CLIAUTH_IO_LOG_ERROR("failed to parse command-line arguments, exiting"));
+         return CLIAUTH_EXIT_STATUS_ARGS_PARSE_ERROR;
+   }
+
+   cliauth_io_log(
+      CLIAUTH_IO_LOG_INFO("account issuer: %.*s"),
+      args.account.issuer_characters,
+      args.account.issuer
+   );
+   cliauth_io_log(
+      CLIAUTH_IO_LOG_INFO("account name: %.*s"),
+      args.account.name_characters,
+      args.account.name
+   );
+   cliauth_io_log(
+      CLIAUTH_IO_LOG_INFO("hash algorithm: %.*s"),
+      args.account.hash_function->identifier_characters,
+      args.account.hash_function->identifier
+   );
+
+   switch (args.account.algorithm.type) {
+      case CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_HOTP:
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("counter value: %" PRIu64),
+            args.account.algorithm.parameters.hotp.counter
+         );
+         break;
+
+      case CLIAUTH_DATABASE_ACCOUNT_ALGORITHM_TYPE_TOTP:
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("initial timestamp: %" PRIu64 " seconds"), 
+            args.totp_parameters.time_initial
+         );
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("current timestamp: %" PRIu64 " seconds"),
+            args.totp_parameters.time_current
+         );
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("period: %" PRIu64 " seconds"),
+            args.account.algorithm.parameters.totp.period
+         );
+         break;
+   }
+
+   cliauth_io_log(
+      CLIAUTH_IO_LOG_INFO("passcode index: %" PRId64),
+      args.index
+   );
+
+   cliauth_io_log(CLIAUTH_IO_LOG_INFO("generating a passcode using the given parameters"));
+
+   passcode_result = cliauth_database_account_generate_passcode(
+      &args.account,
+      &passcode,
+      &passcode_hotp_context,
+      &args.totp_parameters,
+      args.index
+   );
+   switch (passcode_result) {
+      case CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_SUCCESS:
+         cliauth_io_log(
+            CLIAUTH_IO_LOG_INFO("generated passcode: %0*" PRIu32),
+            args.account.digits,
+            passcode
+         );
+         break;
+
+      case CLIAUTH_DATABASE_ACCOUNT_GENERATE_PASSCODE_RESULT_DOES_NOT_EXIST:
+         cliauth_io_log(CLIAUTH_IO_LOG_ERROR("no passcode exists for this index"));
+         break;
+   }
+
+   return CLIAUTH_EXIT_STATUS_SUCCESS;
+}
+
+int main(int argc, char * argv []) {
+   enum CliAuthExitStatus exit_status;
+
+   if (argc > CLIAUTH_UINT16_MAX) {
+      return (int)CLIAUTH_EXIT_STATUS_MAXIMUM_ARGUMENTS_EXCEEDED;
+   }
+
+   exit_status = cliauth_main(
+      (CliAuthUInt16)argc,
+      (const char * const *)argv
+   );
+
+   return (int)exit_status;
+}
+

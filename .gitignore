@@ -8,6 +8,7 @@ config.status
 Makefile
 Makefile.in
 cliauth
+!src/cliauth
 *.o
 **/.deps
 **/.dirstamp
