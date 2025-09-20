@@ -123,20 +123,26 @@ cliauth_crypto_hash_sha1_2_ring_buffer_digest(
       digest_blocks--;
    }
 
+   /* reset the capacity to the block size as the only remaining bytes are */
+   /* less than a single block, thus won't incure any flushes. */
+   context->capacity = implementation->bytes;
+
    /* copy the remainder bytes into the ring buffer, note that we don't */
    /* update remaining_bytes because the function will never fail after this */
-   /* final read. */
-   read_result = cliauth_io_stream_reader_read(
-      message_reader,
-      buffer,
-      remainder_bytes
-   );
-   digest_bytes += read_result.bytes;
-   context->total += read_result.bytes;
+   /* final read.  we wrap this with an if statement as to not cause an end */
+   /* of stream I/O result in the edge-case that our input stream is a */
+   /* multiple of the block length. */
+   if (remainder_bytes != CLIAUTH_LITERAL_UINT32(0u)) {
+      read_result = cliauth_io_stream_reader_read(
+         message_reader,
+         buffer,
+         remainder_bytes
+      );
+      digest_bytes += read_result.bytes;
+      context->total += read_result.bytes;
+      context->capacity -= read_result.bytes;
+   }
 
-   /* since there's no additional work, we set these values no matter the */
-   /* read status */
-   context->capacity = implementation->bytes - read_result.bytes;
    read_result.bytes = digest_bytes;
    return read_result;
 }
