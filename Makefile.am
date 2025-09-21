@@ -21,6 +21,9 @@ AM_CFLAGS = \
 	-Wpedantic \
 	-Werror
 
+libcliauth_la_LDFLAGS = \
+	-release $(PACKAGE_VERSION)
+
 cliauth_LDADD = \
 	$(top_builddir)/libcliauth.la
 

@@ -9,6 +9,7 @@ Makefile
 Makefile.in
 cliauth
 libcliauth.*
+libcliauth-*.*
 libtool
 !src/cliauth
 *.o
