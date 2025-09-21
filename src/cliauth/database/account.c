@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/account.c - Account management implementation.                         */
+/* src/cliauth/account.c - Account management implementation.                 */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth/cliauth.h"

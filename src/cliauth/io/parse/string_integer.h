@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/parse/string_integer.h - String integer parser.                     */
+/* src/cliauth/io/parse/string_integer.h - String integer parser.             */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_IO_PARSE_STRING_INTEGER_H

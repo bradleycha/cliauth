@@ -2,8 +2,8 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/parse/i_digit_to_integer.c - Digit character to integer conversion  */
-/*    implementations.                                                        */
+/* src/cliauth/io/parse/i_digit_to_integer.c - Digit character to integer     */
+/*    conversion implementations.                                             */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth/cliauth.h"

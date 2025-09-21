@@ -2,8 +2,8 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/parse/i_digit_to_integer.h - Internal interface to convert a        */
-/*    digit character to its integer representation.                          */
+/* src/cliauth/io/parse/i_digit_to_integer.h - Internal interface to convert  */
+/*    a digit character to its integer representation.                        */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_IO_PARSE_I_DIGIT_TO_INTEGER_H

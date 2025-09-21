@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/log.h - Global logging interface.                                   */
+/* src/cliauth/io/log.h - Global logging interface.                           */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_IO_LOG_H

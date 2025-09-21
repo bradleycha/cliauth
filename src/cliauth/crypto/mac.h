@@ -2,7 +2,8 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/crypto/mac.h - Message authentication code (MAC) algorithms header.    */
+/* src/cliauth/crypto/mac.h - Message authentication code (MAC) algorithms    */
+/*    header.                                                                 */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_CRYPTO_MAC_H

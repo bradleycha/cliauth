@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/buffered_stream.h - Buffered I/O stream layer.                      */
+/* src/cliauth/io/buffered_stream.h - Buffered I/O stream layer.              */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_IO_BUFFERED_STREAM_H

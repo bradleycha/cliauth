@@ -2,7 +2,8 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/cliauth.h - Global project header which contains common includes.      */
+/* src/cliauth/cliauth.h - Global project header which contains common        */
+/*    includes.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_H

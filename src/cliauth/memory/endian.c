@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/memory/endian.c - Endian swapping function implementations.            */
+/* src/cliauth/memory/endian.c - Endian swapping function implementations.    */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth/cliauth.h"

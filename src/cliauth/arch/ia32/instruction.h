@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/arch/ia32/instruction.h - IA32 instruction bindings.                   */
+/* src/cliauth/arch/ia32/instruction.h - IA32 instruction bindings.           */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_ARCH_IA32_INSTRUCTION_H

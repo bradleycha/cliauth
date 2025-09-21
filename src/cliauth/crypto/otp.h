@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/crypto/otp.h - One-time-password (OTP) algorithms header.              */
+/* src/cliauth/crypto/otp.h - One-time-password (OTP) algorithms header.      */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_CRYPTO_OTP_H

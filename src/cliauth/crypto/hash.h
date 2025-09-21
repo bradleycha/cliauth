@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/crypto/hash.h - Public header for hashing algorithms                   */
+/* src/cliauth/crypto/hash.h - Public header for hashing algorithms           */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_CRYPTO_HASH_H

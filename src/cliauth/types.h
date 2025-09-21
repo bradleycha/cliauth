@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/types.h - General types used throughout the program                    */
+/* src/cliauth/types.h - General types used throughout the program            */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_TYPES_H

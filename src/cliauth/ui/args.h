@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/ui/args.h - Command-line arguments parsing header.                     */
+/* src/cliauth/ui/args.h - Command-line arguments parsing header.             */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_UI_ARGS_H

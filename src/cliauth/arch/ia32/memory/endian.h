@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/arch/ia32/memory/endian.h - IA32-specific endian declarations.         */
+/* src/cliauth/arch/ia32/memory/endian.h - IA32-specific endian declarations. */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_ARCH_IA32_MEMORY_ENDIAN_H

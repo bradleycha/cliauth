@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/parse/string_block_data.c - String block data parser                */
+/* src/cliauth/io/parse/string_block_data.c - String block data parser        */
 /*    implementations.                                                        */
 /*----------------------------------------------------------------------------*/
 

@@ -2,7 +2,8 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/byte_array_mapper.c - Byte array I/O mapper layer implementations.  */
+/* src/cliauth/io/byte_array_mapper.c - Byte array I/O mapper layer           */
+/*    implementations.                                                        */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth/cliauth.h"

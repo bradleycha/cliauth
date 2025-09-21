@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/imports.h - Library import macro definitions.                          */
+/* src/cliauth/imports.h - Library import macro definitions.                  */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_IMPORTS_H

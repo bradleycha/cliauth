@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/arch/amd64/instruction.c - AMD64 instruction wrappers.                 */
+/* src/cliauth/arch/amd64/instruction.c - AMD64 instruction wrappers.         */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth/cliauth.h"

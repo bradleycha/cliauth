@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/math/bitwise.h - Various bitwise operations.                           */
+/* src/cliauth/math/bitwise.h - Various bitwise operations.                   */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_MATH_BITWISE_H

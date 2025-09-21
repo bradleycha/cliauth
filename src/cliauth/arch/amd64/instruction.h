@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/arch/amd64/instruction.h - AMD64 instruction bindings.                 */
+/* src/cliauth/arch/amd64/instruction.h - AMD64 instruction bindings.         */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_ARCH_AMD64_INSTRUCTION_H

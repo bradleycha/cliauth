@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/io/mapper_stream.h - I/O stream over an I/O mapper.                    */
+/* src/cliauth/io/mapper_stream.h - I/O stream over an I/O mapper.            */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_IO_MAPPER_STREAM_H

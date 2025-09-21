@@ -2,7 +2,8 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/arch/ia32/memory/endian.c - IA32-specific endian implementations.      */
+/* src/cliauth/arch/ia32/memory/endian.c - IA32-specific endian               */
+/*    implementations.                                                        */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth/cliauth.h"

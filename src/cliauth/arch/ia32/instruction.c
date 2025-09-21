@@ -2,7 +2,7 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/arch/ia32/instruction.c - IA32 instruction wrappers.                   */
+/* src/cliauth/arch/ia32/instruction.c - IA32 instruction wrappers.           */
 /*----------------------------------------------------------------------------*/
 
 #include "cliauth/cliauth.h"

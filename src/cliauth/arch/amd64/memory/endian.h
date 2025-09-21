@@ -2,7 +2,8 @@
 /*                      Copyright (c) CliAuth 2024, 2025                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
-/* src/arch/amd64/memory/endian.h - AMD64-specific endian declarations.       */
+/* src/cliauth/arch/amd64/memory/endian.h - AMD64-specific endian             */
+/*    declarations.                                                           */
 /*----------------------------------------------------------------------------*/
 
 #ifndef _CLIAUTH_ARCH_AMD64_MEMORY_ENDIAN_H
