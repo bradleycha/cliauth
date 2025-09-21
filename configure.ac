@@ -17,10 +17,12 @@ AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_MACRO_DIRS([m4])
+AC_CONFIG_MACRO_DIRS([build/m4])
 AX_PREFIX_CONFIG_H(build/cliauth/config.h)
 
 AC_PROG_CC
+AM_PROG_AR
+LT_INIT
 
 AC_CHECK_SIZEOF([char])
 AC_CHECK_SIZEOF([short])
