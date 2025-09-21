@@ -12,7 +12,7 @@
 
 #include <inttypes.h>
 
-#define CLIAUTH_ABOUT PACKAGE_NAME " version " PACKAGE_VERSION
+#define CLIAUTH_ABOUT CLIAUTH_PACKAGE_NAME " version " CLIAUTH_PACKAGE_VERSION
 
 /* Return status enum for cliauth_main(). */
 #define CLIAUTH_EXIT_STATUS_FIELD_COUNT 3u

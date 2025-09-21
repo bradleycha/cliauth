@@ -5,9 +5,11 @@
 # configure.ac - GNU Autoconf script                                           #
 #------------------------------------------------------------------------------#
 
+m4_include([m4/ax_prefix_config_h.m4])
+
 AC_INIT([cliauth], 0.1.1, [bradleycha@proton.me])
 
-AC_CONFIG_SRCDIR([src/cliauth/cliauth.c])
+AC_CONFIG_SRCDIR([src/cliauth/cliauth.h])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_HEADERS([build/config.h])
 
@@ -15,6 +17,8 @@ AC_CANONICAL_TARGET
 
 AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_MACRO_DIRS([m4])
+AX_PREFIX_CONFIG_H(build/cliauth/config.h)
 
 AC_PROG_CC
 
@@ -142,83 +146,84 @@ AC_ARG_ENABLE([hash-sha2-512-256],
    [config_feature_crypto_hash_sha2_512_256=0]
 )
 
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_SIGN_MAGNITUDE],
+# These will all be prefixed with "CLIAUTH_" by AX_PREFIX_CONFIG_H.
+AC_DEFINE_UNQUOTED([CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_SIGN_MAGNITUDE],
    [$config_platform_cpu_integer_sign_is_sign_magnitude],
    [Whether the target platform uses sign-magnitude to represent signed integers or not]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_ONES_COMPLEMENT],
+AC_DEFINE_UNQUOTED([CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_ONES_COMPLEMENT],
    [$config_platform_cpu_integer_sign_is_ones_complement],
    [Whether the target platform uses one's complement to represent signed integers or not]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_TWOS_COMPLEMENT],
+AC_DEFINE_UNQUOTED([CONFIG_PLATFORM_CPU_INTEGER_SIGN_IS_TWOS_COMPLEMENT],
    [$config_platform_cpu_integer_sign_is_twos_complement],
    [Whether the target platform uses two's complement to represent signed integers or not]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG],
+AC_DEFINE_UNQUOTED([CONFIG_PLATFORM_CPU_ENDIAN_IS_BIG],
    [$config_platform_cpu_endian_is_big],
    [Whether the target platform is big-endian or not]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_IA32],
+AC_DEFINE_UNQUOTED([CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_IA32],
    [$config_platform_cpu_architecture_is_ia32],
    [Whether the target CPU architecture is IA32, also known as 32-bit x86]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_AMD64],
+AC_DEFINE_UNQUOTED([CONFIG_PLATFORM_CPU_ARCHITECTURE_IS_AMD64],
    [$config_platform_cpu_architecture_is_amd64],
    [Whether the target CPU architecture is AMD64, also known as 64-bit x86, x86-64, or x64]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_CPU_ARCHITECTURE_IA32_HAS_INSTRUCTION_BSWAP],
+AC_DEFINE_UNQUOTED([CONFIG_PLATFORM_CPU_ARCHITECTURE_IA32_HAS_INSTRUCTION_BSWAP],
    [$config_platform_cpu_architecture_ia32_has_instruction_bswap],
    [Whether the target CPU supports the bswap instruction for IA32]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_OS_IS_POSIX],
+AC_DEFINE_UNQUOTED([CONFIG_PLATFORM_OS_IS_POSIX],
    [$config_platform_os_is_posix],
    [Whether the target operating system is POSIX-compliant or not]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_PLATFORM_OS_IS_WINDOWS],
+AC_DEFINE_UNQUOTED([CONFIG_PLATFORM_OS_IS_WINDOWS],
    [$config_platform_os_is_windows],
    [Whether the target operating system is Windows or not]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_OPTIONAL_LIBRARY_IMPORTS],
+AC_DEFINE_UNQUOTED([CONFIG_OPTIONAL_LIBRARY_IMPORTS],
    [$config_feature_optional_library_imports],
    [Use optional library functions where possible]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_ANSI],
+AC_DEFINE_UNQUOTED([CONFIG_ANSI],
    [$config_feature_ansi],
    [Enable support for ANSI escape sequences]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_LOG_ORIGIN],
+AC_DEFINE_UNQUOTED([CONFIG_LOG_ORIGIN],
    [$config_feature_log_origin],
    [Include the location in source code every log message originates from]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_IO_BUFFERING],
+AC_DEFINE_UNQUOTED([CONFIG_IO_BUFFERING],
    [$config_feature_io_buffering],
    [Enable support for file IO buffering]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA1],
+AC_DEFINE_UNQUOTED([CONFIG_CRYPTO_HASH_SHA1],
    [$config_feature_crypto_hash_sha1],
    [Enable support for the SHA1 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_224],
+AC_DEFINE_UNQUOTED([CONFIG_CRYPTO_HASH_SHA2_224],
    [$config_feature_crypto_hash_sha2_224],
    [Enable support for the SHA2-224 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_256],
+AC_DEFINE_UNQUOTED([CONFIG_CRYPTO_HASH_SHA2_256],
    [$config_feature_crypto_hash_sha2_256],
    [Enable support for the SHA2-256 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_384],
+AC_DEFINE_UNQUOTED([CONFIG_CRYPTO_HASH_SHA2_384],
    [$config_feature_crypto_hash_sha2_384],
    [Enable support for the SHA2-384 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512],
+AC_DEFINE_UNQUOTED([CONFIG_CRYPTO_HASH_SHA2_512],
    [$config_feature_crypto_hash_sha2_512],
    [Enable support for the SHA2-512 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_224],
+AC_DEFINE_UNQUOTED([CONFIG_CRYPTO_HASH_SHA2_512_224],
    [$config_feature_crypto_hash_sha2_512_224],
    [Enable support for the SHA2-512-224 hash algorithm]
 )
-AC_DEFINE_UNQUOTED([CLIAUTH_CONFIG_CRYPTO_HASH_SHA2_512_256],
+AC_DEFINE_UNQUOTED([CONFIG_CRYPTO_HASH_SHA2_512_256],
    [$config_feature_crypto_hash_sha2_512_256],
    [Enable support for the SHA2-512-256 hash algorithm]
 )

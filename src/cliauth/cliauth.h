@@ -11,7 +11,7 @@
 
 /* configure script *must* be the first include so it's available at all */
 /* times */
-#include "config.h"
+#include "cliauth/config.h"
 
 /* additional config options which require more advanced code to set properly */
 
