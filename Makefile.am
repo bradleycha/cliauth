@@ -9,7 +9,8 @@ ACLOCAL_AMFLAGS = -I build/m4
 
 bin_PROGRAMS = \
 	cliauth
-
+noinst_PROGRAMS = \
+	cliauth_test
 lib_LTLIBRARIES = \
 	libcliauth.la
 
@@ -26,6 +27,19 @@ libcliauth_la_LDFLAGS = \
 
 cliauth_LDADD = \
 	$(top_builddir)/libcliauth.la
+cliauth_test_LDADD = \
+	$(top_builddir)/libcliauth.la
+
+cliauth_SOURCES = \
+	src/cliauth.c
+
+cliauth_test_SOURCES = \
+	src/test/cliauth_test.c \
+	src/test/cliauth_test.h \
+	src/test/crypto/crypto.c \
+	src/test/crypto/crypto.h \
+	src/test/crypto/i_hash.c \
+	src/test/crypto/i_hash.h
 
 libcliauth_includedir = $(pkgincludedir)
 libcliauth_arch_includedir = $(libcliauth_includedir)/arch
@@ -40,9 +54,6 @@ libcliauth_io_parse_includedir = $(libcliauth_io_includedir)/parse
 libcliauth_math_includedir = $(libcliauth_includedir)/math
 libcliauth_memory_includedir = $(libcliauth_includedir)/memory
 libcliauth_ui_includedir = $(libcliauth_includedir)/ui
-
-cliauth_SOURCES = \
-	src/cliauth.c
 
 libcliauth_la_SOURCES = \
 	src/cliauth/arch/amd64/instruction.c \

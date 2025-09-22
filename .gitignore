@@ -7,9 +7,10 @@ config.log
 config.status
 Makefile
 Makefile.in
-cliauth
 libcliauth.*
 libcliauth-*.*
+cliauth
+cliauth_test
 libtool
 !src/cliauth
 *.o
