@@ -48,6 +48,11 @@ cliauth_test_execute_node(
    retn.failed = CLIAUTH_LITERAL_UINT32(0u);
 
    if (node->children_count == CLIAUTH_LITERAL_UINT32(0u)) {
+      if (node->runner == CLIAUTH_NULLPTR) {
+         retn.total = CLIAUTH_LITERAL_UINT32(0u);
+         return retn;
+      }
+
       status = node->runner();
       switch (status) {
          case CLIAUTH_TEST_RUNNER_STATUS_PASSED:

@@ -53,7 +53,8 @@ typedef enum CliAuthTestRunnerStatus (*CliAuthTestUnitFunctionRunner)(void);
 /*                                                                            */
 /* runner -                                                                   */
 /*    The test runner function to execute.  This field is only valid when     */
-/*    'children_count' is zero, i.e. when this is a leaf node.                */
+/*    'children_count' is zero, i.e. when this is a leaf node.  If this is    */
+/*    set to CLIAUTH_NULLPTR in a leaf node, the unit test will be skipped.   */
 /*----------------------------------------------------------------------------*/
 struct CliAuthTestNode {
    const char *                     label;

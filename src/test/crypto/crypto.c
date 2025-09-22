@@ -10,18 +10,20 @@
 
 #include "cliauth/cliauth.h"
 #include "test/crypto/i_hash.h"
+#include "test/crypto/i_mac.h"
 
-#define CLIAUTH_TEST_CRYPTO_NODE_LABEL\
+#define CLIAUTH_TEST_CRYPTO_NODE_LABEL \
    "crypto"
-#define CLIAUTH_TEST_CRYPTO_NODE_LABEL_CHARACTERS\
+#define CLIAUTH_TEST_CRYPTO_NODE_LABEL_CHARACTERS \
    ((sizeof(CLIAUTH_TEST_CRYPTO_NODE_LABEL) / sizeof(char)) - 1u)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_node_children [] = {
-   &cliauth_test_crypto_hash_node
+   &cliauth_test_crypto_hash_node,
+   &cliauth_test_crypto_mac_node
 };
 
-#define CLIAUTH_TEST_CRYPTO_NODE_CHILDREN_COUNT\
+#define CLIAUTH_TEST_CRYPTO_NODE_CHILDREN_COUNT \
    ( \
       sizeof(cliauth_test_crypto_node_children) / \
       sizeof(cliauth_test_crypto_node_children[0]) \
