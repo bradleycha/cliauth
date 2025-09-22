@@ -75,14 +75,6 @@ cliauth_test_execute_node(
 
    do {
       child_execute_count = cliauth_test_execute_node(*children_iter);
-      if (child_execute_count.failed != CLIAUTH_LITERAL_UINT32(0u)) {
-         cliauth_io_log(
-            CLIAUTH_IO_LOG_WARNING("%" PRIu32 " tests failed for %.*s"),
-            child_execute_count.failed,
-            node->label_characters,
-            node->label
-         );
-      }
 
       retn.failed += child_execute_count.failed;
       retn.total += child_execute_count.total;
@@ -90,6 +82,15 @@ cliauth_test_execute_node(
       children_iter++;
       children_count--;
    } while (children_count != CLIAUTH_LITERAL_UINT32(0u));
+
+   if (retn.failed != CLIAUTH_LITERAL_UINT32(0u)) {
+      cliauth_io_log(
+         CLIAUTH_IO_LOG_WARNING("%" PRIu32 " tests failed for %.*s"),
+         retn.failed,
+         node->label_characters,
+         node->label
+      );
+   }
 
    return retn;
 }
