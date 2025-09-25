@@ -11,6 +11,7 @@
 #include "cliauth/cliauth.h"
 #include "test/crypto/i_hash.h"
 #include "test/crypto/i_mac.h"
+#include "test/crypto/i_otp.h"
 
 #define CLIAUTH_TEST_CRYPTO_NODE_LABEL \
    "crypto"
@@ -20,7 +21,8 @@
 static const struct CliAuthTestNode *
 cliauth_test_crypto_node_children [] = {
    &cliauth_test_crypto_hash_node,
-   &cliauth_test_crypto_mac_node
+   &cliauth_test_crypto_mac_node,
+   &cliauth_test_crypto_otp_node
 };
 
 #define CLIAUTH_TEST_CRYPTO_NODE_CHILDREN_COUNT \

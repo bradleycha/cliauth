@@ -41,7 +41,9 @@ cliauth_test_SOURCES = \
 	src/test/crypto/i_hash.c \
 	src/test/crypto/i_hash.h \
 	src/test/crypto/i_mac.c \
-	src/test/crypto/i_mac.h
+	src/test/crypto/i_mac.h \
+	src/test/crypto/i_otp.c \
+	src/test/crypto/i_otp.h
 
 libcliauth_includedir = $(pkgincludedir)
 libcliauth_arch_includedir = $(libcliauth_includedir)/arch
