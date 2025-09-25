@@ -98,7 +98,7 @@ cliauth_test_execute_node(
 }
 
 #define CLIAUTH_TEST_ABOUT \
-   CLIAUTH_PACKAGE_NAME " test runner version " CLIAUTH_PACKAGE_VERSION
+   CLIAUTH_PACKAGE_NAME " version " CLIAUTH_PACKAGE_VERSION " test runner"
 
 /* Return status enum for cliauth_test_main(). */
 #define CLIAUTH_TEST_EXIT_STATUS_FIELD_COUNT 3u
