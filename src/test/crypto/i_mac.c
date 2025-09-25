@@ -27,7 +27,7 @@
 #define CLIAUTH_TEST_CRYPTO_MAC_HMAC_NODE_LABEL \
    "crypto/mac/hmac"
 #define CLIAUTH_TEST_CRYPTO_MAC_HMAC_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_MAC_HMAC_NODE_LABEL) / sizeof(char)) - 1)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_MAC_HMAC_NODE_LABEL)
 
 #if CLIAUTH_TEST_CRYPTO_MAC_HMAC_ENABLE
 /*----------------------------------------------------------------------------*/
@@ -276,7 +276,7 @@ cliauth_test_crypto_mac_hmac_key3_runner(void) {
 #define CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY1_NODE_LABEL \
    "crypto/mac/hmac (key 1, |K| < K_0)"
 #define CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY1_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY1_NODE_LABEL) / sizeof(char)) - 1)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY1_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_mac_hmac_key1_node = {
@@ -290,7 +290,7 @@ cliauth_test_crypto_mac_hmac_key1_node = {
 #define CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY2_NODE_LABEL \
    "crypto/mac/hmac (key 2, |K| = K_0)"
 #define CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY2_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY2_NODE_LABEL) / sizeof(char)) - 1)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY2_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_mac_hmac_key2_node = {
@@ -304,7 +304,7 @@ cliauth_test_crypto_mac_hmac_key2_node = {
 #define CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY3_NODE_LABEL \
    "crypto/mac/hmac (key 3, |K| > K_0)"
 #define CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY3_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY3_NODE_LABEL) / sizeof(char)) - 1)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_MAC_HMAC_KEY3_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_mac_hmac_key3_node = {
@@ -323,10 +323,7 @@ cliauth_test_crypto_mac_hmac_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_MAC_HMAC_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_mac_hmac_node_children) / \
-      sizeof(cliauth_test_crypto_mac_hmac_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_mac_hmac_node_children)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_mac_hmac_node = {
@@ -357,7 +354,7 @@ cliauth_test_crypto_mac_hmac_node = {
 #define CLIAUTH_TEST_CRYPTO_MAC_NODE_LABEL \
    "crypto/mac"
 #define CLIAUTH_TEST_CRYPTO_MAC_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_MAC_NODE_LABEL) / sizeof(char)) - 1)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_MAC_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_mac_node_children [] = {
@@ -365,10 +362,7 @@ cliauth_test_crypto_mac_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_MAC_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_mac_node_children) / \
-      sizeof(cliauth_test_crypto_mac_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_mac_node_children)
 
 const struct CliAuthTestNode
 cliauth_test_crypto_mac_node = {

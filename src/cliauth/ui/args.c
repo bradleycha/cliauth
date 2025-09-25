@@ -20,11 +20,11 @@
 #define TEST_NAME    "user@email.com"
 
 #define TEST_SECRETS_BYTES\
-   (((sizeof(TEST_SECRETS) / sizeof(char)) - 1u) * sizeof(char))
+   (CLIAUTH_STRING_CHARACTERS(TEST_SECRETS) * sizeof(char))
 #define TEST_ISSUER_BYTES\
-   (((sizeof(TEST_ISSUER) / sizeof(char)) - 1u) * sizeof(char))
+   (CLIAUTH_STRING_CHARACTERS(TEST_ISSUER) * sizeof(char))
 #define TEST_NAME_BYTES\
-   (((sizeof(TEST_NAME) / sizeof(char)) - 1u) * sizeof(char))
+   (CLIAUTH_STRING_CHARACTERS(TEST_NAME) * sizeof(char))
 
 static const struct CliAuthCryptoHashFunction *
 cliauth_args_parse_hash_function(

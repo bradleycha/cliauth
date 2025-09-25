@@ -103,6 +103,19 @@
 #define CLIAUTH_UNREACHABLE\
    _CLIAUTH_UNREACHABLE_BUILTIN
 
+/*----------------------------------------------------------------------------*/
+/* Computes the length of statically-sized array, in elements.                */
+/*----------------------------------------------------------------------------*/
+#define CLIAUTH_ARRAY_ELEMENTS(array)\
+   (sizeof(array) / sizeof(*array))
+
+/*----------------------------------------------------------------------------*/
+/* Computes the length of a string literal in characters, not including the   */
+/* null-terminator.                                                           */
+/*----------------------------------------------------------------------------*/
+#define CLIAUTH_STRING_CHARACTERS(string)\
+   (CLIAUTH_ARRAY_ELEMENTS(string) - 1u)
+
 /* implicit includes are at the bottom to ensure all previous project */
 /* declarations are available in these headers */
 #include "cliauth/types.h"

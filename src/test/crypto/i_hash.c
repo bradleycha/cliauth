@@ -210,7 +210,7 @@ cliauth_test_crypto_hash_sha1_message3_runner(void) {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE1_NODE_LABEL \
    "crypto/hash/sha1 (message 1)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE1_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE1_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE1_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha1_message1_node = {
@@ -224,7 +224,7 @@ cliauth_test_crypto_hash_sha1_message1_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE2_NODE_LABEL \
    "crypto/hash/sha1 (message 2)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE2_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE2_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE2_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha1_message2_node = {
@@ -238,7 +238,7 @@ cliauth_test_crypto_hash_sha1_message2_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE3_NODE_LABEL \
    "crypto/hash/sha1 (message 3)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE3_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE3_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA1_MESSAGE3_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha1_message3_node = {
@@ -252,7 +252,7 @@ cliauth_test_crypto_hash_sha1_message3_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA1_NODE_LABEL \
    "crypto/hash/sha1"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA1_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA1_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA1_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_hash_sha1_node_children [] = {
@@ -262,10 +262,7 @@ cliauth_test_crypto_hash_sha1_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA1_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_hash_sha1_node_children) / \
-      sizeof(cliauth_test_crypto_hash_sha1_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_hash_sha1_node_children)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha1_node = {
@@ -350,7 +347,7 @@ cliauth_test_crypto_hash_sha2_224_message3_runner(void) {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE1_NODE_LABEL \
    "crypto/hash/sha2-224 (message 1)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE1_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE1_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE1_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_224_message1_node = {
@@ -364,7 +361,7 @@ cliauth_test_crypto_hash_sha2_224_message1_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE2_NODE_LABEL \
    "crypto/hash/sha2-224 (message 2)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE2_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE2_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE2_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_224_message2_node = {
@@ -378,7 +375,7 @@ cliauth_test_crypto_hash_sha2_224_message2_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE3_NODE_LABEL \
    "crypto/hash/sha2-224 (message 3)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE3_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE3_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_MESSAGE3_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_224_message3_node = {
@@ -392,7 +389,7 @@ cliauth_test_crypto_hash_sha2_224_message3_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_NODE_LABEL \
    "crypto/hash/sha2-224"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_hash_sha2_224_node_children [] = {
@@ -402,10 +399,7 @@ cliauth_test_crypto_hash_sha2_224_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_224_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_hash_sha2_224_node_children) / \
-      sizeof(cliauth_test_crypto_hash_sha2_224_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_hash_sha2_224_node_children)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_224_node = {
@@ -490,7 +484,7 @@ cliauth_test_crypto_hash_sha2_256_message3_runner(void) {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE1_NODE_LABEL \
    "crypto/hash/sha2-256 (message 1)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE1_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE1_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE1_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_256_message1_node = {
@@ -504,7 +498,7 @@ cliauth_test_crypto_hash_sha2_256_message1_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE2_NODE_LABEL \
    "crypto/hash/sha2-256 (message 2)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE2_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE2_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE2_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_256_message2_node = {
@@ -518,7 +512,7 @@ cliauth_test_crypto_hash_sha2_256_message2_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE3_NODE_LABEL \
    "crypto/hash/sha2-256 (message 3)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE3_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE3_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_MESSAGE3_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_256_message3_node = {
@@ -532,7 +526,7 @@ cliauth_test_crypto_hash_sha2_256_message3_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_NODE_LABEL \
    "crypto/hash/sha2-256"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_hash_sha2_256_node_children [] = {
@@ -542,10 +536,7 @@ cliauth_test_crypto_hash_sha2_256_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_256_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_hash_sha2_256_node_children) / \
-      sizeof(cliauth_test_crypto_hash_sha2_256_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_hash_sha2_256_node_children)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_256_node = {
@@ -636,7 +627,7 @@ cliauth_test_crypto_hash_sha2_384_message3_runner(void) {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE1_NODE_LABEL \
    "crypto/hash/sha2-384 (message 1)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE1_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE1_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE1_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_384_message1_node = {
@@ -650,7 +641,7 @@ cliauth_test_crypto_hash_sha2_384_message1_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE2_NODE_LABEL \
    "crypto/hash/sha2-384 (message 2)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE2_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE2_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE2_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_384_message2_node = {
@@ -664,7 +655,7 @@ cliauth_test_crypto_hash_sha2_384_message2_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE3_NODE_LABEL \
    "crypto/hash/sha2-384 (message 3)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE3_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE3_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_MESSAGE3_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_384_message3_node = {
@@ -678,7 +669,7 @@ cliauth_test_crypto_hash_sha2_384_message3_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_NODE_LABEL \
    "crypto/hash/sha2-384"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_hash_sha2_384_node_children [] = {
@@ -688,10 +679,7 @@ cliauth_test_crypto_hash_sha2_384_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_384_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_hash_sha2_384_node_children) / \
-      sizeof(cliauth_test_crypto_hash_sha2_384_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_hash_sha2_384_node_children)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_384_node = {
@@ -788,7 +776,7 @@ cliauth_test_crypto_hash_sha2_512_message3_runner(void) {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE1_NODE_LABEL \
    "crypto/hash/sha2-512 (message 1)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE1_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE1_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE1_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_message1_node = {
@@ -802,7 +790,7 @@ cliauth_test_crypto_hash_sha2_512_message1_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE2_NODE_LABEL \
    "crypto/hash/sha2-512 (message 2)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE2_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE2_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE2_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_message2_node = {
@@ -816,7 +804,7 @@ cliauth_test_crypto_hash_sha2_512_message2_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE3_NODE_LABEL \
    "crypto/hash/sha2-512 (message 3)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE3_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE3_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_MESSAGE3_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_message3_node = {
@@ -830,7 +818,7 @@ cliauth_test_crypto_hash_sha2_512_message3_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_NODE_LABEL \
    "crypto/hash/sha2-512"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_hash_sha2_512_node_children [] = {
@@ -840,10 +828,7 @@ cliauth_test_crypto_hash_sha2_512_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_hash_sha2_512_node_children) / \
-      sizeof(cliauth_test_crypto_hash_sha2_512_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_hash_sha2_512_node_children)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_node = {
@@ -928,7 +913,7 @@ cliauth_test_crypto_hash_sha2_512_224_message3_runner(void) {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE1_NODE_LABEL \
    "crypto/hash/sha2-512-224 (message 1)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE1_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE1_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE1_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_224_message1_node = {
@@ -942,7 +927,7 @@ cliauth_test_crypto_hash_sha2_512_224_message1_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE2_NODE_LABEL \
    "crypto/hash/sha2-512-224 (message 2)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE2_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE2_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE2_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_224_message2_node = {
@@ -956,7 +941,7 @@ cliauth_test_crypto_hash_sha2_512_224_message2_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE3_NODE_LABEL \
    "crypto/hash/sha2-512-224 (message 3)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE3_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE3_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_MESSAGE3_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_224_message3_node = {
@@ -970,7 +955,7 @@ cliauth_test_crypto_hash_sha2_512_224_message3_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_NODE_LABEL \
    "crypto/hash/sha2-512-224"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_hash_sha2_512_224_node_children [] = {
@@ -980,10 +965,7 @@ cliauth_test_crypto_hash_sha2_512_224_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_224_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_hash_sha2_512_224_node_children) / \
-      sizeof(cliauth_test_crypto_hash_sha2_512_224_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_hash_sha2_512_224_node_children)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_224_node = {
@@ -1068,7 +1050,7 @@ cliauth_test_crypto_hash_sha2_512_256_message3_runner(void) {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE1_NODE_LABEL \
    "crypto/hash/sha2-512-256 (message 1)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE1_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE1_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE1_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_256_message1_node = {
@@ -1082,7 +1064,7 @@ cliauth_test_crypto_hash_sha2_512_256_message1_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE2_NODE_LABEL \
    "crypto/hash/sha2-512-256 (message 2)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE2_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE2_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE2_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_256_message2_node = {
@@ -1096,7 +1078,7 @@ cliauth_test_crypto_hash_sha2_512_256_message2_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE3_NODE_LABEL \
    "crypto/hash/sha2-512-256 (message 3)"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE3_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE3_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_MESSAGE3_NODE_LABEL)
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_256_message3_node = {
@@ -1110,7 +1092,7 @@ cliauth_test_crypto_hash_sha2_512_256_message3_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_NODE_LABEL \
    "crypto/hash/sha2-512-256"
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_hash_sha2_512_256_node_children [] = {
@@ -1120,10 +1102,7 @@ cliauth_test_crypto_hash_sha2_512_256_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_HASH_SHA2_512_256_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_hash_sha2_512_256_node_children) / \
-      sizeof(cliauth_test_crypto_hash_sha2_512_256_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_hash_sha2_512_256_node_children )
 
 static const struct CliAuthTestNode
 cliauth_test_crypto_hash_sha2_512_256_node = {
@@ -1140,7 +1119,7 @@ cliauth_test_crypto_hash_sha2_512_256_node = {
 #define CLIAUTH_TEST_CRYPTO_HASH_NODE_LABEL \
    "crypto/hash"
 #define CLIAUTH_TEST_CRYPTO_HASH_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_HASH_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_HASH_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_hash_node_children [] = {
@@ -1168,10 +1147,7 @@ cliauth_test_crypto_hash_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_HASH_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_hash_node_children) / \
-      sizeof(cliauth_test_crypto_hash_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_hash_node_children)
 
 const struct CliAuthTestNode
 cliauth_test_crypto_hash_node = {

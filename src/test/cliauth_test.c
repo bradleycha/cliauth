@@ -19,10 +19,7 @@ cliauth_test_root_nodes [] = {
 };
 
 #define CLIAUTH_TEST_ROOT_NODES_COUNT \
-   ( \
-      sizeof(cliauth_test_root_nodes) / \
-      sizeof(cliauth_test_root_nodes[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_root_nodes)
 
 /* the number of failed and total unit tests for a particular node. */
 struct CliAuthTestExecuteCount {

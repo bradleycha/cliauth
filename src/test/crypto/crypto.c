@@ -15,7 +15,7 @@
 #define CLIAUTH_TEST_CRYPTO_NODE_LABEL \
    "crypto"
 #define CLIAUTH_TEST_CRYPTO_NODE_LABEL_CHARACTERS \
-   ((sizeof(CLIAUTH_TEST_CRYPTO_NODE_LABEL) / sizeof(char)) - 1u)
+   CLIAUTH_STRING_CHARACTERS(CLIAUTH_TEST_CRYPTO_NODE_LABEL)
 
 static const struct CliAuthTestNode *
 cliauth_test_crypto_node_children [] = {
@@ -24,10 +24,7 @@ cliauth_test_crypto_node_children [] = {
 };
 
 #define CLIAUTH_TEST_CRYPTO_NODE_CHILDREN_COUNT \
-   ( \
-      sizeof(cliauth_test_crypto_node_children) / \
-      sizeof(cliauth_test_crypto_node_children[0]) \
-   )
+   CLIAUTH_ARRAY_ELEMENTS(cliauth_test_crypto_node_children)
 
 const struct CliAuthTestNode
 cliauth_test_crypto_node = {
