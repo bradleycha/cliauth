@@ -13,7 +13,7 @@ AC_CONFIG_SRCDIR([src/cliauth/cliauth.h])
 AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_HEADERS([build/config.h])
 
-AC_CANONICAL_TARGET
+AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
 AC_CONFIG_FILES([Makefile])
@@ -69,7 +69,7 @@ AC_C_BIGENDIAN(
    [config_platform_cpu_endian_is_big=0],
 )
 
-case $target_cpu in
+case $host_cpu in
    "x86_64")
       config_platform_cpu_architecture_is_amd64=1
    ;;
@@ -82,7 +82,7 @@ case $target_cpu in
    ;;
 esac
 
-case $target_os in
+case $host_os in
    "windows")
       config_platform_os_is_windows=1
    ;;
