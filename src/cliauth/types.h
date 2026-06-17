@@ -115,8 +115,6 @@
 #endif /* CLIAUTH_SIZEOF_LONG == 8 */
 #endif /* _CLIAUTH_TYPES_INT64 */
 
-#undef _CLIAUTH_TYPES_INT64
-
 /* here is our last ditch effort to detect types, based on compiler-specific */
 /* intrinsics and extensions. */
 #ifndef _CLIAUTH_TYPES_INT64
