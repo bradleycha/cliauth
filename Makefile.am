@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-#                       Copyright (c) CliAuth 2024, 2025                       #
+#                      Copyright (c) CliAuth 2024 - 2026                       #
 #                    https://github.com/bradleycha/cliauth                     #
 #------------------------------------------------------------------------------#
 # Makefile.am - GNU Automake script                                            #
