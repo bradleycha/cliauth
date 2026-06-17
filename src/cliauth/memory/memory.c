@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*                      Copyright (c) CliAuth 2024, 2025                      */
+/*                     Copyright (c) CliAuth 2024 - 2026                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
 /* src/cliauth/memory/memory.c - Essential memory manipulation                */
@@ -9,10 +9,21 @@
 #include "cliauth/cliauth.h"
 #include "cliauth/memory/memory.h"
 
-#if CLIAUTH_IMPORTS_USE_C_STRING_H
+#define CLIAUTH_MEMORY_USE_IMPORT_C \
+   (CLIAUTH_IMPORTS_USE_C_STRING_H && CLIAUTH_IMPORTS_USE_C_STDINT_H)
+
+#define CLIAUTH_MEMORY_USE_IMPORT_C_MEMCPY \
+   (CLIAUTH_MEMORY_USE_IMPORT_C && CLIAUTH_IMPORTS_USE_C_MEMCPY)
+#define CLIAUTH_MEMORY_USE_IMPORT_C_MEMSET \
+   (CLIAUTH_MEMORY_USE_IMPORT_C && CLIAUTH_IMPORTS_USE_C_MEMSET)
+#define CLIAUTH_MEMORY_USE_IMPORT_C_MEMCMP \
+   (CLIAUTH_MEMORY_USE_IMPORT_C && CLIAUTH_IMPORTS_USE_C_MEMCMP)
+
+#if CLIAUTH_MEMORY_USE_IMPORT_C
 /*----------------------------------------------------------------------------*/
 
 #include <string.h>
+#include <stdint.h>
 
 /* the max value of libc's size_t type */
 #define CLIAUTH_MEMORY_LIBC_SIZE_T_MAX\
@@ -23,7 +34,7 @@
    (CLIAUTH_MEMORY_LIBC_SIZE_T_MAX < CLIAUTH_UINT32_MAX_LITERAL)
 
 /*----------------------------------------------------------------------------*/
-#endif /* CLIAUTH_IMPORTS_USE_C_STRING_H */
+#endif /* CLIAUTH_MEMORY_USE_IMPORT_C */
 
 static void
 cliauth_memory_copy_fallback(
@@ -54,7 +65,7 @@ cliauth_memory_copy_libc(
    const void * source,
    CliAuthUInt32 bytes
 ) {
-#if CLIAUTH_IMPORTS_USE_C_MEMCPY
+#if CLIAUTH_MEMORY_USE_IMPORT_C_MEMCPY
    CliAuthUInt8 * destination_iter;
    const CliAuthUInt8 * source_iter;
 
@@ -80,11 +91,11 @@ cliauth_memory_copy_libc(
       source_iter,
       (size_t)bytes
    );
-#else /* CLIAUTH_IMPORTS_USE_C_MEMCPY */
+#else /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMCPY */
    (void)destination;
    (void)source;
    (void)bytes;
-#endif /* CLIAUTH_IMPORTS_USE_C_MEMCPY */
+#endif /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMCPY */
 
    return;
 }
@@ -95,13 +106,13 @@ cliauth_memory_copy(
    const void * source,
    CliAuthUInt32 bytes
 ) {
-#if CLIAUTH_IMPORTS_USE_C_MEMCPY
+#if CLIAUTH_MEMORY_USE_IMPORT_C_MEMCPY
    (void)cliauth_memory_copy_fallback;
    cliauth_memory_copy_libc(destination, source, bytes);
-#else /* CLIAUTH_IMPORTS_USE_C_MEMCPY */
+#else /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMCPY */
    (void)cliauth_memory_copy_libc;
    cliauth_memory_copy_fallback(destination, source, bytes);
-#endif /* CLIAUTH_IMPORTS_USE_C_MEMCPY */
+#endif /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMCPY */
    
    return;
 }
@@ -138,7 +149,7 @@ cliauth_memory_fill_libc(
    CliAuthUInt32 elements,
    CliAuthUInt32 bytes_per_element
 ) {
-#if CLIAUTH_IMPORTS_USE_C_MEMSET
+#if CLIAUTH_MEMORY_USE_IMPORT_C_MEMSET
    CliAuthUInt8 * buffer_iter;
    CliAuthUInt8 byte;
 
@@ -168,12 +179,12 @@ cliauth_memory_fill_libc(
       byte,
       (size_t)elements
    );
-#else /* CLIAUTH_IMPORTS_USE_C_MEMSET */
+#else /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMSET */
    (void)buffer;
    (void)sentinel;
    (void)elements;
    (void)bytes_per_element;
-#endif /* CLIAUTH_IMPORTS_USE_C_MEMSET */
+#endif /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMSET */
 
    return;
 }
@@ -185,12 +196,12 @@ cliauth_memory_fill(
    CliAuthUInt32 elements,
    CliAuthUInt32 bytes_per_element
 ) {
-#if CLIAUTH_IMPORTS_USE_C_MEMSET
+#if CLIAUTH_MEMORY_USE_IMPORT_C_MEMSET
    cliauth_memory_fill_libc(buffer, sentinel, elements, bytes_per_element);
-#else /* CLIAUTH_IMPORTS_USE_C_MEMSET */
+#else /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMSET */
    (void)cliauth_memory_fill_libc;
    cliauth_memory_fill_fallback(buffer, sentinel, elements, bytes_per_element);
-#endif /* CLIAUTH_IMPORTS_USE_C_MEMSET */
+#endif /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMSET */
 
    return;
 }
@@ -246,7 +257,7 @@ cliauth_memory_compare_with_equal_lengths_libc(
 ) {
    CliAuthBoolean retn;
 
-#if CLIAUTH_IMPORTS_USE_C_MEMCMP
+#if CLIAUTH_MEMORY_USE_IMPORT_C_MEMCMP
    const CliAuthUInt8 * data_lhs_iter;
    const CliAuthUInt8 * data_rhs_iter;
 
@@ -278,12 +289,12 @@ cliauth_memory_compare_with_equal_lengths_libc(
    }
 
    retn = CLIAUTH_BOOLEAN_TRUE;
-#else /* CLIAUTH_IMPORTS_USE_C_MEMCMP */
+#else /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMCMP */
    (void)data_lhs;
    (void)data_rhs;
    (void)bytes;
    retn = CLIAUTH_BOOLEAN_FALSE;
-#endif /* CLIAUTH_IMPORTS_USE_C_MEMCMP */
+#endif /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMCMP */
 
    return retn;
 }
@@ -296,21 +307,21 @@ cliauth_memory_compare_with_equal_lengths(
 ) {
    CliAuthBoolean retn;
 
-#if CLIAUTH_IMPORTS_USE_C_MEMCMP
+#if CLIAUTH_MEMORY_USE_IMPORT_C_MEMCMP
    (void)cliauth_memory_compare_with_equal_lengths_fallback;
    retn = cliauth_memory_compare_with_equal_lengths_libc(
       data_lhs,
       data_rhs,
       bytes
    );
-#else /* CLIAUTH_IMPORTS_USE_C_MEMCMP */
+#else /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMCMP */
    (void)cliauth_memory_compare_with_equal_lengths_libc;
    retn = cliauth_memory_compare_with_equal_lengths_fallback(
       data_lhs,
       data_rhs,
       bytes
    );
-#endif /* CLIAUTH_IMPORTS_USE_C_MEMCMP */
+#endif /* CLIAUTH_MEMORY_USE_IMPORT_C_MEMCMP */
 
    return retn;
 }

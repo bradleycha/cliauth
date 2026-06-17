@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*                      Copyright (c) CliAuth 2024, 2025                      */
+/*                     Copyright (c) CliAuth 2024 - 2026                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
 /* src/cliauth/cliauth.h - Global project header which contains common        */
@@ -118,8 +118,8 @@
 
 /* implicit includes are at the bottom to ensure all previous project */
 /* declarations are available in these headers */
-#include "cliauth/types.h"
 #include "cliauth/imports.h"
+#include "cliauth/types.h"
 
 /*----------------------------------------------------------------------------*/
 #endif /* _CLIAUTH_H */

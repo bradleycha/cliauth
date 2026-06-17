@@ -28,6 +28,7 @@ AC_CHECK_SIZEOF([char])
 AC_CHECK_SIZEOF([short])
 AC_CHECK_SIZEOF([int])
 AC_CHECK_SIZEOF([long])
+AC_CHECK_SIZEOF([long long int]) # GNU extension for C89
 
 AC_CHECK_FUNCS([memcpy])
 AC_CHECK_FUNCS([memset])

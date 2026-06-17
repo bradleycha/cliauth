@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*                      Copyright (c) CliAuth 2024, 2025                      */
+/*                     Copyright (c) CliAuth 2024 - 2026                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
 /* src/cliauth/types.h - General types used throughout the program            */
@@ -9,16 +9,164 @@
 #define _CLIAUTH_TYPES_H
 /*----------------------------------------------------------------------------*/
 
+/* if we have C99 header support, just use standard types.  we're kind of */
+/* fudging it here, since C89 doesn't have stdint.h in the standard.  that's */
+/* why we attempt to fallback below. */
+#if CLIAUTH_IMPORTS_USE_C_STDINT_H
+/*----------------------------------------------------------------------------*/
 #include <stdint.h>
 
-typedef uint8_t   CliAuthUInt8;
-typedef uint16_t  CliAuthUInt16;
-typedef uint32_t  CliAuthUInt32;
-typedef uint64_t  CliAuthUInt64;
-typedef int8_t    CliAuthSInt8;
-typedef int16_t   CliAuthSInt16;
-typedef int32_t   CliAuthSInt32;
-typedef int64_t   CliAuthSInt64;
+#define _CLIAUTH_TYPES_UINT8  uint8_t
+#define _CLIAUTH_TYPES_UINT16 uint16_t
+#define _CLIAUTH_TYPES_UINT32 uint32_t
+#define _CLIAUTH_TYPES_UINT64 uint64_t
+#define _CLIAUTH_TYPES_SINT8  int8_t
+#define _CLIAUTH_TYPES_SINT16 int16_t
+#define _CLIAUTH_TYPES_SINT32 int32_t
+#define _CLIAUTH_TYPES_SINT64 int64_t
+
+#define _CLIAUTH_TYPES_PREFIX_UINT8
+#define _CLIAUTH_TYPES_PREFIX_UINT16
+#define _CLIAUTH_TYPES_PREFIX_UINT32
+#define _CLIAUTH_TYPES_PREFIX_UINT64
+#define _CLIAUTH_TYPES_PREFIX_SINT8
+#define _CLIAUTH_TYPES_PREFIX_SINT16
+#define _CLIAUTH_TYPES_PREFIX_SINT32
+#define _CLIAUTH_TYPES_PREFIX_SINT64
+/*----------------------------------------------------------------------------*/
+#else /* CLIAUTH_IMPORTS_USE_C_STDINT_H */
+/*----------------------------------------------------------------------------*/
+
+/* we now use the AC_CHECK_SIZEOF(...) calls from the configure step to work */
+/* out the correct integer sizes.  there's no guarantee this will succeed, */
+/* which is why we have asserts below.  for example, C89 doesn't standardize */
+/* any 64-bit integer types (e.g. long long).  in the future, we may want to */
+/* create a fallback which emulates 64-bit types. */
+
+#define _CLIAUTH_TYPES_PREFIX_UINT8
+#define _CLIAUTH_TYPES_PREFIX_UINT16
+#define _CLIAUTH_TYPES_PREFIX_UINT32
+#define _CLIAUTH_TYPES_PREFIX_UINT64
+#define _CLIAUTH_TYPES_PREFIX_SINT8
+#define _CLIAUTH_TYPES_PREFIX_SINT16
+#define _CLIAUTH_TYPES_PREFIX_SINT32
+#define _CLIAUTH_TYPES_PREFIX_SINT64
+
+/* here be dragons.  there is no cleaner way do this other than this mountain */
+/* of macro garbage. */
+
+#ifndef _CLIAUTH_TYPES_INT8
+#if CLIAUTH_SIZEOF_CHAR == 1
+#define _CLIAUTH_TYPES_INT8 char
+#endif /* CLIAUTH_AC_SIZEOF_CHAR == 1 */
+#if CLIAUTH_SIZEOF_SHORT == 1
+#define _CLIAUTH_TYPES_INT8 short
+#endif /* CLIAUTH_SIZEOF_SHORT == 1 */
+#if CLIAUTH_SIZEOF_INT == 1
+#define _CLIAUTH_TYPES_INT8 int
+#endif /* CLIAUTH_SIZEOF_INT == 1 */
+#if CLIAUTH_SIZEOF_LONG == 1
+#define _CLIAUTH_TYPES_INT8 long
+#endif /* CLIAUTH_SIZEOF_LONG == 1 */
+#endif /* _CLIAUTH_TYPES_INT8 */
+
+#ifndef _CLIAUTH_TYPES_INT16
+#if CLIAUTH_SIZEOF_CHAR == 2
+#define _CLIAUTH_TYPES_INT16 char
+#endif /* CLIAUTH_AC_SIZEOF_CHAR == 2 */
+#if CLIAUTH_SIZEOF_SHORT == 2
+#define _CLIAUTH_TYPES_INT16 short
+#endif /* CLIAUTH_SIZEOF_SHORT == 2 */
+#if CLIAUTH_SIZEOF_INT == 2
+#define _CLIAUTH_TYPES_INT16 int
+#endif /* CLIAUTH_SIZEOF_INT == 2 */
+#if CLIAUTH_SIZEOF_LONG == 2
+#define _CLIAUTH_TYPES_INT16 long
+#endif /* CLIAUTH_SIZEOF_LONG == 2 */
+#endif /* _CLIAUTH_TYPES_INT16 */
+
+#ifndef _CLIAUTH_TYPES_INT32
+#if CLIAUTH_SIZEOF_CHAR == 4
+#define _CLIAUTH_TYPES_INT32 char
+#endif /* CLIAUTH_AC_SIZEOF_CHAR == 4 */
+#if CLIAUTH_SIZEOF_SHORT == 4
+#define _CLIAUTH_TYPES_INT32 short
+#endif /* CLIAUTH_SIZEOF_SHORT == 4 */
+#if CLIAUTH_SIZEOF_INT == 4
+#define _CLIAUTH_TYPES_INT32 int
+#endif /* CLIAUTH_SIZEOF_INT == 4 */
+#if CLIAUTH_SIZEOF_LONG == 4
+#define _CLIAUTH_TYPES_INT32 long
+#endif /* CLIAUTH_SIZEOF_LONG == 4 */
+#endif /* _CLIAUTH_TYPES_INT32 */
+
+#ifndef _CLIAUTH_TYPES_INT64
+#if CLIAUTH_SIZEOF_CHAR == 8
+#define _CLIAUTH_TYPES_INT64 char
+#endif /* CLIAUTH_AC_SIZEOF_CHAR == 8 */
+#if CLIAUTH_SIZEOF_SHORT == 8
+#define _CLIAUTH_TYPES_INT64 short
+#endif /* CLIAUTH_SIZEOF_SHORT == 8 */
+#if CLIAUTH_SIZEOF_INT == 8
+#define _CLIAUTH_TYPES_INT64 int
+#endif /* CLIAUTH_SIZEOF_INT == 8 */
+#if CLIAUTH_SIZEOF_LONG == 8
+#define _CLIAUTH_TYPES_INT64 long
+#endif /* CLIAUTH_SIZEOF_LONG == 8 */
+#endif /* _CLIAUTH_TYPES_INT64 */
+
+#undef _CLIAUTH_TYPES_INT64
+
+/* here is our last ditch effort to detect types, based on compiler-specific */
+/* intrinsics and extensions. */
+#ifndef _CLIAUTH_TYPES_INT64
+#if (CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_GCC || CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_CLANG)
+#if CLIAUTH_SIZEOF_LONG_LONG_INT == 8
+#undef _CLIAUTH_TYPES_PREFIX_UINT64
+#undef _CLIAUTH_TYPES_PREFIX_SINT64
+#define _CLIAUTH_TYPES_PREFIX_UINT64 __extension__
+#define _CLIAUTH_TYPES_PREFIX_SINT64 __extension__
+#define _CLIAUTH_TYPES_INT64 long long int
+#endif /* CLIAUTH_SIZEOF_LONG_LONG_INT == 8 */
+#endif /* (CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_GCC || CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_CLANG) */
+#if CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_MSVC
+#define _CLIAUTH_TYPES_INT64 __int64
+#endif /* CLIAUTH_CONFIG_PLATFORM_COMPILER_IS_MSVC */
+#endif /* _CLIAUTH_TYPES_INT64 */
+
+#ifndef _CLIAUTH_TYPES_INT8
+#error unable to determine primitive type for 8-bit integers.  try manually defining _CLIAUTH_TYPES_INT8=[type]
+#endif /* _CLIAUTH_TYPES_INT8 */
+#ifndef _CLIAUTH_TYPES_INT16
+#error unable to determine primitive type for 16-bit integers.  try manually defining _CLIAUTH_TYPES_INT16=[type]
+#endif /* _CLIAUTH_TYPES_INT16 */
+#ifndef _CLIAUTH_TYPES_INT32
+#error unable to determine primitive type for 32-bit integers.  try manually defining _CLIAUTH_TYPES_INT32=[type]
+#endif /* _CLIAUTH_TYPES_INT32 */
+#ifndef _CLIAUTH_TYPES_INT64
+#error unable to determine primitive type for 64-bit integers.  try manually defining _CLIAUTH_TYPES_INT64=[type]
+#endif /* _CLIAUTH_TYPES_INT64 */
+
+#define _CLIAUTH_TYPES_UINT8  unsigned _CLIAUTH_TYPES_INT8
+#define _CLIAUTH_TYPES_UINT16 unsigned _CLIAUTH_TYPES_INT16
+#define _CLIAUTH_TYPES_UINT32 unsigned _CLIAUTH_TYPES_INT32
+#define _CLIAUTH_TYPES_UINT64 unsigned _CLIAUTH_TYPES_INT64
+#define _CLIAUTH_TYPES_SINT8  signed   _CLIAUTH_TYPES_INT8
+#define _CLIAUTH_TYPES_SINT16 signed   _CLIAUTH_TYPES_INT16
+#define _CLIAUTH_TYPES_SINT32 signed   _CLIAUTH_TYPES_INT32
+#define _CLIAUTH_TYPES_SINT64 signed   _CLIAUTH_TYPES_INT64
+
+/*----------------------------------------------------------------------------*/
+#endif /* CLIAUTH_IMPORTS_USE_C_STDINT_H */
+
+_CLIAUTH_TYPES_PREFIX_UINT8  typedef _CLIAUTH_TYPES_UINT8  CliAuthUInt8;
+_CLIAUTH_TYPES_PREFIX_UINT16 typedef _CLIAUTH_TYPES_UINT16 CliAuthUInt16;
+_CLIAUTH_TYPES_PREFIX_UINT32 typedef _CLIAUTH_TYPES_UINT32 CliAuthUInt32;
+_CLIAUTH_TYPES_PREFIX_UINT64 typedef _CLIAUTH_TYPES_UINT64 CliAuthUInt64;
+_CLIAUTH_TYPES_PREFIX_SINT8  typedef _CLIAUTH_TYPES_SINT8  CliAuthSInt8;
+_CLIAUTH_TYPES_PREFIX_SINT16 typedef _CLIAUTH_TYPES_SINT16 CliAuthSInt16;
+_CLIAUTH_TYPES_PREFIX_SINT32 typedef _CLIAUTH_TYPES_SINT32 CliAuthSInt32;
+_CLIAUTH_TYPES_PREFIX_SINT64 typedef _CLIAUTH_TYPES_SINT64 CliAuthSInt64;
 
 /*----------------------------------------------------------------------------*/
 /* Generic integer types which allow easy and well-defined reinterpretation   */

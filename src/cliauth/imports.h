@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/*                      Copyright (c) CliAuth 2024, 2025                      */
+/*                     Copyright (c) CliAuth 2024 - 2026                      */
 /*                   https://github.com/bradleycha/cliauth                    */
 /*----------------------------------------------------------------------------*/
 /* src/cliauth/imports.h - Library import macro definitions.                  */
@@ -16,6 +16,8 @@
 
 #define CLIAUTH_IMPORTS_USE_C_STRING_H\
    (_CLIAUTH_IMPORTS_USE_OPTIONAL(CLIAUTH_HAVE_STRING_H))
+#define CLIAUTH_IMPORTS_USE_C_STDINT_H\
+   (_CLIAUTH_IMPORTS_USE_OPTIONAL(CLIAUTH_HAVE_STDINT_H))
 #define CLIAUTH_IMPORTS_USE_C_MEMCPY\
    (_CLIAUTH_IMPORTS_USE_OPTIONAL(CLIAUTH_HAVE_MEMCPY))
 #define CLIAUTH_IMPORTS_USE_C_MEMSET\
