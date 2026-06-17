@@ -5,7 +5,7 @@
 # Makefile.am - GNU Automake script                                            #
 #------------------------------------------------------------------------------#
 
-ACLOCAL_AMFLAGS = -I build/m4
+ACLOCAL_AMFLAGS = -I configdir/m4
 
 bin_PROGRAMS = \
 	cliauth
@@ -81,7 +81,7 @@ libcliauth_la_SOURCES = \
 	src/cliauth/memory/memory.c \
 	src/cliauth/ui/args.c
 nodist_libcliauth_include_HEADERS = \
-	$(top_builddir)/build/cliauth/config.h
+	$(top_builddir)/configdir/cliauth/config.h
 libcliauth_include_HEADERS = \
 	src/cliauth/cliauth.h \
 	src/cliauth/imports.h \

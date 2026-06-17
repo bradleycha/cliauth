@@ -10,15 +10,15 @@ m4_include([m4/ax_prefix_config_h.m4])
 AC_INIT([cliauth], 0.1.1, [bradleycha@proton.me])
 
 AC_CONFIG_SRCDIR([src/cliauth/cliauth.h])
-AC_CONFIG_AUX_DIR([build])
-AC_CONFIG_HEADERS([build/config.h])
+AC_CONFIG_AUX_DIR([configdir])
+AC_CONFIG_HEADERS([configdir/config.h])
 
 AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([-Wall -Werror subdir-objects])
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_MACRO_DIRS([build/m4])
-AX_PREFIX_CONFIG_H(build/cliauth/config.h)
+AC_CONFIG_MACRO_DIRS([configdir/m4])
+AX_PREFIX_CONFIG_H(configdir/cliauth/config.h)
 
 AC_PROG_CC
 AM_PROG_AR
